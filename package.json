@@ -1,0 +1,40 @@
+{
+  "name": "computer-installation-guide",
+  "version": "1.0.0",
+  "description": "xlcig",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build",
+    "build:generate": "cd frontend && npm run generate",
+    "build:static": "cd frontend && npm run generate",
+    "deploy:static": "npm run build:static && ./build-and-deploy.sh",
+    "deploy:static:win": "npm run build:static && PowerShell -ExecutionPolicy Bypass -File build-and-deploy.ps1",
+    "docker:build": "docker-compose -f docker-compose.prod.yml build --no-cache",
+    "docker:up": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:down": "docker-compose -f docker-compose.prod.yml down",
+    "docker:logs": "docker-compose -f docker-compose.prod.yml logs -f",
+    "docker:restart": "docker-compose -f docker-compose.prod.yml restart",
+    "docker:deploy": "./docker-build.sh",
+    "docker:deploy:win": "PowerShell -ExecutionPolicy Bypass -File docker-build.ps1",
+    "docker:push": "chmod +x docker-push.sh && ./docker-push.sh",
+    "docker:push:win": "PowerShell -ExecutionPolicy Bypass -File docker-push.ps1",
+    "docker:server:deploy": "chmod +x server-deploy.sh && ./server-deploy.sh",
+    "docker:server:up": "docker-compose -f docker-compose.server.yml up -d",
+    "docker:server:down": "docker-compose -f docker-compose.server.yml down",
+    "docker:server:logs": "docker-compose -f docker-compose.server.yml logs -f",
+    "start": "cd backend && npm run start",
+    "start:prod": "pm2 start ecosystem.config.js",
+    "stop:prod": "pm2 stop ecosystem.config.js",
+    "restart:prod": "pm2 restart ecosystem.config.js",
+    "deploy": "npm run build && npm run start:prod"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "pm2": "^5.3.0"
+  }
+} 

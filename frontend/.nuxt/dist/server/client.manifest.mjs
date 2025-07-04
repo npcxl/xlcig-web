@@ -1,0 +1,1 @@
+export { default } from "file:///D:/codeGitee/xlcig-web/frontend/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"

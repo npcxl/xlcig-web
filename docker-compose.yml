@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/docker/mysql/data:/var/lib/mysql
+      - /home/docker/mysql/conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: "G547M!tv#APV77PBjz=~"
+      MYSQL_DATABASE: "cig"
+      MYSQL_USER: "fishing"
+      MYSQL_PASSWORD: "w98?tp7q,Z2cN.kE)-!4"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
