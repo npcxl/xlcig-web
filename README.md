@@ -10,7 +10,10 @@
 
 ## 更新日志
 - [点击查看](https://gitee.com/leheya/xlweb/blob/master/CHANGELOG.md)
+
+## 🔗 项目链接
 - [后端直达](https://gitee.com/leheya/xlcigbackend)
+
 ## ✨ 项目特色
 - 🎨 **现代化UI设计** - 深色主题，玻璃拟态效果，响应式布局
 - ⚡ **高性能架构** - Nuxt 3 + Vue 3 + TypeScript，SSR/SPA混合渲染
