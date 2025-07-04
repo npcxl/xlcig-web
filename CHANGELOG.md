@@ -8,7 +8,7 @@
 ## [未发布]
 
 ### 待完成
-- [ ] 为解决SSR渲染冲突的问题将babylonjs替换使用 Three.js 重新实现 3D 加载动画
+- [ ] 替换 Babylon.js 为 Three.js 重新实现 3D 加载动画（解决 SSR 渲染冲突问题）
 - [ ] 优化 SSR 兼容性
 ---
 

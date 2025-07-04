@@ -8,8 +8,10 @@
 
 > 🚀 基于 Nuxt 3 构建的现代化PC硬件电商平台，提供完整的产品展示、购物车、订单管理等功能。
 
+## 更新日志
+- [点击查看](https://gitee.com/leheya/xlweb/blob/master/CHANGELOG.md)
+- [后端直达](https://gitee.com/leheya/xlcigbackend)
 ## ✨ 项目特色
-
 - 🎨 **现代化UI设计** - 深色主题，玻璃拟态效果，响应式布局
 - ⚡ **高性能架构** - Nuxt 3 + Vue 3 + TypeScript，SSR/SPA混合渲染
 - 🛒 **完整电商功能** - 产品展示、购物车、订单管理、用户认证
