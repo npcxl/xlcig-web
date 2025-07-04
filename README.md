@@ -1,5 +1,5 @@
-# xlCig - 现代化PC硬件电商平台
-在线地址 xlcig.cn
+#  - 现代化PC硬件电商平台
+在线地址 https://xlCig.cn
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Nuxt 3](https://img.shields.io/badge/Nuxt-3.x-00DC82.svg)](https://nuxt.com/)
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-4FC08D.svg)](https://vuejs.org/)
