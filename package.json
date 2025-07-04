@@ -1,40 +1,29 @@
 {
-  "name": "computer-installation-guide",
-  "version": "1.0.0",
-  "description": "xlcig",
+  "name": "pc-guide-frontend",
+  "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
-    "build": "cd frontend && npm run build",
-    "build:generate": "cd frontend && npm run generate",
-    "build:static": "cd frontend && npm run generate",
-    "deploy:static": "npm run build:static && ./build-and-deploy.sh",
-    "deploy:static:win": "npm run build:static && PowerShell -ExecutionPolicy Bypass -File build-and-deploy.ps1",
-    "docker:build": "docker-compose -f docker-compose.prod.yml build --no-cache",
-    "docker:up": "docker-compose -f docker-compose.prod.yml up -d",
-    "docker:down": "docker-compose -f docker-compose.prod.yml down",
-    "docker:logs": "docker-compose -f docker-compose.prod.yml logs -f",
-    "docker:restart": "docker-compose -f docker-compose.prod.yml restart",
-    "docker:deploy": "./docker-build.sh",
-    "docker:deploy:win": "PowerShell -ExecutionPolicy Bypass -File docker-build.ps1",
-    "docker:push": "chmod +x docker-push.sh && ./docker-push.sh",
-    "docker:push:win": "PowerShell -ExecutionPolicy Bypass -File docker-push.ps1",
-    "docker:server:deploy": "chmod +x server-deploy.sh && ./server-deploy.sh",
-    "docker:server:up": "docker-compose -f docker-compose.server.yml up -d",
-    "docker:server:down": "docker-compose -f docker-compose.server.yml down",
-    "docker:server:logs": "docker-compose -f docker-compose.server.yml logs -f",
-    "start": "cd backend && npm run start",
-    "start:prod": "pm2 start ecosystem.config.js",
-    "stop:prod": "pm2 stop ecosystem.config.js",
-    "restart:prod": "pm2 restart ecosystem.config.js",
-    "deploy": "npm run build && npm run start:prod"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@nuxt/devtools": "latest",
+    "nuxt": "^3.8.0"
   },
   "dependencies": {
-    "pm2": "^5.3.0"
+    "@babylonjs/core": "^8.15.1",
+    "@babylonjs/loaders": "^8.15.1",
+    "@babylonjs/materials": "^8.15.1",
+    "@nuxtjs/tailwindcss": "^6.8.4",
+    "@pinia/nuxt": "^0.11.1",
+    "@types/three": "^0.178.0",
+    "axios": "^1.6.2",
+    "bootstrap-icons": "^1.11.2",
+    "naive-ui": "^2.34.4",
+    "pinia": "^3.0.3",
+    "three": "^0.178.0",
+    "vueuc": "^0.4.64"
   }
-} 
+}
