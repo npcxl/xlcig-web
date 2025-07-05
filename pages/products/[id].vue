@@ -1,38 +1,29 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-    <!-- 背景装饰效果 -->
+
     <div class="fixed inset-0 pointer-events-none">
       <div class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow"></div>
     </div>
-
+   
     <!-- 导航栏 -->
-    <nav class="relative z-10">
-      <div class="container mx-auto px-6 py-6">
-        <div class="glass-card-dark rounded-2xl p-6 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-              <!-- Logo -->
-              <AppLogo size="medium" :show-decorations="false" />
-              <div class="h-6 w-px bg-gray-600"></div>
-              <button @click="$router.go(-1)" 
-                      class="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors duration-200">
-                <i class="bi bi-arrow-left mr-2 text-lg"></i>
-                <span class="text-sm font-medium">返回</span>
-              </button>
-            </div>
-            <nav class="text-sm text-gray-400">
-              <NuxtLink to="/" class="hover:text-cyan-400">首页</NuxtLink>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400"></i>
-              <NuxtLink to="/products" class="hover:text-cyan-400">产品中心</NuxtLink>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400"></i>
-              <span class="text-white font-medium">{{ product?.name || '产品详情' }}</span>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <AppHeader 
+      :show-back-button="false"
+      :show-nav-menu="false"
+      :show-breadcrumb="true"
+      :show-location="false"
+      :show-search-button="false"
+      :show-notification-button="false"
+      :show-decorations="false"
+      logo-size="medium"
+      :current-page-title="product?.name || '产品详情'"
+      :breadcrumb-items="[
+        { label: '首页', path: '/' },
+        { label: '产品中心', path: '/products' },
+        { label: product?.name || '产品详情' }
+      ]"
+    />
 
     <!-- 主要内容 -->
     <div class="container mx-auto px-6 py-8 relative z-10" v-if="product && !loading && !error">
@@ -231,23 +222,40 @@
               </div>
             </div>
 
+            <!-- 未登录提示 -->
+            <div v-if="!userStore.isLoggedIn" class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl backdrop-blur-sm">
+              <div class="flex items-center gap-2 text-yellow-400 mb-2">
+                <i class="bi bi-info-circle"></i>
+                <span class="font-medium">购买提示</span>
+              </div>
+              <p class="text-yellow-300 text-sm">
+                <NuxtLink to="/auth/login" class="text-yellow-400 hover:text-yellow-300 underline font-medium">登录</NuxtLink> 
+                后即可将商品添加到购物车，享受更便捷的购物体验。
+              </p>
+            </div>
+
             <!-- 购买按钮 - 增强版 -->
             <div class="space-y-4 mb-8">
               <button @click="addToCart" 
-                      :disabled="!product.inStock || showSuccessMessage"
+                      :disabled="!product.inStock || showSuccessMessage || isAddingToCart || !userStore.isLoggedIn"
                       data-add-to-cart
                       class="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:via-blue-500 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <i class="bi bi-cart-plus text-xl"></i>
-                <span>{{ product.inStock ? '加入购物车' : '暂时缺货' }}</span>
+                <div v-if="isAddingToCart" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <i v-else class="bi bi-cart-plus text-xl"></i>
+                <span v-if="!userStore.isLoggedIn">请先登录</span>
+                <span v-else-if="!product.inStock">暂时缺货</span>
+                <span v-else-if="isAddingToCart">添加中...</span>
+                <span v-else>加入购物车</span>
               </button>
 
               <button @click="buyNow" 
-                      :disabled="!product.inStock"
+                      :disabled="!product.inStock || !userStore.isLoggedIn"
                       class="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-500 hover:via-emerald-500 hover:to-green-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 <i class="bi bi-lightning-fill text-xl"></i>
-                <span>立即购买</span>
+                <span v-if="!userStore.isLoggedIn">请先登录</span>
+                <span v-else>立即购买</span>
               </button>
             </div>
 
@@ -309,42 +317,101 @@
         </h2>
         
         <!-- 评价统计 - 增强版 -->
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div v-if="reviewStats" class="grid md:grid-cols-2 gap-8 mb-8">
           <div class="text-center p-6 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-400/30">
-            <div class="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-4">{{ product.rating }}</div>
+            <div class="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-4">{{ reviewStats.average_rating }}</div>
             <div class="flex justify-center mb-4">
               <i v-for="i in 5" :key="i" 
-                 :class="i <= product.rating ? 'text-yellow-400' : 'text-gray-600'"
+                 :class="i <= Math.round(reviewStats.average_rating) ? 'text-yellow-400' : 'text-gray-600'"
                  class="bi bi-star-fill text-2xl drop-shadow-lg"></i>
             </div>
-            <div class="text-gray-300 text-lg">基于 <span class="text-yellow-400 font-bold">{{ product.reviewCount }}</span> 条评价</div>
+            <div class="text-gray-300 text-lg">基于 <span class="text-yellow-400 font-bold">{{ reviewStats.total_reviews }}</span> 条评价</div>
           </div>
           
           <div class="space-y-4">
-            <div v-for="(count, rating) in ratingDistribution" :key="rating" 
+            <div v-for="item in reviewStats.rating_distribution" :key="item.rating" 
                  class="flex items-center gap-4">
-              <span class="text-white w-12 flex-shrink-0 font-bold">{{ rating }}星</span>
+              <span class="text-white w-12 flex-shrink-0 font-bold">{{ item.rating }}星</span>
               <div class="flex-1 bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm border border-gray-600/30">
                 <div class="bg-gradient-to-r from-yellow-400 to-orange-400 h-3 rounded-full transition-all duration-500 hover:shadow-lg hover:shadow-yellow-500/30" 
-                     :style="{ width: `${Math.min((count / product.reviewCount) * 100, 100)}%` }"></div>
+                     :style="{ width: `${item.percentage}%` }"></div>
               </div>
-              <span class="text-gray-400 w-16 text-sm flex-shrink-0 font-medium">{{ count }} 条</span>
+              <span class="text-gray-400 w-16 text-sm flex-shrink-0 font-medium">{{ item.count }} 条</span>
             </div>
           </div>
         </div>
+        
+        <!-- 加载中状态 -->
+        <div v-else-if="isLoadingReviews" class="text-center py-8">
+          <div class="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p class="text-gray-300">正在加载评论统计...</p>
+        </div>
+
+        <!-- 发表评论组件 -->
+        <div class="mb-8">
+          <ReviewForm 
+            v-if="product" 
+            :product-id="product.id" 
+            @review-submitted="handleReviewSubmitted" />
+        </div>
+
+        <!-- 评论筛选和排序 -->
+        <div class="flex flex-wrap gap-4 mb-6">
+          <select v-model="reviewFilters.rating" @change="handleFilterChange" 
+                  class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
+            <option value="all">所有评分</option>
+            <option value="5">5星</option>
+            <option value="4">4星</option>
+            <option value="3">3星</option>
+            <option value="2">2星</option>
+            <option value="1">1星</option>
+          </select>
+          
+          <select v-model="reviewFilters.sort" @change="handleFilterChange"
+                  class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
+            <option value="newest">最新发布</option>
+            <option value="oldest">最早发布</option>
+            <option value="rating_high">评分从高到低</option>
+            <option value="rating_low">评分从低到高</option>
+            <option value="helpful">最有帮助</option>
+          </select>
+        </div>
 
         <!-- 评价列表 - 增强版 -->
-        <div class="space-y-6">
+        <div v-if="!isLoadingReviews && reviews.length > 0" class="space-y-6">
           <div v-for="review in reviews" :key="review.id" 
                class="p-6 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-sm">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full flex items-center justify-center border border-cyan-400/40 shadow-lg">
-                  <i class="bi bi-person-fill text-cyan-400 text-xl"></i>
+                <!-- 用户头像 -->
+                <div class="w-14 h-14 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full flex items-center justify-center border border-cyan-400/40 shadow-lg overflow-hidden">
+                  <img v-if="review.user_info?.avatar && !review.is_anonymous" 
+                       :src="review.user_info.avatar" 
+                       :alt="review.author"
+                       class="w-full h-full object-cover">
+                  <i v-else class="bi bi-person-fill text-cyan-400 text-xl"></i>
                 </div>
                 <div>
-                  <div class="font-bold text-white text-lg">{{ review.author }}</div>
-                  <div class="text-sm text-gray-400">{{ formatDate(review.date) }}</div>
+                  <div class="flex items-center gap-2">
+                    <!-- 显示用户名或匿名 -->
+                    <div class="font-bold text-white text-lg">
+                      {{ review.is_anonymous ? '匿名用户' : (review.user_info?.nickname || review.author) }}
+                    </div>
+                    <!-- 匿名标识 -->
+                    <span v-if="review.is_anonymous" 
+                          class="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded-full border border-gray-400/30">
+                      <i class="bi bi-incognito mr-1"></i>
+                      匿名
+                    </span>
+                    <!-- 已验证购买标识 -->
+                    <span v-if="review.verified_purchase" 
+                          class="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-400/30">
+                      <i class="bi bi-check-circle mr-1"></i>
+                      已购买
+                    </span>
+
+                  </div>
+                  <div class="text-sm text-gray-400">{{ formatDate(review.created_at) }}</div>
                 </div>
               </div>
               <div class="flex gap-1">
@@ -353,11 +420,70 @@
                    class="bi bi-star-fill text-lg drop-shadow-lg"></i>
               </div>
             </div>
-            <p class="text-gray-300 leading-relaxed text-lg">{{ review.comment }}</p>
+            <p class="text-gray-300 leading-relaxed text-lg mb-4">{{ review.comment }}</p>
+            
+            <!-- 评论图片 -->
+            <div v-if="review.images && review.images.length > 0" class="grid grid-cols-3 gap-2 mb-4">
+              <img v-for="(image, index) in review.images" :key="index"
+                   :src="image" :alt="`评论图片${index + 1}`"
+                   class="w-full h-20 object-cover rounded-lg border border-gray-600/30">
+            </div>
+            
+            <!-- 点赞功能 -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-700/50">
+              <span class="text-gray-400 text-sm">这条评论有帮助吗？</span>
+              <div class="flex items-center gap-4">
+                <button @click="toggleReviewHelpful(review.id, true)"
+                        class="flex items-center gap-2 px-3 py-1 text-gray-400 hover:text-green-400 transition-colors duration-200">
+                  <i class="bi bi-hand-thumbs-up"></i>
+                  <span>有帮助 ({{ review.helpful_count || 0 }})</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+        
+        <!-- 无评论状态 -->
+        <div v-else-if="!isLoadingReviews && reviews.length === 0" class="text-center py-12">
+          <div class="text-4xl text-gray-400 mb-4">
+            <i class="bi bi-chat-dots"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-2">暂无评论</h3>
+          <p class="text-gray-400 mb-6">成为第一个评价此产品的用户</p>
+        </div>
+        
+                 <!-- 评论加载中 -->
+         <div v-else-if="isLoadingReviews" class="text-center py-8">
+           <div class="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+           <p class="text-gray-300">正在加载评论...</p>
+         </div>
+         
+         <!-- 评论分页 -->
+         <div v-if="!isLoadingReviews && reviews.length > 0" class="mt-8 flex justify-center">
+           <div class="flex items-center gap-2">
+             <button 
+               @click="goToPage(currentPage - 1)" 
+               :disabled="currentPage <= 1"
+               class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+               <i class="bi bi-chevron-left"></i>
+               上一页
+             </button>
+             
+             <span class="px-4 py-2 text-gray-300">
+               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
+             </span>
+             
+             <button 
+               @click="goToPage(currentPage + 1)" 
+               :disabled="currentPage >= totalPages"
+               class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+               下一页
+               <i class="bi bi-chevron-right"></i>
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
 
     <!-- 错误状态 - 深色主题 -->
     <div v-else-if="error && !loading" class="container mx-auto px-6 py-20 relative z-10">
@@ -446,8 +572,19 @@
 const route = useRoute()
 const productId = parseInt(route.params.id)
 
-// 导入API
-import { productsApi, cartApi } from '~/utils/api'
+// 导入API和stores
+import { productsApi } from '~/utils/api'
+import { cartApi } from '~/utils/api/cart'
+import { reviewsApi } from '~/utils/api/reviews'
+import { useUserStore } from '~/stores/user'
+import { createDiscreteApi } from 'naive-ui'
+import ReviewForm from '~/components/ReviewForm.vue'
+
+// 使用stores
+const userStore = useUserStore()
+
+// 创建消息API
+const { message } = createDiscreteApi(['message'])
 
 // 响应式数据
 const product = ref(null)
@@ -456,6 +593,19 @@ const isFavorite = ref(false)
 const showSuccessMessage = ref(false)
 const loading = ref(true)
 const error = ref(null)
+const isAddingToCart = ref(false)
+
+// 评论相关数据
+const reviews = ref([])
+const reviewStats = ref(null)
+const isLoadingReviews = ref(false)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const pageSize = 5 // 每页显示5条评论
+const reviewFilters = ref({
+  rating: 'all',
+  sort: 'newest'
+})
 
 // 撒花批次管理
 const confettiBatches = ref([])
@@ -477,39 +627,46 @@ const getProductCategory = (category) => {
   return categories[category] || '硬件'
 }
 
-// 评价分布数据
-const ratingDistribution = ref({
-  5: 856,
-  4: 234,
-  3: 98,
-  2: 45,
-  1: 23
-})
-
-// 用户评价数据
-const reviews = ref([
-  {
-    id: 1,
-    author: '王先生',
-    rating: 5,
-    date: '2024-01-15',
-    comment: '性能绝对令人难以置信！这个硬件在各种应用下都表现出色。运行稳定，性价比很高。'
-  },
-  {
-    id: 2,
-    author: '李女士',
-    rating: 5,
-    date: '2024-01-10',
-    comment: '非常适合专业工作和娱乐使用。质量很好，安装简单，效果显著。'
-  },
-  {
-    id: 3,
-    author: '张先生',
-    rating: 4,
-    date: '2024-01-05',
-    comment: '很棒的产品，性能强劲。运行时有一些发热，需要注意散热，但总体性能非常满意！'
+// 加载评论数据
+const loadReviews = async () => {
+  if (!product.value) return
+  
+  try {
+    isLoadingReviews.value = true
+    
+    // 获取评论列表
+    const reviewsResponse = await reviewsApi.getProductReviews(product.value.id, {
+      page: currentPage.value,
+      limit: pageSize,
+      rating: reviewFilters.value.rating === 'all' ? undefined : parseInt(reviewFilters.value.rating),
+      sort: reviewFilters.value.sort
+    })
+    
+    if (reviewsResponse.success) {
+      reviews.value = reviewsResponse.data.reviews
+      // 更新分页信息
+      totalPages.value = reviewsResponse.data.pagination.total_pages
+    }
+    
+    // 获取评论统计
+    const statsResponse = await reviewsApi.getProductReviewStats(product.value.id)
+    if (statsResponse.success) {
+      reviewStats.value = statsResponse.data
+    }
+  } catch (err) {
+    console.error('加载评论失败:', err)
+  } finally {
+    isLoadingReviews.value = false
   }
-])
+}
+
+// 分页导航
+const goToPage = async (page) => {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return
+  
+  currentPage.value = page
+  await loadReviews()
+}
 
 // 获取产品详情
 const loadProductDetail = async () => {
@@ -547,11 +704,11 @@ const loadProductDetail = async () => {
         model: apiProduct.model
       }
       
-      // 根据真实评价数量更新评价分布
-      updateRatingDistribution(apiProduct.review_count, parseFloat(apiProduct.rating))
-      
       // 检查收藏状态
       checkFavoriteStatus()
+      
+      // 加载评论数据
+      await loadReviews()
     } else {
       error.value = '产品不存在或已下架'
     }
@@ -579,25 +736,45 @@ const getCategoryFromId = (categoryId) => {
   return categoryMap[categoryId] || 'hardware'
 }
 
-// 根据评价数量和平均评分更新评价分布
-const updateRatingDistribution = (totalReviews, avgRating) => {
-  // 根据平均评分生成合理的评价分布
-  const total = totalReviews
-  const distribution = {
-    5: Math.round(total * 0.6),
-    4: Math.round(total * 0.25),
-    3: Math.round(total * 0.1),
-    2: Math.round(total * 0.03),
-    1: Math.round(total * 0.02)
+// 评论点赞功能
+const toggleReviewHelpful = async (reviewId, helpful) => {
+  if (!userStore.isLoggedIn) {
+    message.warning('请先登录后再进行操作')
+    return
   }
   
-  // 确保总数正确
-  const sum = Object.values(distribution).reduce((a, b) => a + b, 0)
-  if (sum !== total) {
-    distribution[5] += total - sum
+  try {
+    const response = await reviewsApi.toggleReviewHelpful(reviewId, helpful)
+    if (response.success) {
+      // 更新本地数据
+      const review = reviews.value.find(r => r.id === reviewId)
+      if (review) {
+        review.helpful_count += helpful ? 1 : -1
+        review.helpful_count = Math.max(0, review.helpful_count)
+      }
+      message.success(helpful ? '点赞成功' : '取消点赞成功')
+    }
+  } catch (err) {
+    console.error('点赞操作失败:', err)
+    message.error('操作失败，请重试')
   }
+}
+
+// 处理评论提交
+const handleReviewSubmitted = () => {
+  // 重置到第一页并重新加载评论数据
+  currentPage.value = 1
+  loadReviews()
   
-  ratingDistribution.value = distribution
+  // 显示成功消息
+  message.success('感谢您的评价！评论已发布')
+}
+
+// 处理筛选器变化
+const handleFilterChange = async () => {
+  // 重置到第一页
+  currentPage.value = 1
+  await loadReviews()
 }
 
 // 检查收藏状态
@@ -631,26 +808,23 @@ const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value
 }
 
-// 动态添加到购物车
+// 添加到购物车
 const addToCart = async () => {
-  if (!product.value || !product.value.inStock || showSuccessMessage.value) return
+  if (!product.value || !product.value.inStock || showSuccessMessage.value || isAddingToCart.value) return
+  
+  // 检查用户登录状态
+  if (!userStore.isLoggedIn) {
+    // 未登录用户跳转到登录页面
+    navigateTo('/auth/login')
+    return
+  }
   
   try {
-    // 添加视觉反馈：按钮禁用状态
-    const button = document.querySelector('[data-add-to-cart]')
-    if (button) {
-      button.disabled = true
-      button.classList.add('opacity-50', 'cursor-not-allowed')
-    }
+    isAddingToCart.value = true
     
     const cartData = {
       productId: product.value.id,
-      quantity: quantity.value,
-      specs: {
-        name: product.value.name,
-        model: product.value.model,
-        sku: product.value.sku
-      }
+      quantity: quantity.value
     }
     
     const response = await cartApi.addToCart(cartData)
@@ -659,58 +833,55 @@ const addToCart = async () => {
       showSuccessMessage.value = true
       playSuccessSound()
       
-      // 同时更新本地存储作为备份
-      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]')
-      const existingItem = cartItems.find(item => item.id === productId)
-      
-      if (existingItem) {
-        existingItem.quantity += quantity.value
-      } else {
-        cartItems.push({
-          ...product.value,
-          quantity: quantity.value
-        })
-      }
-      
-      localStorage.setItem('cartItems', JSON.stringify(cartItems))
+      // 显示成功消息
+      console.log('商品已成功添加到购物车')
     } else {
       throw new Error(response.message || '添加到购物车失败')
     }
   } catch (err) {
     console.error('添加到购物车失败:', err)
     
-    // 如果API失败，回退到本地存储
-    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]')
-    const existingItem = cartItems.find(item => item.id === productId)
-    
-    if (existingItem) {
-      existingItem.quantity += quantity.value
+    // 显示错误消息
+    if (err.message) {
+      message.error('添加失败：' + err.message)
     } else {
-      cartItems.push({
-        ...product.value,
-        quantity: quantity.value
-      })
+      message.error('添加到购物车失败，请重试')
     }
-    
-    localStorage.setItem('cartItems', JSON.stringify(cartItems))
-    showSuccessMessage.value = true
-    playSuccessSound()
   } finally {
-    // 恢复按钮状态
-    setTimeout(() => {
-      const button = document.querySelector('[data-add-to-cart]')
-      if (button) {
-        button.disabled = false
-        button.classList.remove('opacity-50', 'cursor-not-allowed')
-      }
-    }, 1000)
+    isAddingToCart.value = false
   }
 }
 
 const buyNow = async () => {
-  await addToCart()
-  if (showSuccessMessage.value) {
-    navigateTo('/checkout')
+  // 检查用户登录状态
+  if (!userStore.isLoggedIn) {
+    navigateTo('/auth/login')
+    return
+  }
+  
+  if (!product.value || !product.value.inStock) return
+  
+  try {
+    // 直接添加到购物车并跳转到结算页面
+    const cartData = {
+      productId: product.value.id,
+      quantity: quantity.value
+    }
+    
+    const response = await cartApi.addToCart(cartData)
+    
+    if (response.success) {
+      message.success('商品已添加到购物车，正在跳转到结算页面...')
+      // 延迟跳转，让用户看到成功消息
+      setTimeout(() => {
+        navigateTo('/checkout')
+      }, 1000)
+    } else {
+      throw new Error(response.message || '添加到购物车失败')
+    }
+  } catch (err) {
+    console.error('立即购买失败:', err)
+    message.error('购买失败：' + (err.message || '请重试'))
   }
 }
 

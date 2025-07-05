@@ -1,13 +1,16 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-    <!-- 背景装饰效果 -->
+
+    <LoadingScreen :show="isPostLoginLoading" />
+
+
     <div class="fixed inset-0 pointer-events-none">
       <div class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow"></div>
     </div>
 
-    <!-- 导航栏 -->
+ 
     <nav class="relative z-10 w-full px-6 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
@@ -23,7 +26,7 @@
       </div>
     </nav>
 
-    <!-- 主要内容 -->
+
     <div class="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] px-6">
       <div class="w-full max-w-md">
         <!-- Logo和标题 -->
@@ -100,13 +103,15 @@
             <!-- 登录按钮 -->
             <button 
               type="submit"
-              :disabled="loading"
+              :disabled="loading || isPostLoginLoading"
               class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              <div v-if="loading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div v-if="loading || isPostLoginLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <i v-else class="bi bi-box-arrow-in-right text-lg"></i>
-              {{ loading ? '登录中...' : '立即登录' }}
+              {{ getLoginButtonText() }}
             </button>
           </form>
+
+
 
           <!-- 分割线 -->
           <div class="relative my-6">
@@ -166,13 +171,18 @@ import { api } from '../../utils/api'
 import type { UserLoginInput } from '../../utils/api'
 import { useUserStore } from '../../stores/user'
 import { useAddressStore } from '../../stores/address'
+import { useLocation } from '../../composables/useLocation'
 
 // 使用Pinia stores
 const userStore = useUserStore()
 const addressStore = useAddressStore()
 
+// 使用IP定位功能
+const { fetchLocation } = useLocation()
+
 // 响应式数据
 const loading = ref(false)
+const isPostLoginLoading = ref(false)
 const showPassword = ref(false)
 const rememberMe = ref(false)
 
@@ -189,12 +199,73 @@ const message = ref({
   text: ''
 })
 
+// 计算登录按钮文本
+const getLoginButtonText = () => {
+  if (loading.value) return '登录中...'
+  if (isPostLoginLoading.value) return '正在初始化...'
+  return '立即登录'
+}
+
 // 显示消息提示
 const showMessage = (type: 'success' | 'error', text: string) => {
   message.value = { show: true, type, text }
   setTimeout(() => {
     message.value.show = false
   }, 5000)
+}
+
+// 初始化用户数据
+const initializeUserData = async () => {
+  const tasks = [
+    {
+      name: '初始化用户信息',
+      action: async () => {
+        // 用户信息已经在setAuth中设置，这里可以获取更多用户相关信息
+        // 如果需要额外的用户信息接口，可以在这里调用
+        await new Promise(resolve => setTimeout(resolve, 500)) // 模拟API调用
+      }
+    },
+    {
+      name: '初始化收货地址',
+      action: async () => {
+        try {
+          await addressStore.initializeAddresses()
+        } catch (error) {
+          console.error('初始化地址数据失败:', error)
+          // 地址初始化失败不影响登录流程
+        }
+      }
+    },
+    {
+      name: '获取位置信息',
+      action: async () => {
+        try {
+          // 获取用户当前位置信息
+          await fetchLocation(true)
+        } catch (error) {
+          console.error('获取位置信息失败:', error)
+          // 位置信息获取失败不影响登录流程
+        }
+      }
+    },
+    {
+      name: '同步用户配置',
+      action: async () => {
+        try {
+          // 这里可以添加同步用户配置的逻辑
+          // 例如：用户偏好设置、购物车数据等
+          await new Promise(resolve => setTimeout(resolve, 300)) // 模拟API调用
+        } catch (error) {
+          console.error('同步用户配置失败:', error)
+        }
+      }
+    }
+  ]
+
+  // 依次执行各个初始化任务
+  for (const task of tasks) {
+    await task.action()
+  }
 }
 
 // 处理登录
@@ -204,30 +275,40 @@ const handleLogin = async () => {
     const response = await api.auth.login(loginForm)
     
     if (response.data) {
-      // 使用Pinia store保存用户信息和token（自动同步到localStorage）
+      // 保存用户信息和token
       userStore.setAuth(response.data.token, response.data.user)
       
-      // 登录成功后，后台初始化地址数据
+      showMessage('success', '登录成功！正在初始化用户数据...')
+      
+      // 开始登录后的数据初始化
+      isPostLoginLoading.value = true
+      loading.value = false
+      
       try {
-        await addressStore.initializeAddresses()
-      } catch (error) {
-        console.error('初始化地址数据失败:', error)
-        // 地址初始化失败不影响登录流程，用户可以在需要时手动添加地址
-      }
-      
-      showMessage('success', '登录成功！正在跳转...')
-      
-      // 延迟跳转，让用户看到成功提示
-      setTimeout(() => {
-        // 使用window.location.href进行跳转
+        await initializeUserData()
+        
+        // 所有初始化完成后跳转
+        await new Promise(resolve => setTimeout(resolve, 500)) // 短暂延迟
+        
+        // 跳转到首页
         window.location.href = '/'
-      }, 1000)
+        
+      } catch (error) {
+        console.error('用户数据初始化失败:', error)
+        isPostLoginLoading.value = false
+        showMessage('error', '数据初始化失败，但登录成功，正在跳转...')
+        
+        // 即使初始化失败也跳转，用户可以在需要时手动刷新
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 2000)
+      }
     }
   } catch (error: any) {
     console.error('登录失败:', error)
-    showMessage('error', error.message || '登录失败，请检查账号和密码')
-  } finally {
     loading.value = false
+    isPostLoginLoading.value = false
+    showMessage('error', error.message || '登录失败，请检查账号和密码')
   }
 }
 </script>

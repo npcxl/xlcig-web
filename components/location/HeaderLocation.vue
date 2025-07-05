@@ -9,52 +9,10 @@
       >
         <i class="bi bi-geo-alt location-icon"></i>
         <span class="location-text">{{ getLocationText() }}</span>
-        <i class="bi bi-chevron-down detail-icon" :class="{ 'rotate-180': showDetails }"></i>
+       
       </button>
       
-      <!-- 详细信息下拉框 -->
-      <div v-if="showDetails" class="location-details">
-        <div class="detail-item">
-          <span class="detail-label">IP:</span>
-          <span class="detail-value">{{ currentIp }}</span>
-        </div>
-        <div class="detail-item" v-if="data?.location?.province">
-          <span class="detail-label">省份:</span>
-          <span class="detail-value">{{ data.location.province }}</span>
-        </div>
-        <div class="detail-item" v-if="data?.location?.city">
-          <span class="detail-label">城市:</span>
-          <span class="detail-value">{{ data.location.city }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">状态:</span>
-          <span class="detail-value">
-            <span v-if="data?.cached" class="cache-tag">缓存</span>
-            <span v-else class="live-tag">实时</span>
-          </span>
-        </div>
-        <!-- 位置信息不精确提示 -->
-        <div v-if="data?.location && !data.location.province && !data.location.city" 
-             class="detail-info">
-          <div class="info-text">
-            <i class="bi bi-info-circle text-yellow-500"></i>
-            <span>位置信息可能不够精确</span>
-          </div>
-          <div class="info-detail">
-            可能原因：移动网络、代理等
-          </div>
-        </div>
-        <div class="detail-actions">
-          <button 
-            @click="refreshLocation(true)" 
-            :disabled="loading"
-            class="refresh-btn"
-          >
-            <i class="bi bi-arrow-clockwise" :class="{ 'animate-spin': loading }"></i>
-            刷新
-          </button>
-        </div>
-      </div>
+   
     </div>
     
     <!-- 获取中状态 -->
@@ -272,7 +230,7 @@ onUnmounted(() => {
   backdrop-filter: blur(20px);
   overflow: hidden;
   animation: slideDown 0.2s ease;
-  z-index: 1001;
+  z-index: 999999;
 }
 
 .detail-item {

@@ -1,23 +1,48 @@
 import { apiClient } from '../apiClient'
 import type { ApiResponse } from '../../types/api'
 
-// 购物车项目类型
+// 购物车项目类型 - 匹配后端数据结构
 export interface CartItem {
   id: number
-  productId: number
-  configId?: number
-  name: string
-  image: string
-  price: number
-  originalPrice?: number
+  user_id: number
+  product_id: number
   quantity: number
-  stock: number
   selected: boolean
-  specs?: Record<string, any>
-  features?: string[]
-  description?: string
-  createdAt: string
-  updatedAt: string
+  
+  // 产品快照信息
+  product_snapshot: any
+  
+  // 常用字段
+  product_name: string
+  product_brand?: string
+  product_category?: string
+  product_price: number
+  product_original_price?: number
+  product_image?: string
+  product_sku?: string
+  product_model?: string
+  product_slug?: string
+  
+  // 库存状态
+  in_stock: boolean
+  stock_count?: number
+  
+  // 评价信息
+  rating?: number
+  review_count?: number
+  view_count?: number
+  sales?: number
+  
+  // 产品规格等
+  specs?: any
+  features?: any
+  tags?: any
+  images?: any
+  
+  // 时间戳
+  created_at: string
+  updated_at: string
+  product_updated_at?: string
 }
 
 // 购物车统计信息
@@ -29,21 +54,43 @@ export interface CartSummary {
   savings: number
   shippingFee: number
   finalPrice: number
+  selectedItemsCount: number
+  outOfStockCount: number
+  availableCount: number
 }
 
 // 添加到购物车的数据
 export interface AddToCartData {
-  productId?: number
-  configId?: number
-  quantity: number
-  specs?: Record<string, any>
+  productId: number
+  quantity?: number
 }
 
 // 更新购物车项目数据
 export interface UpdateCartItemData {
   quantity?: number
   selected?: boolean
-  specs?: Record<string, any>
+}
+
+// 库存检查结果
+export interface StockCheckResult {
+  available: CartItem[]
+  outOfStock: CartItem[]
+  insufficient: CartItem[]
+  updated: CartItem[]
+  summary: {
+    total: number
+    availableCount: number
+    outOfStockCount: number
+    insufficientCount: number
+    updatedCount: number
+  }
+}
+
+// 运费估算结果
+export interface ShippingEstimate {
+  standard: { fee: number; days: string }
+  express: { fee: number; days: string }
+  overnight: { fee: number; days: string }
 }
 
 // 购物车相关API
@@ -57,20 +104,12 @@ export const cartApi = {
     apiClient.get('/cart/summary'),
 
   // 添加商品到购物车
-  addToCart: (data: AddToCartData): Promise<ApiResponse<CartItem>> => 
+  addToCart: (data: AddToCartData): Promise<ApiResponse<any>> => 
     apiClient.post('/cart', data),
 
-  // 批量添加商品到购物车
-  batchAddToCart: (items: AddToCartData[]): Promise<ApiResponse<CartItem[]>> => 
-    apiClient.post('/cart/batch', { items }),
-
   // 更新购物车项目
-  updateCartItem: (id: number, data: UpdateCartItemData): Promise<ApiResponse<CartItem>> => 
+  updateCartItem: (id: number, data: UpdateCartItemData): Promise<ApiResponse<any>> => 
     apiClient.put(`/cart/${id}`, data),
-
-  // 批量更新购物车项目
-  batchUpdateCartItems: (updates: { id: number, data: UpdateCartItemData }[]): Promise<ApiResponse<CartItem[]>> => 
-    apiClient.put('/cart/batch', { updates }),
 
   // 删除购物车项目
   removeCartItem: (id: number): Promise<ApiResponse<void>> => 
@@ -85,49 +124,28 @@ export const cartApi = {
     apiClient.delete('/cart/clear'),
 
   // 选择/取消选择购物车项目
-  toggleCartItemSelection: (id: number, selected: boolean): Promise<ApiResponse<CartItem>> => 
+  toggleCartItemSelection: (id: number, selected: boolean): Promise<ApiResponse<any>> => 
     apiClient.patch(`/cart/${id}/select`, { selected }),
 
   // 全选/取消全选购物车项目
-  toggleAllCartItems: (selected: boolean): Promise<ApiResponse<CartItem[]>> => 
+  toggleAllCartItems: (selected: boolean): Promise<ApiResponse<any>> => 
     apiClient.patch('/cart/select-all', { selected }),
 
-  // 移动到收藏夹
-  moveToWishlist: (id: number): Promise<ApiResponse<void>> => 
-    apiClient.post(`/cart/${id}/move-to-wishlist`),
-
-  // 从收藏夹移动到购物车
-  moveFromWishlist: (productId: number, quantity: number = 1): Promise<ApiResponse<CartItem>> => 
-    apiClient.post('/cart/from-wishlist', { productId, quantity }),
-
   // 检查库存状态
-  checkStock: (): Promise<ApiResponse<{
-    available: CartItem[]
-    outOfStock: CartItem[]
-    insufficient: CartItem[]
-  }>> => 
+  checkStock: (): Promise<ApiResponse<StockCheckResult>> => 
     apiClient.get('/cart/check-stock'),
 
-  // 获取推荐商品（基于购物车内容）
+  // 刷新购物车产品信息
+  refreshCartItems: (productIds?: number[]): Promise<ApiResponse<{ updated: number }>> => 
+    apiClient.post('/cart/refresh', { productIds }),
+
+  // 获取推荐商品
   getRecommendations: (limit: number = 8): Promise<ApiResponse<any[]>> => 
     apiClient.get(`/cart/recommendations?limit=${limit}`),
 
-  // 同步本地购物车到服务器
-  syncLocalCart: (localCartItems: Omit<AddToCartData, 'id'>[]): Promise<ApiResponse<CartItem[]>> => 
-    apiClient.post('/cart/sync', { items: localCartItems }),
-
-  // 获取购物车商品的优惠券
-  getAvailableCoupons: (): Promise<ApiResponse<{
-    id: number
-    code: string
-    name: string
-    type: 'percentage' | 'fixed' | 'shipping'
-    value: number
-    minAmount: number
-    maxDiscount?: number
-    expiresAt: string
-  }[]>> => 
-    apiClient.get('/cart/coupons'),
+  // 预估运费
+  estimateShipping: (data?: any): Promise<ApiResponse<ShippingEstimate>> => 
+    apiClient.post('/cart/estimate-shipping', data),
 
   // 应用优惠券
   applyCoupon: (couponCode: string): Promise<ApiResponse<{
@@ -139,21 +157,7 @@ export const cartApi = {
 
   // 移除优惠券
   removeCoupon: (): Promise<ApiResponse<CartSummary>> => 
-    apiClient.delete('/cart/coupon'),
-
-  // 预估运费
-  estimateShipping: (addressId?: number, address?: {
-    province: string
-    city: string
-    district: string
-  }): Promise<ApiResponse<{
-    standard: { fee: number, days: string }
-    express: { fee: number, days: string }
-    overnight: { fee: number, days: string }
-  }>> => {
-    const params = addressId ? { addressId } : address
-    return apiClient.post('/cart/estimate-shipping', params)
-  }
+    apiClient.delete('/cart/coupon')
 }
 
 export default cartApi 

@@ -41,23 +41,23 @@ export const useUserStore = defineStore('user', {
     // 初始化用户状态（从localStorage加载）
     async initializeAuth() {
       return new Promise<void>((resolve) => {
-        if (typeof window !== 'undefined') {
-          try {
-            const token = localStorage.getItem('authToken')
-            const userInfo = localStorage.getItem('userInfo')
-            
-            if (token && userInfo) {
-              this.token = token
-              this.user = JSON.parse(userInfo)
-              this.isLoggedIn = true
-            } else {
-              this.clearAuth()
-            }
-          } catch (error) {
-            console.error('初始化用户状态失败:', error)
+      if (typeof window !== 'undefined') {
+        try {
+          const token = localStorage.getItem('authToken')
+          const userInfo = localStorage.getItem('userInfo')
+          
+          if (token && userInfo) {
+            this.token = token
+            this.user = JSON.parse(userInfo)
+            this.isLoggedIn = true
+          } else {
             this.clearAuth()
           }
+        } catch (error) {
+          console.error('初始化用户状态失败:', error)
+          this.clearAuth()
         }
+      }
         this.isInitialized = true
         resolve()
       })

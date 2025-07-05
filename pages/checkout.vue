@@ -1,13 +1,15 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-    <!-- 背景装饰效果 -->
+
     <div class="fixed inset-0 pointer-events-none">
       <div class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow"></div>
     </div>
 
-    <!-- 统一导航栏 -->
+    <!-- 页面加载中 -->
+    <LoadingScreen v-if="isLoadingCart && !cartItems.length" />
+
     <AppHeader 
       :show-back-button="false"
       :show-nav-menu="false"
@@ -36,7 +38,14 @@
             </div>
             
             <div class="p-8">
-              <div v-if="cartItems.length === 0" class="text-center py-12">
+              <!-- 购物车加载中 -->
+              <div v-if="isLoadingCart" class="text-center py-12">
+                <div class="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-gray-300">正在加载购物车...</p>
+              </div>
+
+              <!-- 购物车为空 -->
+              <div v-else-if="cartItems.length === 0" class="text-center py-12">
                 <div class="text-6xl mb-4 text-gray-500">
                   <i class="bi bi-cart-x"></i>
                 </div>
@@ -49,23 +58,24 @@
                 </NuxtLink>
               </div>
 
+              <!-- 购物车商品列表 -->
               <div v-else class="space-y-6">
                 <div v-for="item in cartItems" :key="item.id" 
                      class="flex items-center gap-6 p-6 bg-gray-800/30 rounded-2xl border border-gray-700/30 hover:border-cyan-500/50 transition-colors duration-300">
                   <!-- 产品图片 -->
                   <div class="w-24 h-24 bg-gray-700/50 rounded-lg overflow-hidden">
-                    <img :src="item.image" :alt="item.name" class="w-full h-full object-contain p-2">
+                    <img :src="item.product_image" :alt="item.product_name" class="w-full h-full object-contain p-2">
                   </div>
                   
                   <!-- 产品信息 -->
                   <div class="flex-1">
-                    <h3 class="font-semibold text-white text-lg mb-1">{{ item.name }}</h3>
-                    <p class="text-gray-400 text-sm mb-2">{{ item.brand }}</p>
+                    <h3 class="font-semibold text-white text-lg mb-1">{{ item.product_name }}</h3>
+                    <p class="text-gray-400 text-sm mb-2">{{ item.product_brand }}</p>
                     <div class="flex items-center gap-4">
-                      <span class="text-2xl font-bold text-cyan-400">¥{{ item.price.toLocaleString() }}</span>
-                      <span v-if="item.originalPrice && item.originalPrice > item.price" 
+                      <span class="text-2xl font-bold text-cyan-400">¥{{ item.product_price.toLocaleString() }}</span>
+                      <span v-if="item.product_original_price && item.product_original_price > item.product_price" 
                             class="text-sm text-gray-500 line-through">
-                        ¥{{ item.originalPrice.toLocaleString() }}
+                        ¥{{ item.product_original_price.toLocaleString() }}
                       </span>
                     </div>
                   </div>
@@ -526,6 +536,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { createDiscreteApi } from 'naive-ui'
 import { useUserStore } from '../stores/user'
 import { useAddressStore } from '../stores/address'
+import { cartApi } from '../utils/api/cart'
 
 // 创建消息API
 const { message } = createDiscreteApi(['message'])
@@ -549,6 +560,7 @@ const warning = (content) => {
 
 // 响应式数据
 const cartItems = ref([])
+const isLoadingCart = ref(false)
 const isProcessing = ref(false)
 const showSuccessModal = ref(false)
 const orderNumber = ref('')
@@ -616,7 +628,7 @@ const paymentMethods = ref([
 
 // 计算属性
 const subtotal = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  return cartItems.value.reduce((sum, item) => sum + (item.product_price * item.quantity), 0)
 })
 
 const shipping = computed(() => {
@@ -647,45 +659,98 @@ const canSubmitOrder = computed(() => {
   }
 })
 
-// 方法
-const addToCart = (product, quantity = 1) => {
-  const existingItem = cartItems.value.find(item => item.id === product.id)
-  if (existingItem) {
-    existingItem.quantity += quantity
-  } else {
-    cartItems.value.push({ ...product, quantity })
-  }
-  localStorage.setItem('cartItems', JSON.stringify(cartItems.value))
-}
-
-const removeFromCart = (productId) => {
-  cartItems.value = cartItems.value.filter(item => item.id !== productId)
-  localStorage.setItem('cartItems', JSON.stringify(cartItems.value))
-}
-
-const increaseQuantity = (productId) => {
-  const item = cartItems.value.find(item => item.id === productId)
-  if (item) {
-    item.quantity++
-    localStorage.setItem('cartItems', JSON.stringify(cartItems.value))
+// 购物车相关方法
+const loadCartItems = async () => {
+  if (!userStore.isLoggedIn) return
+  
+  try {
+    isLoadingCart.value = true
+    const response = await cartApi.getCartItems()
+    if (response.success) {
+      cartItems.value = response.data
+    } else {
+      error(response.message || '获取购物车失败')
+    }
+  } catch (err) {
+    console.error('加载购物车失败:', err)
+    error('加载购物车失败，请重试')
+  } finally {
+    isLoadingCart.value = false
   }
 }
 
-const decreaseQuantity = (productId) => {
-  const item = cartItems.value.find(item => item.id === productId)
-  if (item && item.quantity > 1) {
-    item.quantity--
-    localStorage.setItem('cartItems', JSON.stringify(cartItems.value))
+const removeFromCart = async (cartItemId) => {
+  if (!userStore.isLoggedIn) return
+  
+  try {
+    const response = await cartApi.removeCartItem(cartItemId)
+    if (response.success) {
+      cartItems.value = cartItems.value.filter(item => item.id !== cartItemId)
+      success('商品已从购物车移除')
+    } else {
+      error(response.message || '删除失败')
+    }
+  } catch (err) {
+    console.error('删除购物车项目失败:', err)
+    error('删除失败，请重试')
   }
 }
 
-const applyCoupon = () => {
-  // 模拟优惠码验证
-  const validCoupons = ['SAVE10', 'WELCOME20', 'TECH15']
-  if (validCoupons.includes(couponCode.value.toUpperCase())) {
-    appliedCoupon.value = couponCode.value.toUpperCase()
-    success('优惠券使用成功！')
-  } else {
+const increaseQuantity = async (cartItemId) => {
+  if (!userStore.isLoggedIn) return
+  
+  const item = cartItems.value.find(item => item.id === cartItemId)
+  if (!item) return
+  
+  try {
+    const response = await cartApi.updateCartItem(cartItemId, {
+      quantity: item.quantity + 1
+    })
+    if (response.success) {
+      item.quantity = response.data.quantity
+    } else {
+      error(response.message || '更新数量失败')
+    }
+  } catch (err) {
+    console.error('更新购物车数量失败:', err)
+    error('更新失败，请重试')
+  }
+}
+
+const decreaseQuantity = async (cartItemId) => {
+  if (!userStore.isLoggedIn) return
+  
+  const item = cartItems.value.find(item => item.id === cartItemId)
+  if (!item || item.quantity <= 1) return
+  
+  try {
+    const response = await cartApi.updateCartItem(cartItemId, {
+      quantity: item.quantity - 1
+    })
+    if (response.success) {
+      item.quantity = response.data.quantity
+    } else {
+      error(response.message || '更新数量失败')
+    }
+  } catch (err) {
+    console.error('更新购物车数量失败:', err)
+    error('更新失败，请重试')
+  }
+}
+
+const applyCoupon = async () => {
+  if (!userStore.isLoggedIn) return
+  
+  try {
+    const response = await cartApi.applyCoupon(couponCode.value)
+    if (response.success) {
+      appliedCoupon.value = couponCode.value
+      success('优惠券使用成功！')
+    } else {
+      error(response.message || '优惠券代码无效')
+    }
+  } catch (err) {
+    console.error('应用优惠券失败:', err)
     error('优惠券代码无效')
   }
 }
@@ -745,8 +810,10 @@ const submitOrder = async () => {
     orderNumber.value = 'ORD' + Date.now().toString().slice(-8)
     
     // 清空购物车
+    if (userStore.isLoggedIn) {
+      await cartApi.clearCart()
+    }
     cartItems.value = []
-    localStorage.removeItem('cartItems')
     
     // 显示成功弹窗
     showSuccessModal.value = true
@@ -772,14 +839,11 @@ const continueShopping = () => {
 
 // 初始化数据
 const initializeData = async () => {
-  // 加载购物车数据
-  const savedCartItems = localStorage.getItem('cartItems')
-  if (savedCartItems) {
-    cartItems.value = JSON.parse(savedCartItems)
-  }
-  
-  // 如果用户已登录，初始化地址数据
+  // 如果用户已登录，从接口加载购物车数据
   if (userStore.isLoggedIn) {
+    await loadCartItems()
+    
+    // 初始化地址数据
     try {
       await addressStore.initializeAddresses()
       
@@ -792,6 +856,9 @@ const initializeData = async () => {
     } catch (error) {
       console.error('初始化地址失败:', error)
     }
+  } else {
+    // 未登录用户提示登录
+    warning('请登录后查看购物车')
   }
 }
 

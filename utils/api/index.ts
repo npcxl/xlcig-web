@@ -21,6 +21,7 @@ import { addressApi } from './addresses'
 import { uploadApi } from './upload'
 import LocationApi from './location'
 import { cartApi } from './cart'
+import { reviewsApi } from './reviews'
 
 // 导出各业务API模块
 export { authApi } from './auth'
@@ -33,6 +34,7 @@ export { systemApi } from './system'
 export { addressApi } from './addresses'
 export { uploadApi } from './upload'
 export { cartApi } from './cart'
+export { reviewsApi } from './reviews'
 export { default as locationApi } from './location'
 
 // 导出额外类型
@@ -53,6 +55,7 @@ export const api = {
   addresses: addressApi,
   upload: uploadApi,
   cart: cartApi,
+  reviews: reviewsApi,
   location: LocationApi
 }
 

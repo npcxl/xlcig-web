@@ -248,6 +248,134 @@
                   </div>
                 </form>
               </div>
+
+              <!-- 我的评论 -->
+              <div v-if="activeTab === 'reviews'" class="space-y-6 animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="bi bi-chat-dots text-cyan-400"></i>
+                    我的评论
+                  </h3>
+                  <p class="text-gray-400">管理您发表的所有评论</p>
+                </div>
+                
+                <!-- 评论统计 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                  <div class="glass-morphism-dark rounded-lg p-6 border border-gray-700/50 text-center">
+                    <div class="text-3xl font-bold text-cyan-400 mb-2">{{ reviewsCount || 0 }}</div>
+                    <div class="text-gray-300">评论总数</div>
+                  </div>
+                  <div class="glass-morphism-dark rounded-lg p-6 border border-gray-700/50 text-center">
+                    <div class="text-3xl font-bold text-yellow-400 mb-2">{{ averageRating || 0 }}</div>
+                    <div class="text-gray-300">平均评分</div>
+                  </div>
+                  <div class="glass-morphism-dark rounded-lg p-6 border border-gray-700/50 text-center">
+                    <div class="text-3xl font-bold text-green-400 mb-2">{{ helpfulCount || 0 }}</div>
+                    <div class="text-gray-300">获得点赞</div>
+                  </div>
+                </div>
+                
+                <!-- 评论列表 -->
+                <div class="space-y-4">
+                  <div v-if="loadingReviews" class="text-center py-8">
+                    <div class="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="text-gray-300">正在加载评论...</p>
+                  </div>
+                  
+                  <div v-else-if="userReviews.length > 0" class="space-y-4">
+                    <div v-for="review in userReviews" :key="review.id"
+                         class="glass-morphism-dark rounded-lg p-6 border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300">
+                      <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-4">
+                          <!-- 产品图片 -->
+                          <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-700/50">
+                            <img v-if="review.product_images && review.product_images.length > 0" 
+                                 :src="review.product_images[0]" 
+                                 :alt="review.product_name" 
+                                 class="w-full h-full object-cover">
+                            <div v-else class="w-full h-full flex items-center justify-center">
+                              <i class="bi bi-image text-gray-500 text-xl"></i>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 class="font-bold text-white text-lg">{{ review.product_name || '产品已下架' }}</h4>
+                            <p class="text-gray-400 text-sm">{{ formatDate(review.created_at) }}</p>
+                            <!-- 显示评论者信息 -->
+                            <div class="flex items-center gap-2 mt-1">
+                              <span v-if="review.is_anonymous" class="text-xs px-2 py-1 bg-gray-600/50 text-gray-300 rounded">
+                                <i class="bi bi-incognito mr-1"></i>
+                                匿名发表
+                              </span>
+                              <span v-else class="text-xs px-2 py-1 bg-blue-600/30 text-blue-300 rounded">
+                                <i class="bi bi-person mr-1"></i>
+                                {{ review.user_info?.nickname || review.author }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <div class="flex">
+                            <i v-for="i in 5" :key="i" 
+                               :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-600'"
+                               class="bi bi-star-fill text-sm"></i>
+                          </div>
+                          <span class="text-white font-medium">{{ review.rating }}</span>
+                        </div>
+                      </div>
+                      
+                      <p class="text-gray-300 mb-4">{{ review.comment }}</p>
+                      
+                      <!-- 评论图片 -->
+                      <div v-if="review.images && review.images.length > 0" class="grid grid-cols-3 gap-2 mb-4">
+                        <img v-for="(image, index) in review.images" :key="index"
+                             :src="image" :alt="`评论图片${index + 1}`"
+                             class="w-full h-20 object-cover rounded-lg border border-gray-600/30">
+                      </div>
+                      
+                      <div class="flex items-center justify-between pt-4 border-t border-gray-700/50">
+                        <div class="flex items-center gap-4 text-sm text-gray-400">
+                          <span class="flex items-center gap-1">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                            {{ review.helpful_count || 0 }} 人觉得有帮助
+                          </span>
+                          <span v-if="review.verified_purchase" class="text-green-400">
+                            <i class="bi bi-check-circle"></i>
+                            已验证购买
+                          </span>
+                          <span class="text-gray-500">
+                            状态: {{ getReviewStatusText(review.status) }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <button @click="editReview(review)" 
+                                  class="px-3 py-1 text-cyan-400 hover:text-cyan-300 transition-colors duration-200">
+                            <i class="bi bi-pencil mr-1"></i>
+                            编辑
+                          </button>
+                          <button @click="deleteReview(review.id)" 
+                                  class="px-3 py-1 text-red-400 hover:text-red-300 transition-colors duration-200">
+                            <i class="bi bi-trash mr-1"></i>
+                            删除
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div v-else class="text-center py-12">
+                    <div class="text-4xl text-gray-400 mb-4">
+                      <i class="bi bi-chat-dots"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">暂无评论</h3>
+                    <p class="text-gray-400 mb-6">您还没有发表过任何评论</p>
+                    <NuxtLink to="/products" 
+                              class="inline-flex items-center px-6 py-3 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-500 transition-all duration-300">
+                      <i class="bi bi-plus-circle mr-2"></i>
+                      去购买商品
+                    </NuxtLink>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -340,7 +468,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { usePageLoader, pageLoaderPresets } from '../composables/usePageLoader'
 import { api } from '../utils/api'
 import { uploadApi } from '../utils/api/upload'
@@ -371,6 +499,13 @@ const uploadingAvatar = ref(false)
 const avatarPreview = ref<string | null>(null)
 const selectedFile = ref<File | null>(null)
 const activeTab = ref('info')
+
+// 评论相关数据
+const userReviews = ref<any[]>([])
+const reviewsCount = ref(0)
+const averageRating = ref(0)
+const helpfulCount = ref(0)
+const loadingReviews = ref(false)
 
 // 获取用户信息
 const fetchUserInfo = async () => {
@@ -425,7 +560,8 @@ const {
 const tabs = [
   { key: 'info', label: '基本信息', icon: 'bi bi-person' },
   { key: 'edit', label: '编辑资料', icon: 'bi bi-pencil-square' },
-  { key: 'password', label: '修改密码', icon: 'bi bi-shield-lock' }
+  { key: 'password', label: '修改密码', icon: 'bi bi-shield-lock' },
+  { key: 'reviews', label: '我的评论', icon: 'bi bi-chat-dots' }
 ]
 
 // 编辑表单
@@ -610,6 +746,71 @@ const formatDate = (dateString?: string) => {
   if (!dateString) return ''
   return new Date(dateString).toLocaleDateString('zh-CN')
 }
+
+// 加载用户评论
+const loadUserReviews = async () => {
+  try {
+    loadingReviews.value = true
+    const response = await api.reviews.getMyReviews()
+    if (response.data) {
+      userReviews.value = response.data.reviews
+      reviewsCount.value = response.data.pagination.total_items
+      // 计算平均评分
+      if (response.data.reviews.length > 0) {
+        const totalRating = response.data.reviews.reduce((sum, review) => sum + review.rating, 0)
+        averageRating.value = Math.round((totalRating / response.data.reviews.length) * 10) / 10
+      }
+      // 计算获得点赞数
+      helpfulCount.value = response.data.reviews.reduce((sum, review) => sum + review.helpful_count, 0)
+    }
+  } catch (error) {
+    console.error('加载用户评论失败:', error)
+  } finally {
+    loadingReviews.value = false
+  }
+}
+
+// 编辑评论
+const editReview = (review: any) => {
+  // 这里可以跳转到编辑页面或者弹出编辑弹窗
+  console.log('编辑评论:', review)
+  // 实际实现可以是跳转到专门的编辑页面
+  // $router.push(`/my-reviews/${review.id}/edit`)
+}
+
+// 删除评论
+const deleteReview = async (reviewId: number) => {
+  try {
+    const confirmed = confirm('确定要删除这条评论吗？')
+    if (!confirmed) return
+    
+    await api.reviews.deleteReview(reviewId)
+    success('评论删除成功')
+    
+    // 重新加载评论列表
+    await loadUserReviews()
+  } catch (error) {
+    console.error('删除评论失败:', error)
+    error('删除评论失败，请重试')
+  }
+}
+
+// 获取评论状态文本
+const getReviewStatusText = (status) => {
+  const statusMap = {
+    'pending': '待审核',
+    'approved': '已通过',
+    'rejected': '已拒绝'
+  }
+  return statusMap[status] || '未知'
+}
+
+// 监听activeTab变化，当切换到评论标签时加载评论
+watch(activeTab, (newTab) => {
+  if (newTab === 'reviews') {
+    loadUserReviews()
+  }
+})
 </script>
 
 <style scoped>
