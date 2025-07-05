@@ -2,9 +2,6 @@
   "name": "pc-guide-frontend",
   "private": true,
   "type": "module",
-  "imports": {
-    "#internal/nuxt/paths": "./node_modules/nuxt/dist/app/index.mjs"
-  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",

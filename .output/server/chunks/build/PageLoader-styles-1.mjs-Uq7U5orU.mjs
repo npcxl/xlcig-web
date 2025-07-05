@@ -1,4 +1,0 @@
-const PageLoader_vue_vue_type_style_index_0_scoped_5e630c98_lang = ".glass-card-dark[data-v-5e630c98]{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:#1f2937cc}.page-loader-container[data-v-5e630c98]{min-height:100vh;position:relative;width:100%}.error-state[data-v-5e630c98]{animation:fadeIn-5e630c98 .3s ease-in-out;height:100vh;left:0;position:fixed;top:0;width:100vw;z-index:9999}.page-ready[data-v-5e630c98]{animation:fadeIn-5e630c98 .5s ease-in-out}@keyframes fadeIn-5e630c98{0%{opacity:0}to{opacity:1}}";
-
-export { PageLoader_vue_vue_type_style_index_0_scoped_5e630c98_lang as P };
-//# sourceMappingURL=PageLoader-styles-1.mjs-Uq7U5orU.mjs.map
