@@ -111,6 +111,7 @@ declare global {
   const tryUseNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt')['tryUseNuxtApp']
   const unref: typeof import('../../node_modules/vue')['unref']
   const updateAppConfig: typeof import('../../node_modules/nuxt/dist/app/config')['updateAppConfig']
+  const useAddressStore: typeof import('../../stores/address')['useAddressStore']
   const useAppConfig: typeof import('../../node_modules/nuxt/dist/app/config')['useAppConfig']
   const useAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']
   const useAttrs: typeof import('../../node_modules/vue')['useAttrs']
@@ -207,6 +208,9 @@ declare global {
   // @ts-ignore
   export type { Province, City, Area, RegionItem } from '../../utils/regions'
   import('../../utils/regions')
+  // @ts-ignore
+  export type { AddressState } from '../../stores/address'
+  import('../../stores/address')
   // @ts-ignore
   export type { UserState } from '../../stores/user'
   import('../../stores/user')
@@ -325,6 +329,7 @@ declare module 'vue' {
     readonly tryUseNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['tryUseNuxtApp']>
     readonly unref: UnwrapRef<typeof import('../../node_modules/vue')['unref']>
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['updateAppConfig']>
+    readonly useAddressStore: UnwrapRef<typeof import('../../stores/address')['useAddressStore']>
     readonly useAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['useAppConfig']>
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>
     readonly useAttrs: UnwrapRef<typeof import('../../node_modules/vue')['useAttrs']>

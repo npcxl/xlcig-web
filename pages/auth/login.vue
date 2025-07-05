@@ -165,9 +165,11 @@ import { ref, reactive } from 'vue'
 import { api } from '../../utils/api'
 import type { UserLoginInput } from '../../utils/api'
 import { useUserStore } from '../../stores/user'
+import { useAddressStore } from '../../stores/address'
 
-// 使用Pinia store
+// 使用Pinia stores
 const userStore = useUserStore()
+const addressStore = useAddressStore()
 
 // 响应式数据
 const loading = ref(false)
@@ -204,6 +206,14 @@ const handleLogin = async () => {
     if (response.data) {
       // 使用Pinia store保存用户信息和token（自动同步到localStorage）
       userStore.setAuth(response.data.token, response.data.user)
+      
+      // 登录成功后，后台初始化地址数据
+      try {
+        await addressStore.initializeAddresses()
+      } catch (error) {
+        console.error('初始化地址数据失败:', error)
+        // 地址初始化失败不影响登录流程，用户可以在需要时手动添加地址
+      }
       
       showMessage('success', '登录成功！正在跳转...')
       

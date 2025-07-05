@@ -93,74 +93,147 @@
             </div>
           </div>
 
-          <!-- 用户信息表单 -->
+          <!-- 收货地址 -->
           <div v-if="cartItems.length > 0" class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
             <div class="px-8 py-6 border-b border-gray-700/50">
               <h2 class="text-3xl font-bold text-white flex items-center gap-3">
-                <i class="bi bi-person text-cyan-400"></i>
-                客户信息
+                <i class="bi bi-geo-alt text-cyan-400"></i>
+                收货地址
               </h2>
             </div>
             
             <div class="p-8">
-              <form @submit.prevent="submitOrder" class="space-y-6">
+              <!-- 登录用户的地址管理 -->
+              <div v-if="userStore.isLoggedIn">
+                <!-- 地址加载中 -->
+                <div v-if="addressStore.isLoading" class="text-center py-8">
+                  <div class="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p class="text-gray-300">正在加载地址信息...</p>
+                </div>
+
+                <!-- 用户有地址时显示地址选择 -->
+                <div v-else-if="addressStore.hasAddresses" class="space-y-6">
+                  <!-- 地址列表 -->
+                  <div class="space-y-4">
+                    <div v-for="address in addressStore.addresses" :key="address.id" 
+                         class="border-2 rounded-xl p-6 transition-all duration-300 cursor-pointer"
+                         :class="selectedAddressId === address.id 
+                           ? 'border-cyan-500 bg-cyan-500/10' 
+                           : 'border-gray-600/50 hover:border-cyan-500/50'"
+                         @click="selectAddress(address.id)">
+                      <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                          <div class="flex items-center gap-3 mb-2">
+                            <h3 class="font-semibold text-white">{{ address.name }}</h3>
+                            <span class="text-gray-300">{{ address.phone }}</span>
+                            <span v-if="address.is_default" 
+                                  class="px-2 py-1 bg-cyan-500 text-white text-xs rounded-full">
+                              默认
+                            </span>
+                          </div>
+                          <p class="text-gray-300">
+                            {{ address.province }} {{ address.city }} {{ address.district }} {{ address.detail }}
+                          </p>
+                          <p v-if="address.postal_code" class="text-gray-400 text-sm mt-1">
+                            邮编：{{ address.postal_code }}
+                          </p>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="bi bi-check-circle text-cyan-400 text-xl" 
+                             v-if="selectedAddressId === address.id"></i>
+                          <i class="bi bi-circle text-gray-400 text-xl" 
+                             v-else></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 添加新地址按钮 -->
+                  <button @click="showAddAddressModal = true" 
+                          class="w-full py-3 border-2 border-dashed border-gray-600 hover:border-cyan-500 text-gray-300 hover:text-cyan-400 rounded-xl transition-colors duration-300 flex items-center justify-center gap-2">
+                    <i class="bi bi-plus-circle"></i>
+                    添加新地址
+                  </button>
+                </div>
+
+                <!-- 用户没有地址时显示添加地址 -->
+                <div v-else class="text-center py-8">
+                  <div class="text-4xl text-gray-400 mb-4">
+                    <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold text-white mb-2">暂无收货地址</h3>
+                  <p class="text-gray-400 mb-6">添加收货地址以完成订单</p>
+                  <button @click="showAddAddressModal = true" 
+                          class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium transition-colors duration-300">
+                    <i class="bi bi-plus-circle mr-2"></i>
+                    添加收货地址
+                  </button>
+                </div>
+              </div>
+
+              <!-- 未登录用户的地址表单 -->
+              <div v-else class="space-y-6">
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                  <div class="flex items-center gap-2 text-yellow-400">
+                    <i class="bi bi-info-circle"></i>
+                    <span class="font-medium">提示</span>
+                  </div>
+                  <p class="text-yellow-300 text-sm mt-1">
+                    <NuxtLink to="/auth/login" class="text-yellow-400 hover:text-yellow-300 underline">登录</NuxtLink> 
+                    后可以保存地址，方便下次购物
+                  </p>
+                </div>
+
                 <div class="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">姓氏</label>
-                    <input v-model="customerInfo.firstName" 
-                           type="text" required placeholder="请输入姓氏"
+                    <label class="block text-sm font-medium text-white mb-2">收货人姓名</label>
+                    <input v-model="guestAddressForm.name" 
+                           type="text" required placeholder="请输入收货人姓名"
                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">名字</label>
-                    <input v-model="customerInfo.lastName" 
-                           type="text" required placeholder="请输入名字"
+                    <label class="block text-sm font-medium text-white mb-2">手机号码</label>
+                    <input v-model="guestAddressForm.phone" 
+                           type="tel" required placeholder="请输入手机号码"
                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
                   </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-white mb-2">电子邮箱</label>
-                  <input v-model="customerInfo.email" 
-                         type="email" required placeholder="请输入邮箱地址"
-                         class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-white mb-2">手机号码</label>
-                  <input v-model="customerInfo.phone" 
-                         type="tel" required placeholder="请输入手机号码"
-                         class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-white mb-2">收货地址</label>
-                  <textarea v-model="customerInfo.address" 
-                            required rows="3" placeholder="请输入详细收货地址"
-                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 resize-none"></textarea>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6">
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">城市</label>
-                    <input v-model="customerInfo.city" 
-                           type="text" required placeholder="请输入城市"
-                           class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
-                  </div>
-                  <div>
                     <label class="block text-sm font-medium text-white mb-2">省份</label>
-                    <input v-model="customerInfo.state" 
+                    <input v-model="guestAddressForm.province" 
                            type="text" required placeholder="请输入省份"
                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">邮政编码</label>
-                    <input v-model="customerInfo.zipCode" 
-                           type="text" required placeholder="请输入邮编"
+                    <label class="block text-sm font-medium text-white mb-2">城市</label>
+                    <input v-model="guestAddressForm.city" 
+                           type="text" required placeholder="请输入城市"
+                           class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-white mb-2">区县</label>
+                    <input v-model="guestAddressForm.district" 
+                           type="text" required placeholder="请输入区县"
                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
                   </div>
                 </div>
-              </form>
+
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">详细地址</label>
+                  <textarea v-model="guestAddressForm.detail" 
+                            required rows="3" placeholder="请输入详细地址"
+                            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 resize-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">邮政编码（可选）</label>
+                  <input v-model="guestAddressForm.postal_code" 
+                         type="text" placeholder="请输入邮政编码"
+                         class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -296,12 +369,18 @@
               <!-- 下单按钮 -->
               <button v-if="cartItems.length > 0" 
                       @click="submitOrder" 
-                      :disabled="isProcessing"
+                      :disabled="isProcessing || !canSubmitOrder"
                       class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white py-3 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:cursor-not-allowed">
                 <i v-if="!isProcessing" class="bi bi-credit-card"></i>
                 <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 {{ isProcessing ? '处理中...' : '确认下单' }}
               </button>
+
+              <!-- 订单验证提示 -->
+              <div v-if="!canSubmitOrder && cartItems.length > 0" class="text-red-400 text-sm text-center">
+                <i class="bi bi-exclamation-triangle mr-1"></i>
+                请完善收货地址信息
+              </div>
 
               <!-- 安全保障 -->
               <div class="text-center pt-6 border-t border-gray-700/50">
@@ -322,6 +401,98 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加地址弹窗 -->
+    <div v-if="showAddAddressModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+              <i class="bi bi-geo-alt text-cyan-400"></i>
+              添加收货地址
+            </h3>
+            <button @click="closeAddAddressModal" class="text-gray-400 hover:text-white">
+              <i class="bi bi-x-lg text-2xl"></i>
+            </button>
+          </div>
+          
+          <form @submit.prevent="addNewAddress" class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">收货人姓名 *</label>
+                <input v-model="newAddressForm.name" 
+                       type="text" required placeholder="请输入收货人姓名"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">手机号码 *</label>
+                <input v-model="newAddressForm.phone" 
+                       type="tel" required placeholder="请输入手机号码"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">省份 *</label>
+                <input v-model="newAddressForm.province" 
+                       type="text" required placeholder="请输入省份"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">城市 *</label>
+                <input v-model="newAddressForm.city" 
+                       type="text" required placeholder="请输入城市"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">区县 *</label>
+                <input v-model="newAddressForm.district" 
+                       type="text" required placeholder="请输入区县"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-cyan-400 mb-2">详细地址 *</label>
+              <textarea v-model="newAddressForm.detail" 
+                        required rows="3" placeholder="请输入详细地址"
+                        class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400 resize-none"></textarea>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-cyan-400 mb-2">邮政编码</label>
+                <input v-model="newAddressForm.postal_code" 
+                       type="text" placeholder="请输入邮政编码（可选）"
+                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-white placeholder-gray-400">
+              </div>
+              <div class="flex items-end">
+                <label class="flex items-center space-x-2">
+                  <input v-model="newAddressForm.is_default" 
+                         type="checkbox" 
+                         class="w-4 h-4 text-cyan-500 bg-transparent border-2 border-cyan-500 rounded focus:ring-cyan-500">
+                  <span class="text-sm text-gray-300">设为默认地址</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-6">
+              <button type="button" @click="closeAddAddressModal" 
+                      class="px-6 py-3 border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 rounded-lg font-medium transition-colors duration-300">
+                取消
+              </button>
+              <button type="submit" :disabled="addingAddress"
+                      class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center gap-2">
+                <div v-if="addingAddress" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <i v-else class="bi bi-check-circle"></i>
+                {{ addingAddress ? '添加中...' : '添加地址' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -353,9 +524,15 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { createDiscreteApi } from 'naive-ui'
+import { useUserStore } from '../stores/user'
+import { useAddressStore } from '../stores/address'
 
 // 创建消息API
 const { message } = createDiscreteApi(['message'])
+
+// 使用 Pinia stores
+const userStore = useUserStore()
+const addressStore = useAddressStore()
 
 // 消息函数
 const success = (content) => {
@@ -375,17 +552,31 @@ const cartItems = ref([])
 const isProcessing = ref(false)
 const showSuccessModal = ref(false)
 const orderNumber = ref('')
+const selectedAddressId = ref(null)
+const showAddAddressModal = ref(false)
+const addingAddress = ref(false)
 
-// 客户信息
-const customerInfo = ref({
-  firstName: '',
-  lastName: '',
-  email: '',
+// 游客地址表单
+const guestAddressForm = ref({
+  name: '',
   phone: '',
-  address: '',
+  province: '',
   city: '',
-  state: '',
-  zipCode: ''
+  district: '',
+  detail: '',
+  postal_code: ''
+})
+
+// 新地址表单
+const newAddressForm = ref({
+  name: '',
+  phone: '',
+  province: '',
+  city: '',
+  district: '',
+  detail: '',
+  postal_code: '',
+  is_default: false
 })
 
 // 支付信息
@@ -440,6 +631,22 @@ const total = computed(() => {
   return subtotal.value + shipping.value + tax.value
 })
 
+// 检查是否可以提交订单
+const canSubmitOrder = computed(() => {
+  if (userStore.isLoggedIn) {
+    // 登录用户需要选择地址
+    return selectedAddressId.value !== null
+  } else {
+    // 游客需要填写地址信息
+    return guestAddressForm.value.name && 
+           guestAddressForm.value.phone && 
+           guestAddressForm.value.province && 
+           guestAddressForm.value.city && 
+           guestAddressForm.value.district && 
+           guestAddressForm.value.detail
+  }
+})
+
 // 方法
 const addToCart = (product, quantity = 1) => {
   const existingItem = cartItems.value.find(item => item.id === product.id)
@@ -477,14 +684,56 @@ const applyCoupon = () => {
   const validCoupons = ['SAVE10', 'WELCOME20', 'TECH15']
   if (validCoupons.includes(couponCode.value.toUpperCase())) {
     appliedCoupon.value = couponCode.value.toUpperCase()
-    // 这里可以添加折扣逻辑
+    success('优惠券使用成功！')
   } else {
     error('优惠券代码无效')
   }
 }
 
+// 地址相关方法
+const selectAddress = (addressId) => {
+  selectedAddressId.value = addressId
+}
+
+const addNewAddress = async () => {
+  if (!userStore.isLoggedIn) return
+
+  try {
+    addingAddress.value = true
+    await addressStore.addAddress(newAddressForm.value)
+    
+    success('地址添加成功！')
+    closeAddAddressModal()
+    
+    // 如果是用户的第一个地址，或者设为默认地址，自动选择
+    if (addressStore.addresses.length === 1 || newAddressForm.value.is_default) {
+      selectedAddressId.value = addressStore.addresses[addressStore.addresses.length - 1].id
+    }
+  } catch (error) {
+    console.error('添加地址失败:', error)
+    error(error.message || '添加地址失败，请重试')
+  } finally {
+    addingAddress.value = false
+  }
+}
+
+const closeAddAddressModal = () => {
+  showAddAddressModal.value = false
+  // 重置表单
+  newAddressForm.value = {
+    name: '',
+    phone: '',
+    province: '',
+    city: '',
+    district: '',
+    detail: '',
+    postal_code: '',
+    is_default: false
+  }
+}
+
 const submitOrder = async () => {
-  if (cartItems.value.length === 0) return
+  if (cartItems.value.length === 0 || !canSubmitOrder.value) return
   
   isProcessing.value = true
   
@@ -501,6 +750,8 @@ const submitOrder = async () => {
     
     // 显示成功弹窗
     showSuccessModal.value = true
+    
+    success('订单提交成功！')
   } catch (error) {
     console.error('订单提交失败:', error)
     error('订单提交失败，请重试。')
@@ -519,19 +770,41 @@ const continueShopping = () => {
   navigateTo('/products')
 }
 
-// 加载购物车数据
-onMounted(() => {
+// 初始化数据
+const initializeData = async () => {
+  // 加载购物车数据
   const savedCartItems = localStorage.getItem('cartItems')
   if (savedCartItems) {
     cartItems.value = JSON.parse(savedCartItems)
   }
+  
+  // 如果用户已登录，初始化地址数据
+  if (userStore.isLoggedIn) {
+    try {
+      await addressStore.initializeAddresses()
+      
+      // 自动选择默认地址
+      if (addressStore.getDefaultAddress) {
+        selectedAddressId.value = addressStore.getDefaultAddress.id
+      } else if (addressStore.addresses.length > 0) {
+        selectedAddressId.value = addressStore.addresses[0].id
+      }
+    } catch (error) {
+      console.error('初始化地址失败:', error)
+    }
+  }
+}
+
+// 页面挂载时初始化
+onMounted(() => {
+  initializeData()
 })
 
 // 页面元数据
 useHead({
   title: '购物车结算 - xlCig',
   meta: [
-    { name: 'description', content: '安全快捷的购物车结算流程，支持多种支付方式' }
+    { name: 'description', content: '安全快捷的购物车结算流程，支持多种支付方式和地址管理' }
   ]
 })
 </script> 
