@@ -276,7 +276,7 @@
               <button @click="openProductLink" 
                       @keydown.enter="openProductLink"
                       @keydown.space.prevent="openProductLink"
-                      class="btn-premium-advanced px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 relative overflow-hidden"
+                      class="btn-premium-advanced px-8 py-3 rounded-2xl font-bold text-lg flex items-center gap-3 relative overflow-hidden"
                       aria-label="查看显卡详情"
                       tabindex="0">
                 <i class="bi bi-eye mr-3" aria-hidden="true"></i>

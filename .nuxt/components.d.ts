@@ -12,9 +12,10 @@ type HydrationStrategies = {
 }
 type LazyComponent<T> = (T & DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }>)
 interface _GlobalComponents {
-      'AppLogo': typeof import("../components/AppLogo.vue")['default']
+      'AppHeader': typeof import("../components/AppHeader.vue")['default']
+    'AppLogo': typeof import("../components/AppLogo.vue")['default']
     'LoadingScreen': typeof import("../components/LoadingScreen.vue")['default']
-    'LoadingScreen3D': typeof import("../components/LoadingScreen3D.vue")['default']
+    'PageLoader': typeof import("../components/PageLoader.vue")['default']
     'SteamCarousel': typeof import("../components/SteamCarousel.vue")['default']
     'LocationHeaderLocation': typeof import("../components/location/HeaderLocation.vue")['default']
     'LocationIpLocationCard': typeof import("../components/location/IpLocationCard.vue")['default']
@@ -42,9 +43,10 @@ interface _GlobalComponents {
     'Body': typeof import("../node_modules/nuxt/dist/head/runtime/components")['Body']
     'NuxtIsland': typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
     'NuxtRouteAnnouncer': IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
-      'LazyAppLogo': LazyComponent<typeof import("../components/AppLogo.vue")['default']>
+      'LazyAppHeader': LazyComponent<typeof import("../components/AppHeader.vue")['default']>
+    'LazyAppLogo': LazyComponent<typeof import("../components/AppLogo.vue")['default']>
     'LazyLoadingScreen': LazyComponent<typeof import("../components/LoadingScreen.vue")['default']>
-    'LazyLoadingScreen3D': LazyComponent<typeof import("../components/LoadingScreen3D.vue")['default']>
+    'LazyPageLoader': LazyComponent<typeof import("../components/PageLoader.vue")['default']>
     'LazySteamCarousel': LazyComponent<typeof import("../components/SteamCarousel.vue")['default']>
     'LazyLocationHeaderLocation': LazyComponent<typeof import("../components/location/HeaderLocation.vue")['default']>
     'LazyLocationIpLocationCard': LazyComponent<typeof import("../components/location/IpLocationCard.vue")['default']>
@@ -78,9 +80,10 @@ declare module 'vue' {
   export interface GlobalComponents extends _GlobalComponents { }
 }
 
+export const AppHeader: typeof import("../components/AppHeader.vue")['default']
 export const AppLogo: typeof import("../components/AppLogo.vue")['default']
 export const LoadingScreen: typeof import("../components/LoadingScreen.vue")['default']
-export const LoadingScreen3D: typeof import("../components/LoadingScreen3D.vue")['default']
+export const PageLoader: typeof import("../components/PageLoader.vue")['default']
 export const SteamCarousel: typeof import("../components/SteamCarousel.vue")['default']
 export const LocationHeaderLocation: typeof import("../components/location/HeaderLocation.vue")['default']
 export const LocationIpLocationCard: typeof import("../components/location/IpLocationCard.vue")['default']
@@ -108,9 +111,10 @@ export const Html: typeof import("../node_modules/nuxt/dist/head/runtime/compone
 export const Body: typeof import("../node_modules/nuxt/dist/head/runtime/components")['Body']
 export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
 export const NuxtRouteAnnouncer: IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
+export const LazyAppHeader: LazyComponent<typeof import("../components/AppHeader.vue")['default']>
 export const LazyAppLogo: LazyComponent<typeof import("../components/AppLogo.vue")['default']>
 export const LazyLoadingScreen: LazyComponent<typeof import("../components/LoadingScreen.vue")['default']>
-export const LazyLoadingScreen3D: LazyComponent<typeof import("../components/LoadingScreen3D.vue")['default']>
+export const LazyPageLoader: LazyComponent<typeof import("../components/PageLoader.vue")['default']>
 export const LazySteamCarousel: LazyComponent<typeof import("../components/SteamCarousel.vue")['default']>
 export const LazyLocationHeaderLocation: LazyComponent<typeof import("../components/location/HeaderLocation.vue")['default']>
 export const LazyLocationIpLocationCard: LazyComponent<typeof import("../components/location/IpLocationCard.vue")['default']>

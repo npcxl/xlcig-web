@@ -7,64 +7,18 @@
     </div>
 
     <!-- 导航栏 -->
-    <nav class="relative z-10">
-      <div class="container mx-auto px-6 py-6">
-        <div class="glass-card-dark rounded-2xl p-6 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-              <!-- Logo -->
-              <AppLogo size="medium" :show-decorations="false" />
-              <div class="h-6 w-px bg-gray-600"></div>
-              
-              <!-- 帅气的返回按钮 -->
-              <button 
-                @click="goBack" 
-                class="group relative inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 overflow-hidden"
-              >
-                <!-- 按钮背景渐变和光效 -->
-                <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 rounded-xl transition-all duration-300 group-hover:from-cyan-500/30 group-hover:via-blue-500/30 group-hover:to-purple-500/30"></div>
-                <div class="absolute inset-0 border-2 border-cyan-500/30 rounded-xl transition-all duration-300 group-hover:border-cyan-400/60 group-hover:shadow-lg group-hover:shadow-cyan-400/25"></div>
-                
-                <!-- 动态粒子效果 -->
-                <div class="absolute inset-0 rounded-xl overflow-hidden">
-                  <div class="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
-                  <div class="absolute w-1 h-1 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping" style="top: 60%; left: 80%; animation-delay: 0.2s;"></div>
-                  <div class="absolute w-1.5 h-1.5 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping" style="top: 80%; left: 30%; animation-delay: 0.4s;"></div>
-                </div>
-                
-                <!-- 左侧箭头图标 -->
-                <div class="relative flex items-center">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center mr-3 transition-all duration-300 group-hover:from-cyan-400/40 group-hover:to-blue-400/40 group-hover:scale-110">
-                    <i class="bi bi-arrow-left text-cyan-400 text-lg transition-all duration-300 group-hover:text-white group-hover:-translate-x-1"></i>
-                  </div>
-                  
-                  <!-- 文字和副标题 -->
-                  <div class="text-left">
-                    <div class="text-white text-sm font-semibold transition-all duration-300 group-hover:text-cyan-100">返回</div>
-                    <div class="text-gray-400 text-xs transition-all duration-300 group-hover:text-cyan-300">Back</div>
-                  </div>
-                </div>
-                
-                <!-- 右侧装饰线条 -->
-                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div class="flex flex-col space-y-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                    <div class="w-6 h-0.5 bg-gradient-to-r from-cyan-400 to-transparent rounded-full transition-all duration-300 group-hover:w-8"></div>
-                    <div class="w-4 h-0.5 bg-gradient-to-r from-blue-400 to-transparent rounded-full transition-all duration-300 group-hover:w-6 delay-75"></div>
-                    <div class="w-2 h-0.5 bg-gradient-to-r from-purple-400 to-transparent rounded-full transition-all duration-300 group-hover:w-4 delay-150"></div>
-                  </div>
-                </div>
-              </button>
-            </div>
-            
-            <nav class="text-sm text-gray-400">
-              <NuxtLink to="/" class="hover:text-cyan-400 transition-colors duration-200">首页</NuxtLink>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400"></i>
-              <span class="text-white font-medium">收货地址</span>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <AppHeader 
+      :show-back-button="false"
+      :show-nav-menu="false"
+      :show-breadcrumb="true"
+      :show-location="false"
+      :show-search-button="false"
+      :show-notification-button="false"
+      :show-decorations="false"
+      logo-size="medium"
+      current-page-title="收货地址"
+    />
+
     <div class="relative z-10 py-8">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- 页面标题 -->
@@ -222,8 +176,8 @@
                   @change="onProvinceChange"
                 >
                   <option value="">请选择省份</option>
-                  <option v-for="province in provinces" :key="province" :value="province">
-                    {{ province }}
+                  <option v-for="province in provinces" :key="province.name" :value="province.name">
+                    {{ province.name }}
                   </option>
                 </select>
               </div>
@@ -237,8 +191,8 @@
                   @change="onCityChange"
                 >
                   <option value="">请选择城市</option>
-                  <option v-for="city in cities" :key="city" :value="city">
-                    {{ city }}
+                  <option v-for="city in cities" :key="city.name" :value="city.name">
+                    {{ city.name }}
                   </option>
                 </select>
               </div>
@@ -251,8 +205,8 @@
                   required
                 >
                   <option value="">请选择区县</option>
-                  <option v-for="district in districts" :key="district" :value="district">
-                    {{ district }}
+                  <option v-for="district in districts" :key="district.name" :value="district.name">
+                    {{ district.name }}
                   </option>
                 </select>
               </div>
@@ -325,6 +279,16 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { addressApi } from '../utils/api/addresses'
 import type { Address, AddressCreateInput, AddressUpdateInput } from '../types/api'
 import { createDiscreteApi } from 'naive-ui'
+import { 
+  getProvinces, 
+  getCitiesByProvinceName, 
+  getAreasByCityName,
+  validateRegion,
+  type Province,
+  type City,
+  type Area
+} from '../utils/regions'
+import AppHeader from '../components/AppHeader.vue'
 
 // 创建消息API
 const { message } = createDiscreteApi(['message'])
@@ -362,25 +326,22 @@ const form = reactive<AddressCreateInput>({
   is_default: false
 })
 
-// 地区数据（示例数据，实际应该从API获取）
-const provinces = ref([
-  '北京市', '上海市', '天津市', '重庆市',
-  '河北省', '山西省', '辽宁省', '吉林省', '黑龙江省',
-  '江苏省', '浙江省', '安徽省', '福建省', '江西省', '山东省',
-  '河南省', '湖北省', '湖南省', '广东省', '海南省',
-  '四川省', '贵州省', '云南省', '陕西省', '甘肃省', '青海省',
-  '内蒙古自治区', '广西壮族自治区', '西藏自治区', '宁夏回族自治区', '新疆维吾尔自治区'
-])
-
-const cities = ref<string[]>([])
-const districts = ref<string[]>([])
+// 地区数据
+const provinces = ref<Province[]>([])
+const cities = ref<City[]>([])
+const districts = ref<Area[]>([])
 
 // 计算属性
 const isEditing = computed(() => editingAddress.value !== null)
 
-// 返回功能
-const goBack = () => {
-  window.history.back()
+// 初始化省份数据
+const initProvinces = () => {
+  try {
+    provinces.value = getProvinces()
+  } catch (error) {
+    console.error('获取省份数据失败:', error)
+    error('获取省份数据失败')
+  }
 }
 
 // 获取地址列表
@@ -400,6 +361,12 @@ const fetchAddresses = async () => {
 // 添加地址
 const addAddress = async () => {
   try {
+    // 验证省市区组合
+    if (!validateRegion(form.province, form.city, form.district)) {
+      error('请选择正确的省市区组合')
+      return
+    }
+    
     submitting.value = true
     const response = await addressApi.createAddress(form)
     if (response.success && response.data) {
@@ -439,6 +406,12 @@ const updateAddress = async () => {
   if (!editingAddress.value) return
   
   try {
+    // 验证省市区组合
+    if (!validateRegion(form.province, form.city, form.district)) {
+      error('请选择正确的省市区组合')
+      return
+    }
+    
     submitting.value = true
     const response = await addressApi.updateAddress(editingAddress.value.id, form)
     if (response.success && response.data) {
@@ -501,11 +474,8 @@ const closeModal = () => {
   showAddModal.value = false
   showEditModal.value = false
   editingAddress.value = null
-  resetForm()
-}
-
-// 重置表单
-const resetForm = () => {
+  
+  // 重置表单
   form.name = ''
   form.phone = ''
   form.province = ''
@@ -514,46 +484,48 @@ const resetForm = () => {
   form.detail = ''
   form.postal_code = ''
   form.is_default = false
+  
+  // 重置地区数据
   cities.value = []
   districts.value = []
 }
 
-// 省份变化处理
+// 省份变化时获取城市
 const onProvinceChange = () => {
   form.city = ''
   form.district = ''
+  cities.value = []
   districts.value = []
   
-  // 根据省份设置城市（示例数据）
-  const cityMap: Record<string, string[]> = {
-    '北京市': ['东城区', '西城区', '朝阳区', '丰台区', '石景山区', '海淀区', '门头沟区', '房山区', '通州区', '顺义区', '昌平区', '大兴区', '怀柔区', '平谷区', '密云区', '延庆区'],
-    '上海市': ['黄浦区', '徐汇区', '长宁区', '静安区', '普陀区', '虹口区', '杨浦区', '闵行区', '宝山区', '嘉定区', '浦东新区', '金山区', '松江区', '青浦区', '奉贤区', '崇明区'],
-    '广东省': ['广州市', '深圳市', '珠海市', '汕头市', '佛山市', '韶关市', '湛江市', '肇庆市', '江门市', '茂名市', '惠州市', '梅州市', '汕尾市', '河源市', '阳江市', '清远市', '东莞市', '中山市', '潮州市', '揭阳市', '云浮市'],
-    '江苏省': ['南京市', '无锡市', '徐州市', '常州市', '苏州市', '南通市', '连云港市', '淮安市', '盐城市', '扬州市', '镇江市', '泰州市', '宿迁市'],
-    '浙江省': ['杭州市', '宁波市', '温州市', '嘉兴市', '湖州市', '绍兴市', '金华市', '衢州市', '舟山市', '台州市', '丽水市']
+  if (form.province) {
+    try {
+      cities.value = getCitiesByProvinceName(form.province)
+    } catch (error) {
+      console.error('获取城市数据失败:', error)
+      error('获取城市数据失败')
+    }
   }
-  
-  cities.value = cityMap[form.province] || []
 }
 
-// 城市变化处理
+// 城市变化时获取区县
 const onCityChange = () => {
   form.district = ''
+  districts.value = []
   
-  // 根据城市设置区县（示例数据）
-  const districtMap: Record<string, string[]> = {
-    '广州市': ['荔湾区', '越秀区', '海珠区', '天河区', '白云区', '黄埔区', '番禺区', '花都区', '南沙区', '从化区', '增城区'],
-    '深圳市': ['罗湖区', '福田区', '南山区', '宝安区', '龙岗区', '盐田区', '龙华区', '坪山区', '光明区', '大鹏新区'],
-    '南京市': ['玄武区', '秦淮区', '建邺区', '鼓楼区', '浦口区', '栖霞区', '雨花台区', '江宁区', '六合区', '溧水区', '高淳区'],
-    '杭州市': ['上城区', '下城区', '江干区', '拱墅区', '西湖区', '滨江区', '萧山区', '余杭区', '富阳区', '临安区', '桐庐县', '淳安县', '建德市']
+  if (form.province && form.city) {
+    try {
+      districts.value = getAreasByCityName(form.province, form.city)
+    } catch (error) {
+      console.error('获取区县数据失败:', error)
+      error('获取区县数据失败')
+    }
   }
-  
-  districts.value = districtMap[form.city] || []
 }
 
-// 页面挂载时获取地址列表
+// 页面挂载时获取数据
 onMounted(() => {
   fetchAddresses()
+  initProvinces()
 })
 </script>
 

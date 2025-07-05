@@ -30,8 +30,10 @@ export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callba
 export { setInterval } from '#app/compat/interval';
 export { useLocation } from '../composables/useLocation';
 export { useMessage } from '../composables/useMessage';
+export { usePageLoader, pageLoaderPresets } from '../composables/usePageLoader';
 export { default as apiClient } from '../utils/apiClient';
 export { getAuthToken, requestInterceptor, responseInterceptor, errorInterceptor, RequestInterceptorConfig } from '../utils/interceptors';
+export { getProvinces, getCitiesByProvinceName, getCitiesByProvinceCode, getAreasByCityName, getStreetsByAreaName, getRegionDetails, validateRegion, searchRegions, getFullAddress, getRegionTree, Province, City, Area, RegionItem } from '../utils/regions';
 export { useUserStore, UserState } from '../stores/user';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
 export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';

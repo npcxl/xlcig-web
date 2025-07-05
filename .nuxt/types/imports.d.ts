@@ -29,10 +29,18 @@ declare global {
   const effectScope: typeof import('../../node_modules/vue')['effectScope']
   const errorInterceptor: typeof import('../../utils/interceptors')['errorInterceptor']
   const getAppManifest: typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']
+  const getAreasByCityName: typeof import('../../utils/regions')['getAreasByCityName']
   const getAuthToken: typeof import('../../utils/interceptors')['getAuthToken']
+  const getCitiesByProvinceCode: typeof import('../../utils/regions')['getCitiesByProvinceCode']
+  const getCitiesByProvinceName: typeof import('../../utils/regions')['getCitiesByProvinceName']
   const getCurrentInstance: typeof import('../../node_modules/vue')['getCurrentInstance']
   const getCurrentScope: typeof import('../../node_modules/vue')['getCurrentScope']
+  const getFullAddress: typeof import('../../utils/regions')['getFullAddress']
+  const getProvinces: typeof import('../../utils/regions')['getProvinces']
+  const getRegionDetails: typeof import('../../utils/regions')['getRegionDetails']
+  const getRegionTree: typeof import('../../utils/regions')['getRegionTree']
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']
+  const getStreetsByAreaName: typeof import('../../utils/regions')['getStreetsByAreaName']
   const h: typeof import('../../node_modules/vue')['h']
   const hasInjectionContext: typeof import('../../node_modules/vue')['hasInjectionContext']
   const inject: typeof import('../../node_modules/vue')['inject']
@@ -68,6 +76,7 @@ declare global {
   const onServerPrefetch: typeof import('../../node_modules/vue')['onServerPrefetch']
   const onUnmounted: typeof import('../../node_modules/vue')['onUnmounted']
   const onUpdated: typeof import('../../node_modules/vue')['onUpdated']
+  const pageLoaderPresets: typeof import('../../composables/usePageLoader')['pageLoaderPresets']
   const prefetchComponents: typeof import('../../node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']
   const preloadComponents: typeof import('../../node_modules/nuxt/dist/app/composables/preload')['preloadComponents']
   const preloadPayload: typeof import('../../node_modules/nuxt/dist/app/composables/payload')['preloadPayload']
@@ -85,6 +94,7 @@ declare global {
   const requestInterceptor: typeof import('../../utils/interceptors')['requestInterceptor']
   const resolveComponent: typeof import('../../node_modules/vue')['resolveComponent']
   const responseInterceptor: typeof import('../../utils/interceptors')['responseInterceptor']
+  const searchRegions: typeof import('../../utils/regions')['searchRegions']
   const setInterval: typeof import('../../node_modules/nuxt/dist/app/compat/interval')['setInterval']
   const setPageLayout: typeof import('../../node_modules/nuxt/dist/app/composables/router')['setPageLayout']
   const setResponseStatus: typeof import('../../node_modules/nuxt/dist/app/composables/ssr')['setResponseStatus']
@@ -123,6 +133,7 @@ declare global {
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']
   const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']
+  const usePageLoader: typeof import('../../composables/usePageLoader')['usePageLoader']
   const usePinia: typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['usePinia']
   const usePreviewMode: typeof import('../../node_modules/nuxt/dist/app/composables/preview')['usePreviewMode']
   const useRequestEvent: typeof import('../../node_modules/nuxt/dist/app/composables/ssr')['useRequestEvent']
@@ -173,6 +184,7 @@ declare global {
   const useTemplateRef: typeof import('../../node_modules/vue')['useTemplateRef']
   const useTransitionState: typeof import('../../node_modules/vue')['useTransitionState']
   const useUserStore: typeof import('../../stores/user')['useUserStore']
+  const validateRegion: typeof import('../../utils/regions')['validateRegion']
   const watch: typeof import('../../node_modules/vue')['watch']
   const watchEffect: typeof import('../../node_modules/vue')['watchEffect']
   const watchPostEffect: typeof import('../../node_modules/vue')['watchPostEffect']
@@ -192,6 +204,9 @@ declare global {
   // @ts-ignore
   export type { RequestInterceptorConfig } from '../../utils/interceptors'
   import('../../utils/interceptors')
+  // @ts-ignore
+  export type { Province, City, Area, RegionItem } from '../../utils/regions'
+  import('../../utils/regions')
   // @ts-ignore
   export type { UserState } from '../../stores/user'
   import('../../stores/user')
@@ -228,10 +243,18 @@ declare module 'vue' {
     readonly effectScope: UnwrapRef<typeof import('../../node_modules/vue')['effectScope']>
     readonly errorInterceptor: UnwrapRef<typeof import('../../utils/interceptors')['errorInterceptor']>
     readonly getAppManifest: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']>
+    readonly getAreasByCityName: UnwrapRef<typeof import('../../utils/regions')['getAreasByCityName']>
     readonly getAuthToken: UnwrapRef<typeof import('../../utils/interceptors')['getAuthToken']>
+    readonly getCitiesByProvinceCode: UnwrapRef<typeof import('../../utils/regions')['getCitiesByProvinceCode']>
+    readonly getCitiesByProvinceName: UnwrapRef<typeof import('../../utils/regions')['getCitiesByProvinceName']>
     readonly getCurrentInstance: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentScope']>
+    readonly getFullAddress: UnwrapRef<typeof import('../../utils/regions')['getFullAddress']>
+    readonly getProvinces: UnwrapRef<typeof import('../../utils/regions')['getProvinces']>
+    readonly getRegionDetails: UnwrapRef<typeof import('../../utils/regions')['getRegionDetails']>
+    readonly getRegionTree: UnwrapRef<typeof import('../../utils/regions')['getRegionTree']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
+    readonly getStreetsByAreaName: UnwrapRef<typeof import('../../utils/regions')['getStreetsByAreaName']>
     readonly h: UnwrapRef<typeof import('../../node_modules/vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('../../node_modules/vue')['hasInjectionContext']>
     readonly inject: UnwrapRef<typeof import('../../node_modules/vue')['inject']>
@@ -267,6 +290,7 @@ declare module 'vue' {
     readonly onServerPrefetch: UnwrapRef<typeof import('../../node_modules/vue')['onServerPrefetch']>
     readonly onUnmounted: UnwrapRef<typeof import('../../node_modules/vue')['onUnmounted']>
     readonly onUpdated: UnwrapRef<typeof import('../../node_modules/vue')['onUpdated']>
+    readonly pageLoaderPresets: UnwrapRef<typeof import('../../composables/usePageLoader')['pageLoaderPresets']>
     readonly prefetchComponents: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']>
     readonly preloadComponents: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/preload')['preloadComponents']>
     readonly preloadPayload: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/payload')['preloadPayload']>
@@ -284,6 +308,7 @@ declare module 'vue' {
     readonly requestInterceptor: UnwrapRef<typeof import('../../utils/interceptors')['requestInterceptor']>
     readonly resolveComponent: UnwrapRef<typeof import('../../node_modules/vue')['resolveComponent']>
     readonly responseInterceptor: UnwrapRef<typeof import('../../utils/interceptors')['responseInterceptor']>
+    readonly searchRegions: UnwrapRef<typeof import('../../utils/regions')['searchRegions']>
     readonly setInterval: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/compat/interval')['setInterval']>
     readonly setPageLayout: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['setPageLayout']>
     readonly setResponseStatus: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/ssr')['setResponseStatus']>
@@ -322,6 +347,7 @@ declare module 'vue' {
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
     readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
+    readonly usePageLoader: UnwrapRef<typeof import('../../composables/usePageLoader')['usePageLoader']>
     readonly usePinia: UnwrapRef<typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['usePinia']>
     readonly usePreviewMode: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/preview')['usePreviewMode']>
     readonly useRequestEvent: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/ssr')['useRequestEvent']>
@@ -372,6 +398,7 @@ declare module 'vue' {
     readonly useTemplateRef: UnwrapRef<typeof import('../../node_modules/vue')['useTemplateRef']>
     readonly useTransitionState: UnwrapRef<typeof import('../../node_modules/vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/user')['useUserStore']>
+    readonly validateRegion: UnwrapRef<typeof import('../../utils/regions')['validateRegion']>
     readonly watch: UnwrapRef<typeof import('../../node_modules/vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('../../node_modules/vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('../../node_modules/vue')['watchPostEffect']>

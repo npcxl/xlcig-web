@@ -7,32 +7,18 @@
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow"></div>
     </div>
 
-    <!-- 导航栏 -->
-    <nav class="relative z-10">
-      <div class="container mx-auto px-6 py-6">
-        <div class="glass-card-dark rounded-2xl p-6 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-              <!-- Logo -->
-              <AppLogo size="medium" :show-decorations="false" />
-              <div class="h-6 w-px bg-gray-600"></div>
-              <button @click="$router.go(-1)" 
-                      class="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors duration-200">
-                <i class="bi bi-arrow-left mr-2 text-lg"></i>
-                <span class="text-sm font-medium">返回</span>
-              </button>
-            </div>
-            <nav class="text-sm text-gray-400">
-              <NuxtLink to="/" class="hover:text-cyan-400">首页</NuxtLink>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400"></i>
-              <NuxtLink to="/products" class="hover:text-cyan-400">产品中心</NuxtLink>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400"></i>
-              <span class="text-white font-medium">购物车结算</span>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <!-- 统一导航栏 -->
+    <AppHeader 
+      :show-back-button="false"
+      :show-nav-menu="false"
+      :show-breadcrumb="true"
+      :show-location="false"
+      :show-search-button="false"
+      :show-notification-button="false"
+      :show-decorations="false"
+      logo-size="medium"
+      current-page-title="购物车结算"
+    />
 
     <!-- 主要内容 -->
     <div class="container mx-auto px-6 py-8 relative z-10">
@@ -76,10 +62,10 @@
                     <h3 class="font-semibold text-white text-lg mb-1">{{ item.name }}</h3>
                     <p class="text-gray-400 text-sm mb-2">{{ item.brand }}</p>
                     <div class="flex items-center gap-4">
-                      <span class="text-2xl font-bold text-cyan-400">¥{{ (item.price * 7.2).toLocaleString() }}</span>
+                      <span class="text-2xl font-bold text-cyan-400">¥{{ item.price.toLocaleString() }}</span>
                       <span v-if="item.originalPrice && item.originalPrice > item.price" 
                             class="text-sm text-gray-500 line-through">
-                        ¥{{ (item.originalPrice * 7.2).toLocaleString() }}
+                        ¥{{ item.originalPrice.toLocaleString() }}
                       </span>
                     </div>
                   </div>
@@ -271,20 +257,20 @@
               <div class="space-y-4">
                 <div class="flex justify-between items-center">
                   <span class="text-gray-300">商品小计</span>
-                  <span class="text-white font-semibold">¥{{ (subtotal * 7.2).toLocaleString() }}</span>
+                  <span class="text-white font-semibold">¥{{ subtotal.toLocaleString() }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-gray-300">运费</span>
-                  <span class="text-white font-semibold">¥{{ (shipping * 7.2).toLocaleString() }}</span>
+                  <span class="text-white font-semibold">¥{{ shipping.toLocaleString() }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-gray-300">税费</span>
-                  <span class="text-white font-semibold">¥{{ (tax * 7.2).toLocaleString() }}</span>
+                  <span class="text-white font-semibold">¥{{ tax.toLocaleString() }}</span>
                 </div>
                 <div class="border-t border-gray-700/50 pt-4">
                   <div class="flex justify-between items-center">
                     <span class="text-xl font-semibold text-white">总计</span>
-                    <span class="text-2xl font-bold text-cyan-400">¥{{ (total * 7.2).toLocaleString() }}</span>
+                    <span class="text-2xl font-bold text-cyan-400">¥{{ total.toLocaleString() }}</span>
                   </div>
                 </div>
               </div>
@@ -311,7 +297,7 @@
               <button v-if="cartItems.length > 0" 
                       @click="submitOrder" 
                       :disabled="isProcessing"
-                      class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:cursor-not-allowed">
+                      class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white py-3 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:cursor-not-allowed">
                 <i v-if="!isProcessing" class="bi bi-credit-card"></i>
                 <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 {{ isProcessing ? '处理中...' : '确认下单' }}
@@ -443,7 +429,7 @@ const subtotal = computed(() => {
 })
 
 const shipping = computed(() => {
-  return subtotal.value > 1000 ? 0 : 50 // 满$1000免费配送
+  return subtotal.value > 1000 ? 0 : 50 // 满¥1000免费配送
 })
 
 const tax = computed(() => {

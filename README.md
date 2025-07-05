@@ -8,6 +8,11 @@
 
 > 🚀 基于 Nuxt 3 构建的现代化PC硬件电商平台，提供完整的产品展示、购物车、订单管理等功能。
 
+## 必看
+  在于 oxc-parser 这个包的 Windows 原生绑定文件缺失或损坏。这是一个常见的原生模块安装问题，特别是在 Windows 系统上。
+  清除并重新安装依赖 运行命令 rm -rf node_modules package-lock.json 或手动删除掉这两个文件。
+  然后在重新下载依赖 npm install
+  运行 npm run dev
 ## 更新日志
 - [点击查看](https://gitee.com/leheya/xlweb/blob/master/CHANGELOG.md)
 

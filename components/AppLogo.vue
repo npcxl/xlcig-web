@@ -11,15 +11,8 @@
         loading="lazy"
       />
       
-      <!-- 品牌文字 (根据size决定是否显示) -->
-      <div v-if="showText" class="text-content">
-        <div class="brand-text">
-          <span class="brand-name">xlCig</span>
-        </div>
-        <div v-if="showSubtitle" class="brand-subtitle">
-          PC BUILDING GUIDE
-        </div>
-      </div>
+   
+    
     </div>
   </NuxtLink>
 </template>

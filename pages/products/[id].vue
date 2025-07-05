@@ -61,7 +61,7 @@
               <div v-if="product.originalPrice && product.originalPrice > product.price" 
                    class="absolute top-4 left-4 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-red-500/40 animate-pulse">
                 <i class="bi bi-lightning-fill mr-1"></i>
-                省 ¥{{ ((product.originalPrice - product.price) * 7.2).toLocaleString() }}
+                省 ¥{{ (product.originalPrice - product.price).toLocaleString() }}
               </div>
 
               <!-- 增强库存状态 -->
@@ -192,11 +192,11 @@
             <div class="mb-8 p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-400/30 backdrop-blur-sm">
               <div class="flex items-end gap-4 mb-3">
                 <span class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                  ¥{{ (product.price * 7.2).toLocaleString() }}
+                  ¥{{ product.price.toLocaleString() }}
                 </span>
                 <span v-if="product.originalPrice && product.originalPrice > product.price" 
                       class="text-2xl text-gray-500 line-through mb-2">
-                  ¥{{ (product.originalPrice * 7.2).toLocaleString() }}
+                  ¥{{ product.originalPrice.toLocaleString() }}
                 </span>
                 <span v-if="product.originalPrice && product.originalPrice > product.price"
                       class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg text-sm font-medium border border-red-400/30 mb-2">
@@ -215,12 +215,12 @@
               <div class="flex items-center gap-6">
                 <div class="flex items-center border border-gray-600/50 rounded-xl bg-gray-800/30 backdrop-blur-sm">
                   <button @click="decreaseQuantity" 
-                          class="px-5 py-4 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-l-xl transition-all duration-300 border-r border-gray-600/50">
+                          class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-l-xl transition-all duration-300 border-r border-gray-600/50">
                     <i class="bi bi-dash-lg text-lg font-bold"></i>
                   </button>
-                  <span class="px-8 py-4 text-white font-bold text-lg min-w-[80px] text-center bg-gray-700/30">{{ quantity }}</span>
+                  <span class="px-8 py-3 text-white font-bold text-lg min-w-[80px] text-center bg-gray-700/30">{{ quantity }}</span>
                   <button @click="increaseQuantity" 
-                          class="px-5 py-4 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-r-xl transition-all duration-300 border-l border-gray-600/50">
+                          class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-r-xl transition-all duration-300 border-l border-gray-600/50">
                     <i class="bi bi-plus-lg text-lg font-bold"></i>
                   </button>
                 </div>
@@ -234,8 +234,9 @@
             <!-- 购买按钮 - 增强版 -->
             <div class="space-y-4 mb-8">
               <button @click="addToCart" 
-                      :disabled="!product.inStock"
-                      class="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:via-blue-500 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
+                      :disabled="!product.inStock || showSuccessMessage"
+                      data-add-to-cart
+                      class="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:via-blue-500 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 <i class="bi bi-cart-plus text-xl"></i>
                 <span>{{ product.inStock ? '加入购物车' : '暂时缺货' }}</span>
@@ -243,7 +244,7 @@
 
               <button @click="buyNow" 
                       :disabled="!product.inStock"
-                      class="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-500 hover:via-emerald-500 hover:to-green-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
+                      class="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-500 hover:via-emerald-500 hover:to-green-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 <i class="bi bi-lightning-fill text-xl"></i>
                 <span>立即购买</span>
@@ -398,10 +399,28 @@
 
     <!-- 购买成功提示 - 增强版 -->
     <div v-if="showSuccessMessage" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div class="glass-card-enhanced rounded-2xl border border-green-400/50 shadow-2xl shadow-green-500/30 p-10 max-w-md w-full text-center backdrop-blur-xl transform animate-bounce">
+      <!-- 撒花动画背景 -->
+      <div class="confetti-container">
+        <!-- 持续生成撒花 -->
+        <div v-for="batch in confettiBatches" :key="batch.id">
+          <div v-for="i in 30" :key="`${batch.id}-${i}`" 
+               class="confetti-piece"
+               :class="getConfettiShape(i)"
+               :style="{
+                 left: Math.random() * 100 + '%',
+                 animationDelay: (Math.random() * 2 + batch.delay) + 's',
+                 animationDuration: '3s',
+                 backgroundColor: getConfettiColor(i + batch.id * 30),
+                 width: (8 + Math.random() * 6) + 'px',
+                 height: (8 + Math.random() * 6) + 'px'
+               }"></div>
+        </div>
+      </div>
+      
+      <div class="glass-card-enhanced rounded-2xl border border-green-400/50 shadow-2xl shadow-green-500/30 p-10 max-w-md w-full text-center backdrop-blur-xl transform animate-bounce-in">
         <div class="text-8xl text-green-400 mb-8 relative">
-          <i class="bi bi-check-circle-fill drop-shadow-2xl"></i>
-          <div class="absolute inset-0 text-green-400/30 animate-ping">
+          <i class="bi bi-check-circle-fill drop-shadow-2xl animate-check-bounce"></i>
+          <div class="absolute inset-0 text-green-400/30 animate-ping-once">
             <i class="bi bi-check-circle-fill"></i>
           </div>
         </div>
@@ -409,11 +428,11 @@
         <p class="text-gray-300 mb-8 text-lg leading-relaxed">{{ product?.name }} 已成功添加到购物车。</p>
         <div class="space-y-4">
           <button @click="goToCheckout" 
-                  class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transform hover:scale-105">
+                  class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transform hover:scale-105">
             立即去结算
           </button>
-          <button @click="showSuccessMessage = false" 
-                  class="w-full border border-gray-600/50 hover:border-green-400/50 text-gray-300 hover:text-white hover:bg-green-500/10 py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 backdrop-blur-sm">
+          <button @click="hideSuccessMessage" 
+                  class="w-full border border-gray-600/50 hover:border-green-400/50 text-gray-300 hover:text-white hover:bg-green-500/10 py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 backdrop-blur-sm">
             继续购物
           </button>
         </div>
@@ -437,6 +456,10 @@ const isFavorite = ref(false)
 const showSuccessMessage = ref(false)
 const loading = ref(true)
 const error = ref(null)
+
+// 撒花批次管理
+const confettiBatches = ref([])
+let confettiInterval = null
 
 // 获取产品类别
 const getProductCategory = (category) => {
@@ -610,9 +633,16 @@ const toggleFavorite = () => {
 
 // 动态添加到购物车
 const addToCart = async () => {
-  if (!product.value || !product.value.inStock) return
+  if (!product.value || !product.value.inStock || showSuccessMessage.value) return
   
   try {
+    // 添加视觉反馈：按钮禁用状态
+    const button = document.querySelector('[data-add-to-cart]')
+    if (button) {
+      button.disabled = true
+      button.classList.add('opacity-50', 'cursor-not-allowed')
+    }
+    
     const cartData = {
       productId: product.value.id,
       quantity: quantity.value,
@@ -627,6 +657,7 @@ const addToCart = async () => {
     
     if (response.success) {
       showSuccessMessage.value = true
+      playSuccessSound()
       
       // 同时更新本地存储作为备份
       const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]')
@@ -663,6 +694,16 @@ const addToCart = async () => {
     
     localStorage.setItem('cartItems', JSON.stringify(cartItems))
     showSuccessMessage.value = true
+    playSuccessSound()
+  } finally {
+    // 恢复按钮状态
+    setTimeout(() => {
+      const button = document.querySelector('[data-add-to-cart]')
+      if (button) {
+        button.disabled = false
+        button.classList.remove('opacity-50', 'cursor-not-allowed')
+      }
+    }, 1000)
   }
 }
 
@@ -675,6 +716,100 @@ const buyNow = async () => {
 
 const goToCheckout = () => {
   navigateTo('/checkout')
+}
+
+// 隐藏成功消息
+const hideSuccessMessage = () => {
+  showSuccessMessage.value = false
+}
+
+// 播放成功音效（可选）
+const playSuccessSound = () => {
+  try {
+    // 创建Web Audio API音效
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+    
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+    
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
+    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1)
+    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2)
+    
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime)
+    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+    
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.3)
+  } catch (error) {
+    // 音效播放失败时静默处理
+    console.log('音效播放不支持或被禁用')
+  }
+}
+
+// 监听成功消息状态，管理撒花动画
+watch(showSuccessMessage, (newValue) => {
+  if (newValue) {
+    // 开始撒花动画
+    startConfettiAnimation()
+    
+    // 撒花动画3秒后自动停止，但弹窗保持显示
+    setTimeout(() => {
+      stopConfettiAnimation()
+    }, 3000)
+  } else {
+    // 停止撒花动画
+    stopConfettiAnimation()
+  }
+})
+
+// 开始撒花动画
+const startConfettiAnimation = () => {
+  confettiBatches.value = []
+  let batchId = 0
+  
+  // 立即生成第一批撒花
+  confettiBatches.value.push({
+    id: batchId++,
+    delay: 0
+  })
+  
+  // 每0.5秒生成新的撒花批次，让动画更连续
+  confettiInterval = setInterval(() => {
+    confettiBatches.value.push({
+      id: batchId++,
+      delay: 0
+    })
+    
+    // 保持最多6个批次，移除旧的批次
+    if (confettiBatches.value.length > 6) {
+      confettiBatches.value.shift()
+    }
+  }, 500)
+}
+
+// 停止撒花动画
+const stopConfettiAnimation = () => {
+  if (confettiInterval) {
+    clearInterval(confettiInterval)
+    confettiInterval = null
+  }
+  confettiBatches.value = []
+}
+
+// 获取撒花颜色
+const getConfettiColor = (index) => {
+  const colors = ['#00f5ff', '#0080ff', '#a855f7', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6']
+  return colors[index % colors.length]
+}
+
+// 获取撒花形状
+const getConfettiShape = (index) => {
+  const shapes = ['confetti-circle', 'confetti-square', 'confetti-triangle']
+  return shapes[index % shapes.length]
 }
 
 const translateSpecKey = (key) => {
@@ -723,6 +858,11 @@ const formatDate = (dateString) => {
 // 页面加载时获取产品详情
 onMounted(() => {
   loadProductDetail()
+})
+
+// 页面卸载时清理定时器
+onUnmounted(() => {
+  stopConfettiAnimation()
 })
 
 // 监听路由变化
@@ -1132,5 +1272,134 @@ useHead({
   100% {
     transform: translateX(100%);
   }
+}
+
+/* 撒花动画容器 */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* 撒花片段 */
+.confetti-piece {
+  position: absolute;
+  width: 10px; /* 默认大小，会被内联样式覆盖 */
+  height: 10px; /* 默认大小，会被内联样式覆盖 */
+  top: -10px;
+  animation: confettiFall 3s linear infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  will-change: transform, opacity;
+}
+
+/* 撒花形状 */
+.confetti-circle {
+  border-radius: 50%;
+}
+
+.confetti-square {
+  border-radius: 2px;
+}
+
+.confetti-triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 12px solid;
+  border-bottom-color: inherit;
+  background: transparent !important;
+}
+
+/* 撒花掉落动画 */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg) translateX(0) scale(1);
+    opacity: 1;
+  }
+  10% {
+    transform: translateY(-80vh) rotate(90deg) translateX(30px) scale(1.1);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-50vh) rotate(180deg) translateX(-20px) scale(0.9);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-20vh) rotate(270deg) translateX(40px) scale(1.05);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateY(20vh) rotate(450deg) translateX(-30px) scale(0.95);
+    opacity: 0.8;
+  }
+  80% {
+    transform: translateY(60vh) rotate(630deg) translateX(25px) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 一次性弹跳动画 */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3) rotate(-5deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(-1deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out forwards;
+}
+
+/* 检查图标弹跳动画 */
+@keyframes check-bounce {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-check-bounce {
+  animation: check-bounce 0.6s ease-out;
+}
+
+/* 一次性ping动画 */
+@keyframes ping-once {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-once {
+  animation: ping-once 1s cubic-bezier(0, 0, 0.2, 1) once;
 }
 </style> 

@@ -1,0 +1,5 @@
+const index_vue_vue_type_style_index_0_scoped_0eb23aaf_lang = ".glass-card-dark[data-v-0eb23aaf]{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:#1f2937cc}.home-product-image-container[data-v-0eb23aaf],.home-product-placeholder[data-v-0eb23aaf]{align-items:center;background:linear-gradient(135deg,#1f2937cc,#111827cc);display:flex;height:100%;justify-content:center;width:100%}.home-product-placeholder[data-v-0eb23aaf]{color:#9ca3af;flex-direction:column}.home-product-type[data-v-0eb23aaf]{color:#6b7280;font-size:.875rem;font-weight:500;margin-top:8px}.line-clamp-2[data-v-0eb23aaf]{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.animate-spin-slow[data-v-0eb23aaf]{animation:spin-0eb23aaf 20s linear infinite}@keyframes spin-0eb23aaf{0%{transform:rotate(0)}to{transform:rotate(1turn)}}";
+export {
+  index_vue_vue_type_style_index_0_scoped_0eb23aaf_lang as default
+};
+//# sourceMappingURL=index-styles-1.mjs-C7M_fAHH.js.map

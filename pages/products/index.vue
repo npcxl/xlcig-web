@@ -1,7 +1,7 @@
 <template>
-  <!-- 统一深色背景 -->
+ 
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-    <!-- 增强背景装饰效果 -->
+
     <div class="fixed inset-0 pointer-events-none">
       <div class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full filter blur-3xl animate-pulse"></div>
       <div class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/25 to-pink-500/25 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
@@ -10,40 +10,35 @@
       <div class="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-orange-500/15 to-red-500/15 rounded-full filter blur-3xl animate-pulse delay-2000"></div>
     </div>
 
-    <!-- 专业页面头部 -->
+ 
+    <AppHeader 
+      :show-back-button="false"
+      :show-nav-menu="true"
+      :show-breadcrumb="false"
+      :show-location="false"
+      :show-search-button="true"
+      :show-notification-button="true"
+      :show-decorations="false"
+      logo-size="medium"
+    />
+
+  
     <section class="relative z-10">
       <div class="container mx-auto px-6 py-8">
-        <div class="glass-card-enhanced rounded-2xl p-6 border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-              <!-- Logo -->
-              <AppLogo size="medium" :show-decorations="false" />
-              <div class="h-6 w-px bg-gradient-to-b from-transparent via-cyan-400/60 to-transparent"></div>
-              <NuxtLink to="/" class="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-105 group">
-                <i class="bi bi-house-door mr-2 text-lg group-hover:transform group-hover:-translate-x-1 transition-transform duration-300"></i>
-                <span class="text-sm font-medium">首页</span>
-              </NuxtLink>
+        <div class="glass-card-enhanced rounded-3xl p-8 border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl shadow-lg shadow-cyan-500/40 mb-6">
+              <i class="bi bi-grid-3x3-gap text-white text-3xl"></i>
             </div>
-            <nav class="text-sm text-gray-400">
-              <span class="hover:text-cyan-400 transition-colors duration-300">首页</span>
-              <i class="bi bi-chevron-right mx-2 text-cyan-400/60"></i>
-              <span class="text-white font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">产品中心</span>
-            </nav>
-          </div>
-          <div class="mt-6">
-            <h1 class="text-4xl font-bold text-white mb-3 flex items-center gap-3">
-              <div class="p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg shadow-lg">
-                <i class="bi bi-grid-3x3-gap text-white text-2xl"></i>
-              </div>
+            <h1 class="text-5xl font-bold text-white mb-4 flex items-center justify-center gap-4">
               <span class="bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">产品中心</span>
             </h1>
-            <p class="text-gray-300 text-lg">专业的PC硬件产品，为您的项目提供可靠的解决方案</p>
+            <p class="text-gray-300 text-xl max-w-2xl mx-auto">专业的PC硬件产品，为您的项目提供可靠的解决方案</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Steam游戏展示区 -->
     <section class="relative z-10">
       <div class="container mx-auto px-6 py-6">
         <div class="glass-card-enhanced rounded-2xl p-8 border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
@@ -77,7 +72,7 @@
                 ]">
                 <i :class="cat.icon" class="mr-2 text-lg"></i>
                 <span>{{ cat.name }}</span>
-                <span class="ml-2 text-sm opacity-75 px-2 py-1 bg-black/20 rounded-full">({{ cat.count }})</span>
+                <span v-if="cat.count > 0" class="ml-2 text-sm opacity-75 px-2 py-1 bg-black/20 rounded-full">({{ cat.count }})</span>
               </button>
             </div>
           </div>
@@ -358,16 +353,18 @@ const fetchCategories = async () => {
       { id: 'workstation', name: '工作站', icon: 'bi-cpu', count: 0 }
     ]
     
-    // 获取各分类的产品数量
-    for (const category of categories.value) {
+    // 只获取全部产品的数量
+    const response = await productsApi.getProducts({ limit: 1 })
+    const totalCount = response.meta?.total || 0
+    
+    // 只给"全部产品"设置总数量，其他分类不显示数量
+    categories.value.forEach(category => {
       if (category.id === 'all') {
-        const response = await productsApi.getProducts({ limit: 1 })
-        category.count = response.meta?.total || 0
+        category.count = totalCount
       } else {
-        const response = await productsApi.getProducts({ category: category.id, limit: 1 })
-        category.count = response.meta?.total || 0
+        category.count = 0 // 设置为0，模板中会判断不显示
       }
-    }
+    })
   } catch (error) {
     console.error('获取分类失败:', error)
     categories.value = [

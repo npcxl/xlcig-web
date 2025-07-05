@@ -1,9 +1,9 @@
 {
-  "_hash": "6-chIVfT1iFgpZA9BkoHL4rkfcjtv2adKU3bJy7AvhA",
+  "_hash": "irVUIv5OvW7vhDZ8f4TkEzNIbCTYQ_PUHmK-Hepmlh8",
   "project": {
-    "rootDir": "D:/code/xlweb"
+    "rootDir": "D:/codeGitee/xlweb"
   },
   "versions": {
-    "nuxt": "3.17.6"
+    "nuxt": "3.17.5"
   }
 }

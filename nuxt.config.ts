@@ -9,16 +9,22 @@ export default defineNuxtConfig({
   devtools: { 
     enabled: process.env.NODE_ENV === 'development' 
   },
+  ssr: true,
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
-  runtimeConfig: {
-    public: {
-      apiBase: process.env.NODE_ENV === 'production' 
-        ? 'https://api.xlcig.cn'  // 生产环境使用API子域名
-        : 'http://192.168.11.193:9999'  // 开发环境保持不变
-    }
-  },
+  
+  // 页面过渡配置
   app: {
+    pageTransition: { 
+      name: 'page', 
+      mode: 'out-in',
+      duration: 400
+    },
+    layoutTransition: { 
+      name: 'layout', 
+      mode: 'out-in',
+      duration: 400
+    },
     head: {
       title: 'xlCig - 专业PC硬件产品和装机服务',
 
@@ -41,12 +47,27 @@ export default defineNuxtConfig({
       ]
     }
   },
+  
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NODE_ENV === 'production' 
+        ? 'https://api.xlcig.cn'  // 生产环境使用API子域名
+        : 'http://192.168.11.193:9999'  // 开发环境保持不变
+    }
+  },
+  
   build: {
     transpile: ['naive-ui', 'vueuc', '@css-render/vue3-ssr']
   },
+  
   vite: {
     optimizeDeps: {
       include: ['naive-ui']
     }
+  },
+  
+  // 优化SSR性能
+  nitro: {
+    compressPublicAssets: true
   }
 }) 

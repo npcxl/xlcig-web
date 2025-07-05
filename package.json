@@ -21,8 +21,10 @@
     "@types/three": "^0.178.0",
     "axios": "^1.6.2",
     "bootstrap-icons": "^1.11.2",
+    "china-division": "^2.7.0",
     "naive-ui": "^2.34.4",
     "pinia": "^3.0.3",
+    "province-city-china": "^8.5.8",
     "three": "^0.178.0",
     "vueuc": "^0.4.64"
   }

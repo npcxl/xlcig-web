@@ -18,11 +18,11 @@
           <span class="detail-label">IP:</span>
           <span class="detail-value">{{ currentIp }}</span>
         </div>
-        <div class="detail-item" v-if="data?.location.province">
+        <div class="detail-item" v-if="data?.location?.province">
           <span class="detail-label">省份:</span>
           <span class="detail-value">{{ data.location.province }}</span>
         </div>
-        <div class="detail-item" v-if="data?.location.city">
+        <div class="detail-item" v-if="data?.location?.city">
           <span class="detail-label">城市:</span>
           <span class="detail-value">{{ data.location.city }}</span>
         </div>
@@ -34,7 +34,7 @@
           </span>
         </div>
         <!-- 位置信息不精确提示 -->
-        <div v-if="data?.location && !data.location.error && (!data.location.province || !data.location.city)" 
+        <div v-if="data?.location && !data.location.province && !data.location.city" 
              class="detail-info">
           <div class="info-text">
             <i class="bi bi-info-circle text-yellow-500"></i>
@@ -139,7 +139,7 @@ onUnmounted(() => {
 <style scoped>
 .header-location {
   position: relative;
-  z-index: 50;
+  z-index: 1000;
 }
 
 .location-button {
@@ -204,21 +204,54 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(75, 85, 99, 0.3);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, 
+    rgba(0, 245, 255, 0.15) 0%, 
+    rgba(0, 212, 255, 0.1) 25%, 
+    rgba(0, 184, 255, 0.15) 50%, 
+    rgba(0, 128, 255, 0.1) 75%, 
+    rgba(0, 245, 255, 0.15) 100%
+  );
+  border: 1px solid rgba(0, 245, 255, 0.3);
   border-radius: 8px;
-  color: #9ca3af;
+  color: #00f5ff;
   font-size: 14px;
   backdrop-filter: blur(10px);
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: loadingPulse 2s ease-in-out infinite alternate;
 }
 
 .loading-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(156, 163, 175, 0.3);
-  border-top: 2px solid #00f5ff;
+  border: 2px solid transparent;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  background: conic-gradient(
+    from 0deg,
+    #00f5ff 0deg,
+    #00d4ff 60deg,
+    #00b8ff 120deg,
+    #0080ff 180deg,
+    #00b8ff 240deg,
+    #00d4ff 300deg,
+    #00f5ff 360deg
+  );
+  animation: spin 1s linear infinite, colorShift 3s ease-in-out infinite;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.loading-spinner::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  background: rgba(31, 41, 55, 0.95);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
 }
 
 .error-display,
@@ -239,6 +272,7 @@ onUnmounted(() => {
   backdrop-filter: blur(20px);
   overflow: hidden;
   animation: slideDown 0.2s ease;
+  z-index: 1001;
 }
 
 .detail-item {
@@ -355,6 +389,37 @@ onUnmounted(() => {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes loadingPulse {
+  0% {
+    box-shadow: 
+      0 0 20px rgba(0, 245, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 245, 255, 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 0 30px rgba(0, 245, 255, 0.2),
+      0 0 40px rgba(0, 212, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 245, 255, 0.5);
+  }
+}
+
+@keyframes colorShift {
+  0%, 100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  25% {
+    filter: hue-rotate(15deg) saturate(1.2);
+  }
+  50% {
+    filter: hue-rotate(30deg) saturate(1.4);
+  }
+  75% {
+    filter: hue-rotate(15deg) saturate(1.2);
   }
 }
 
