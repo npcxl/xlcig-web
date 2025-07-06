@@ -996,6 +996,23 @@ async function errorHandler(error, event) {
   // H3 will handle fallback
 }
 
+const script = `
+if (!window.__NUXT_DEVTOOLS_TIME_METRIC__) {
+  Object.defineProperty(window, '__NUXT_DEVTOOLS_TIME_METRIC__', {
+    value: {},
+    enumerable: false,
+    configurable: true,
+  })
+}
+window.__NUXT_DEVTOOLS_TIME_METRIC__.appInit = Date.now()
+`;
+
+const __0FwVmpFGWJ0YunnzpF_B0ceQMcfudbSb5ffnfYDjQQ = (function(nitro) {
+  nitro.hooks.hook("render:html", (htmlContext) => {
+    htmlContext.head.push(`<script>${script}<\/script>`);
+  });
+});
+
 const rootDir = "D:/code/xlweb";
 
 const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑"},{"name":"keywords","content":"xlCig,PC硬件,电脑配置,显卡,CPU,装机"},{"name":"author","content":"xlCig"},{"property":"og:title","content":"xlCig - 专业PC硬件产品和装机服务"},{"property":"og:description","content":"专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑"},{"property":"og:type","content":"website"},{"name":"theme-color","content":"#00f5ff"}],"link":[{"rel":"icon","type":"image/png","href":"/logo.png"},{"rel":"apple-touch-icon","sizes":"180x180","href":"/logo.png"},{"rel":"icon","type":"image/png","sizes":"32x32","href":"/logo.png"},{"rel":"icon","type":"image/png","sizes":"16x16","href":"/logo.png"}],"style":[],"script":[],"noscript":[],"title":"xlCig - 专业PC硬件产品和装机服务"};
@@ -1085,7 +1102,8 @@ function onConsoleLog(callback) {
 }
 
 const plugins = [
-  _7oeU5c9MVw_95lyR6k8ZR1nhKA2dqmR3iUlMVcwR16s
+  __0FwVmpFGWJ0YunnzpF_B0ceQMcfudbSb5ffnfYDjQQ,
+_7oeU5c9MVw_95lyR6k8ZR1nhKA2dqmR3iUlMVcwR16s
 ];
 
 const VueResolver = (_, value) => {
