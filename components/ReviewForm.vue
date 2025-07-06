@@ -290,25 +290,31 @@ const submitReview = async () => {
 
 // 组件挂载时检查评论状态
 onMounted(() => {
-  checkUserReview()
+  // 确保只在客户端执行
+  if (process.client) {
+    checkUserReview()
+  }
 })
 
 // 监听用户登录状态变化
 watch(() => userStore.isLoggedIn, (newValue) => {
-  if (newValue) {
-    // 用户登录后重新检查评论状态
-    checkUserReview()
-  } else {
-    // 用户退出登录后重置状态
-    hasReviewed.value = false
-    existingReview.value = null
+  // 确保只在客户端执行
+  if (process.client) {
+    if (newValue) {
+      // 用户登录后重新检查评论状态
+      checkUserReview()
+    } else {
+      // 用户退出登录后重置状态
+      hasReviewed.value = false
+      existingReview.value = null
+    }
   }
 })
 
 // 监听产品ID变化
 watch(() => props.productId, () => {
   // 产品ID变化时重新检查评论状态
-  if (userStore.isLoggedIn) {
+  if (process.client && userStore.isLoggedIn) {
     checkUserReview()
   }
 })

@@ -42,9 +42,34 @@
                 </h1>
                 <p class="text-gray-300 text-lg">查看和管理您的订单历史</p>
               </div>
-              <div class="text-right">
-                <div class="text-3xl font-bold text-cyan-400">{{ orders.length }}</div>
-                <div class="text-gray-400 text-sm">订单总数</div>
+              <div class="flex items-center gap-4">
+                <!-- 批量操作按钮组 (只在有待支付订单时显示) -->
+                <div v-if="pendingOrders.length > 0" class="flex items-center gap-2">
+                  <button @click="toggleAllOrders"
+                          :class="[
+                            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 border-2',
+                            isAllSelected 
+                              ? 'border-cyan-500 bg-cyan-500/20 text-cyan-300' 
+                              : 'border-gray-600 text-gray-300 hover:border-cyan-500 hover:text-cyan-300'
+                          ]">
+                    <i :class="isAllSelected ? 'bi-check-square' : 'bi-square'" class="mr-2"></i>
+                    {{ isAllSelected ? '取消全选' : '全选待支付' }}
+                  </button>
+                  
+                  <button @click="quickPay"
+                          :class="[
+                            'px-6 py-2 text-sm font-medium rounded-lg transition-all duration-300 flex items-center gap-2',
+                            hasSelectedOrders 
+                              ? 'bg-cyan-600 hover:bg-cyan-500 text-white' 
+                              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                          ]">
+                    <i class="bi bi-credit-card"></i>
+                    立即支付
+                    <span v-if="hasSelectedOrders" class="text-xs bg-cyan-400 text-cyan-900 px-2 py-1 rounded-full">
+                      {{ selectedOrders.size }}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -111,9 +136,22 @@
             <div class="px-8 py-6 border-b border-gray-700/50 bg-gray-800/30">
               <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
+                  <!-- 待支付订单的自定义多选框 -->
+                  <div v-if="order.status === 'pending'" class="flex items-center">
+                    <div @click="toggleOrderSelection(order.id)"
+                         :class="[
+                           'w-6 h-6 rounded-lg border-2 cursor-pointer transition-all duration-300 flex items-center justify-center',
+                           selectedOrders.has(order.id) 
+                             ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400' 
+                             : 'border-gray-600 hover:border-cyan-500 text-transparent hover:text-cyan-500/50'
+                         ]">
+                      <i class="bi bi-check text-sm font-bold"></i>
+                    </div>
+                  </div>
+                  
                   <div>
-                    <h3 class="text-xl font-bold text-white mb-1">订单 #{{ order.orderNumber }}</h3>
-                    <p class="text-gray-400 text-sm">下单时间：{{ formatDate(order.createdAt) }}</p>
+                    <h3 class="text-xl font-bold text-white mb-1">订单 #{{ order.orderNumber || order.order_no || 'N/A' }}</h3>
+                    <p class="text-gray-400 text-sm">下单时间：{{ formatDate(order.createdAt || order.created_at) }}</p>
                   </div>
                   <div :class="[
                     'inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium',
@@ -124,8 +162,8 @@
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-2xl font-bold text-cyan-400">¥{{ order.total.toLocaleString() }}</div>
-                  <div class="text-gray-400 text-sm">{{ (order.items?.length || 0) }} 件商品</div>
+                  <div class="text-2xl font-bold text-cyan-400">¥{{ (order.total || 0).toLocaleString() }}</div>
+                  <div class="text-gray-400 text-sm">{{ (order.items?.length || 1) }} 件商品</div>
                 </div>
               </div>
             </div>
@@ -150,11 +188,11 @@
                   
                   <!-- 商品信息 -->
                   <div class="flex-1">
-                    <h4 class="font-semibold text-white text-lg mb-1">{{ item.name }}</h4>
-                    <p class="text-gray-400 text-sm mb-2">{{ item.brand }}</p>
+                    <h4 class="font-semibold text-white text-lg mb-1">{{ item.name || '未知商品' }}</h4>
+                    <p class="text-gray-400 text-sm mb-2">{{ item.brand || '未知品牌' }}</p>
                     <div class="flex items-center gap-4">
-                      <span class="text-cyan-400 font-semibold">¥{{ item.price.toLocaleString() }}</span>
-                      <span class="text-gray-400 text-sm">数量：{{ item.quantity }}</span>
+                      <span class="text-cyan-400 font-semibold">¥{{ (item.price || 0).toLocaleString() }}</span>
+                      <span class="text-gray-400 text-sm">数量：{{ item.quantity || 1 }}</span>
                     </div>
                   </div>
 
@@ -264,6 +302,114 @@
           </div>
         </div>
       </div>
+
+      <!-- 批量支付弹窗 -->
+      <div v-if="showBatchPayment" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+              <i class="bi bi-credit-card text-cyan-400"></i>
+              批量支付
+            </h3>
+            <button @click="showBatchPayment = false" class="text-gray-400 hover:text-white">
+              <i class="bi bi-x-lg text-2xl"></i>
+            </button>
+          </div>
+
+          <!-- 选中订单列表 -->
+          <div class="mb-6">
+            <h4 class="text-lg font-semibold text-white mb-4">选中的订单</h4>
+            <div class="space-y-3 max-h-60 overflow-y-auto">
+              <div v-for="order in pendingOrders.filter(o => selectedOrders.has(o.id))" :key="order.id"
+                   class="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-700/30">
+                <div>
+                  <h5 class="font-semibold text-white">订单 #{{ order.orderNumber || order.order_no }}</h5>
+                  <p class="text-gray-400 text-sm">{{ (order.items?.length || 1) }} 件商品</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-cyan-400">¥{{ (order.total || 0).toLocaleString() }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 支付摘要 -->
+          <div class="border-t border-gray-700/50 pt-6 mb-6">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">订单数量</span>
+                <span class="text-white font-semibold">{{ selectedOrders.size }} 个</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">商品总价</span>
+                <span class="text-white font-semibold">¥{{ selectedOrdersTotal.toLocaleString() }}</span>
+              </div>
+              <div class="flex justify-between items-center border-t border-gray-700/50 pt-3">
+                <span class="text-xl font-semibold text-white">支付总额</span>
+                <span class="text-2xl font-bold text-cyan-400">¥{{ selectedOrdersTotal.toLocaleString() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 支付方式选择 -->
+          <div class="mb-6">
+            <h4 class="text-lg font-semibold text-white mb-4">选择支付方式</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button @click="selectedPaymentMethod = 'card'"
+                      :class="[
+                        'p-4 border-2 rounded-lg transition-all duration-300 text-center',
+                        selectedPaymentMethod === 'card' 
+                          ? 'border-cyan-500 bg-cyan-500/20 text-cyan-300' 
+                          : 'border-gray-600/50 hover:border-cyan-500/50 text-gray-300 hover:text-white'
+                      ]">
+                <i class="bi bi-credit-card text-2xl mb-2"></i>
+                <div class="font-semibold">银行卡支付</div>
+                <div class="text-xs opacity-75 mt-1">支持各大银行卡</div>
+              </button>
+              
+              <button @click="selectedPaymentMethod = 'alipay'"
+                      :class="[
+                        'p-4 border-2 rounded-lg transition-all duration-300 text-center',
+                        selectedPaymentMethod === 'alipay' 
+                          ? 'border-cyan-500 bg-cyan-500/20 text-cyan-300' 
+                          : 'border-gray-600/50 hover:border-cyan-500/50 text-gray-300 hover:text-white'
+                      ]">
+                <i class="bi bi-wallet2 text-2xl mb-2"></i>
+                <div class="font-semibold">支付宝</div>
+                <div class="text-xs opacity-75 mt-1">安全便捷支付</div>
+              </button>
+              
+              <button @click="selectedPaymentMethod = 'wechat'"
+                      :class="[
+                        'p-4 border-2 rounded-lg transition-all duration-300 text-center',
+                        selectedPaymentMethod === 'wechat' 
+                          ? 'border-cyan-500 bg-cyan-500/20 text-cyan-300' 
+                          : 'border-gray-600/50 hover:border-cyan-500/50 text-gray-300 hover:text-white'
+                      ]">
+                <i class="bi bi-wechat text-2xl mb-2"></i>
+                <div class="font-semibold">微信支付</div>
+                <div class="text-xs opacity-75 mt-1">微信扫码支付</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex gap-4">
+            <button @click="showBatchPayment = false"
+                    :disabled="isProcessingPayment"
+                    class="flex-1 px-6 py-3 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+              取消
+            </button>
+            <button @click="processBatchPayment"
+                    :disabled="isProcessingPayment"
+                    class="flex-1 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center justify-center gap-2">
+              <div v-if="isProcessingPayment" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <i v-else class="bi bi-credit-card"></i>
+              {{ isProcessingPayment ? '支付中...' : `确认支付 ¥${selectedOrdersTotal.toLocaleString()}` }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </PageLoader>
 </template>
@@ -298,13 +444,54 @@ const reviewItem = ref(null)
 const reviewRating = ref(5)
 const reviewComment = ref('')
 
+// 批量支付相关
+const selectedOrders = ref(new Set())
+const showBatchPayment = ref(false)
+const selectedPaymentMethod = ref('card')
+const isProcessingPayment = ref(false)
+
 // 获取订单数据
 const fetchOrders = async () => {
   try {
     const response = await ordersApi.getMyOrders()
     if (response.success && response.data) {
-      orders.value = response.data
-      return response.data
+      // 处理后端数据，转换为前端期望的格式
+      const processedOrders = response.data.map(order => {
+        // 解析收货地址（如果是JSON字符串）
+        let shippingAddress = order.shipping_address
+        if (typeof shippingAddress === 'string') {
+          try {
+            shippingAddress = JSON.parse(shippingAddress)
+          } catch (e) {
+            console.warn('解析收货地址失败:', e)
+            shippingAddress = {}
+          }
+        }
+
+        // 构造单个订单的商品信息
+        const items = [{
+          id: order.config_id || order.product_id || order.id,
+          name: order.config_name || '未知商品',
+          brand: '品牌',
+          price: Number(order.unit_price || 0),
+          quantity: Number(order.quantity || 1),
+          image: null, // 暂时没有图片
+          product_id: order.config_id || order.product_id
+        }]
+
+        return {
+          ...order,
+          // 添加前端兼容字段，确保数字类型
+          orderNumber: order.order_no,
+          total: Number(order.final_price || order.total_price || 0),
+          createdAt: order.created_at,
+          items: items,
+          shippingAddress: shippingAddress
+        }
+      })
+      
+      orders.value = processedOrders
+      return processedOrders
     } else {
       orders.value = []
       return []
@@ -356,10 +543,149 @@ const filteredOrders = computed(() => {
   return orders.value.filter(order => order.status === selectedStatus.value)
 })
 
+// 待支付订单
+const pendingOrders = computed(() => {
+  return orders.value.filter(order => order.status === 'pending')
+})
+
+// 选中的待支付订单总价
+const selectedOrdersTotal = computed(() => {
+  let total = 0
+  pendingOrders.value.forEach(order => {
+    if (selectedOrders.value.has(order.id)) {
+      // 确保转换为数字进行计算
+      const orderTotal = Number(order.total || order.final_price || 0)
+      total += orderTotal
+    }
+  })
+  return Math.round(total * 100) / 100 // 保留两位小数
+})
+
+// 是否有选中的订单
+const hasSelectedOrders = computed(() => {
+  return selectedOrders.value.size > 0
+})
+
+// 是否全选
+const isAllSelected = computed(() => {
+  return pendingOrders.value.length > 0 && 
+         pendingOrders.value.every(order => selectedOrders.value.has(order.id))
+})
+
 // 方法
 const getOrderCountByStatus = (status) => {
   if (status === 'all') return orders.value.length
   return orders.value.filter(order => order.status === status).length
+}
+
+// 批量支付相关方法
+const toggleOrderSelection = (orderId) => {
+  if (selectedOrders.value.has(orderId)) {
+    selectedOrders.value.delete(orderId)
+  } else {
+    selectedOrders.value.add(orderId)
+  }
+  // 触发响应式更新
+  selectedOrders.value = new Set(selectedOrders.value)
+}
+
+const toggleAllOrders = () => {
+  if (isAllSelected.value) {
+    // 取消全选
+    selectedOrders.value.clear()
+  } else {
+    // 全选待支付订单
+    pendingOrders.value.forEach(order => {
+      selectedOrders.value.add(order.id)
+    })
+  }
+  selectedOrders.value = new Set(selectedOrders.value)
+}
+
+const clearSelection = () => {
+  selectedOrders.value.clear()
+  selectedOrders.value = new Set(selectedOrders.value)
+}
+
+const batchPayment = () => {
+  if (!hasSelectedOrders.value) {
+    error('请先选择要支付的订单')
+    return
+  }
+  
+  const selectedOrderIds = Array.from(selectedOrders.value)
+  console.log('批量支付订单ID:', selectedOrderIds)
+  console.log('支付总金额:', selectedOrdersTotal.value)
+  
+  // 这里应该跳转到支付页面或打开支付弹窗
+  showBatchPayment.value = true
+}
+
+const quickPay = () => {
+  if (!hasSelectedOrders.value) {
+    error('请先选择要支付的订单！')
+    return
+  }
+  
+  console.log('快速支付订单ID:', Array.from(selectedOrders.value))
+  console.log('支付总金额:', selectedOrdersTotal.value)
+  
+  // 打开支付选择弹窗
+  showBatchPayment.value = true
+}
+
+const processBatchPayment = async () => {
+  try {
+    isProcessingPayment.value = true
+    const selectedOrderIds = Array.from(selectedOrders.value)
+    
+    // 获取支付方式中文名
+    const paymentMethods = {
+      'card': '银行卡',
+      'alipay': '支付宝',
+      'wechat': '微信支付'
+    }
+    
+    // 显示支付处理信息
+    console.log('正在处理批量支付...', {
+      orderIds: selectedOrderIds,
+      totalAmount: selectedOrdersTotal.value,
+      orderCount: selectedOrders.value.size,
+      paymentMethod: paymentMethods[selectedPaymentMethod.value]
+    })
+    
+    info(`正在使用${paymentMethods[selectedPaymentMethod.value]}支付 ¥${selectedOrdersTotal.value.toLocaleString()}...`)
+    
+    // 这里应该调用支付API
+    // const paymentResult = await paymentApi.batchPay({
+    //   orderIds: selectedOrderIds,
+    //   amount: selectedOrdersTotal.value,
+    //   paymentMethod: selectedPaymentMethod.value
+    // })
+    
+    // 模拟支付处理时间
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    
+    // 更新订单状态为已支付
+    selectedOrderIds.forEach(orderId => {
+      const orderIndex = orders.value.findIndex(order => order.id === orderId)
+      if (orderIndex > -1) {
+        orders.value[orderIndex].status = 'paid'
+      }
+    })
+    
+    // 清空选择并关闭弹窗
+    clearSelection()
+    showBatchPayment.value = false
+    
+    success(`${paymentMethods[selectedPaymentMethod.value]}支付成功！共支付 ${selectedOrderIds.length} 个订单，总金额 ¥${selectedOrdersTotal.value.toLocaleString()}`)
+    
+  } catch (error) {
+    console.error('批量支付失败:', error)
+    error('支付失败，请重试')
+  } finally {
+    isProcessingPayment.value = false
+  }
 }
 
 const getStatusLabel = (status) => {

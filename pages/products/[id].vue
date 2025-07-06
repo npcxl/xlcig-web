@@ -2,28 +2,25 @@
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
 
     <div class="fixed inset-0 pointer-events-none">
-      <div class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full filter blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
-      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow"></div>
+      <div
+        class="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full filter blur-3xl animate-pulse">
+      </div>
+      <div
+        class="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse delay-1000">
+      </div>
+      <div
+        class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow">
+      </div>
     </div>
-   
+
     <!-- 导航栏 -->
-    <AppHeader 
-      :show-back-button="false"
-      :show-nav-menu="false"
-      :show-breadcrumb="true"
-      :show-location="false"
-      :show-search-button="false"
-      :show-notification-button="false"
-      :show-decorations="false"
-      logo-size="medium"
-      :current-page-title="product?.name || '产品详情'"
-      :breadcrumb-items="[
+    <AppHeader :show-back-button="false" :show-nav-menu="false" :show-breadcrumb="true" :show-location="false"
+      :show-search-button="false" :show-notification-button="false" :show-decorations="false" logo-size="medium"
+      :current-page-title="product?.name || '产品详情'" :breadcrumb-items="[
         { label: '首页', path: '/' },
         { label: '产品中心', path: '/products' },
         { label: product?.name || '产品详情' }
-      ]"
-    />
+      ]" />
 
     <!-- 主要内容 -->
     <div class="container mx-auto px-6 py-8 relative z-10" v-if="product && !loading && !error">
@@ -31,13 +28,14 @@
         <!-- 左侧：产品图片和特性 -->
         <div class="space-y-6">
           <!-- 增强主图片展示 -->
-          <div class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 overflow-hidden backdrop-blur-xl">
+          <div
+            class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 overflow-hidden backdrop-blur-xl">
             <div class="relative h-96 bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-6">
               <!-- 产品图片或placeholder -->
               <div v-if="product.image" class="product-image-container">
-                <img :src="product.image" :alt="product.name" 
-                     class="w-full h-full object-contain transition-all duration-500 hover:scale-105 filter drop-shadow-2xl"
-                     @error="$event.target.style.display = 'none'">
+                <img :src="product.image" :alt="product.name"
+                  class="w-full h-full object-contain transition-all duration-500 hover:scale-105 filter drop-shadow-2xl"
+                  @error="$event.target.style.display = 'none'">
               </div>
               <div v-else class="product-placeholder">
                 <div class="product-icon-wrapper">
@@ -47,33 +45,34 @@
                 <span class="product-placeholder-text">{{ product.name }}</span>
                 <div class="product-tech-pattern"></div>
               </div>
-              
+
               <!-- 增强折扣标签 -->
-              <div v-if="product.originalPrice && product.originalPrice > product.price" 
-                   class="absolute top-4 left-4 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-red-500/40 animate-pulse">
+              <div v-if="product.originalPrice && product.originalPrice > product.price"
+                class="absolute top-4 left-4 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-red-500/40 animate-pulse">
                 <i class="bi bi-lightning-fill mr-1"></i>
                 省 ¥{{ (product.originalPrice - product.price).toLocaleString() }}
               </div>
 
               <!-- 增强库存状态 -->
               <div class="absolute top-4 right-4">
-                <span v-if="!product.inStock" 
-                      class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-500/30 text-red-200 border border-red-400/50 shadow-lg shadow-red-500/30 backdrop-blur-sm">
+                <span v-if="!product.inStock"
+                  class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-500/30 text-red-200 border border-red-400/50 shadow-lg shadow-red-500/30 backdrop-blur-sm">
                   <i class="bi bi-x-circle-fill mr-2 text-red-300"></i>缺货
                 </span>
-                <span v-else-if="product.stockCount <= 5" 
-                      class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-orange-500/30 text-orange-200 border border-orange-400/50 shadow-lg shadow-orange-500/30 backdrop-blur-sm animate-pulse">
+                <span v-else-if="product.stockCount <= 5"
+                  class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-orange-500/30 text-orange-200 border border-orange-400/50 shadow-lg shadow-orange-500/30 backdrop-blur-sm animate-pulse">
                   <i class="bi bi-exclamation-triangle-fill mr-2 text-orange-300"></i>仅剩 {{ product.stockCount }} 件
                 </span>
-                <span v-else 
-                      class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/50 shadow-lg shadow-emerald-500/30 backdrop-blur-sm">
+                <span v-else
+                  class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/50 shadow-lg shadow-emerald-500/30 backdrop-blur-sm">
                   <i class="bi bi-check-circle-fill mr-2 text-emerald-300"></i>现货充足
                 </span>
               </div>
 
               <!-- 产品类型标识 -->
               <div class="absolute bottom-4 left-4">
-                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm">
                   <i class="bi bi-bookmark-fill mr-1"></i>
                   {{ getProductCategory(product.category) }}
                 </span>
@@ -82,7 +81,8 @@
           </div>
 
           <!-- 增强产品特性 -->
-          <div class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
+          <div
+            class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
             <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <div class="p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg shadow-lg">
                 <i class="bi bi-stars text-white"></i>
@@ -91,12 +91,14 @@
             </h3>
             <div class="grid grid-cols-1 gap-4" v-if="product.features && product.features.length > 0">
               <div v-for="(feature, index) in product.features" :key="feature"
-                   class="group flex items-center gap-4 p-4 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 backdrop-blur-sm"
-                   :style="{ 'animation-delay': `${index * 100}ms` }">
-                <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                class="group flex items-center gap-4 p-4 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 backdrop-blur-sm"
+                :style="{ 'animation-delay': `${index * 100}ms` }">
+                <div
+                  class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <i class="bi bi-check text-white text-sm font-bold"></i>
                 </div>
-                <span class="text-white font-medium group-hover:text-cyan-300 transition-colors duration-300">{{ feature }}</span>
+                <span class="text-white font-medium group-hover:text-cyan-300 transition-colors duration-300">{{ feature
+                }}</span>
               </div>
             </div>
             <div v-else class="text-gray-400 text-center py-8">
@@ -109,11 +111,13 @@
         <!-- 右侧：产品信息和购买 -->
         <div class="space-y-6">
           <!-- 增强基本信息 -->
-          <div class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
+          <div
+            class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
             <!-- 品牌和收藏 -->
             <div class="flex items-center justify-between mb-6">
               <div class="flex items-center gap-4">
-                <span class="inline-flex items-center px-5 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-500/30 to-blue-500/30 text-cyan-200 border border-cyan-400/40 shadow-lg backdrop-blur-sm">
+                <span
+                  class="inline-flex items-center px-5 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-500/30 to-blue-500/30 text-cyan-200 border border-cyan-400/40 shadow-lg backdrop-blur-sm">
                   <i class="bi bi-award mr-2"></i>
                   {{ product.brand }}
                 </span>
@@ -122,16 +126,17 @@
                   <span>{{ product.viewCount || 1234 }} 次浏览</span>
                 </div>
               </div>
-              <button @click="toggleFavorite" 
-                      :class="[
-                        'p-3 rounded-xl border transition-all duration-300 group relative overflow-hidden',
-                        isFavorite 
-                          ? 'bg-gradient-to-r from-red-500/30 to-pink-500/30 border-red-400/50 text-red-300 shadow-lg shadow-red-500/30' 
-                          : 'border-gray-600/50 text-gray-400 hover:border-red-400/50 hover:text-red-300 hover:bg-red-500/10'
-                      ]">
-                <i :class="isFavorite ? 'bi bi-heart-fill' : 'bi bi-heart'" 
-                   class="text-xl relative z-10 group-hover:scale-110 transition-transform duration-300"></i>
-                <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <button @click="toggleFavorite" :class="[
+                'p-3 rounded-xl border transition-all duration-300 group relative overflow-hidden',
+                isFavorite
+                  ? 'bg-gradient-to-r from-red-500/30 to-pink-500/30 border-red-400/50 text-red-300 shadow-lg shadow-red-500/30'
+                  : 'border-gray-600/50 text-gray-400 hover:border-red-400/50 hover:text-red-300 hover:bg-red-500/10'
+              ]">
+                <i :class="isFavorite ? 'bi bi-heart-fill' : 'bi bi-heart'"
+                  class="text-xl relative z-10 group-hover:scale-110 transition-transform duration-300"></i>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                </div>
               </button>
             </div>
 
@@ -155,12 +160,12 @@
             </div>
 
             <!-- 增强评分展示 -->
-            <div class="flex items-center gap-6 mb-8 p-4 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 backdrop-blur-sm">
+            <div
+              class="flex items-center gap-6 mb-8 p-4 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 backdrop-blur-sm">
               <div class="flex items-center gap-3">
                 <div class="flex">
-                  <i v-for="i in 5" :key="i" 
-                     :class="i <= product.rating ? 'text-yellow-400' : 'text-gray-600'"
-                     class="bi bi-star-fill text-xl drop-shadow-lg"></i>
+                  <i v-for="i in 5" :key="i" :class="i <= product.rating ? 'text-yellow-400' : 'text-gray-600'"
+                    class="bi bi-star-fill text-xl drop-shadow-lg"></i>
                 </div>
                 <span class="text-2xl font-bold text-white">{{ product.rating }}</span>
               </div>
@@ -180,17 +185,19 @@
             </div>
 
             <!-- 增强价格展示 -->
-            <div class="mb-8 p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-400/30 backdrop-blur-sm">
+            <div
+              class="mb-8 p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-400/30 backdrop-blur-sm">
               <div class="flex items-end gap-4 mb-3">
-                <span class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                <span
+                  class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                   ¥{{ product.price.toLocaleString() }}
                 </span>
-                <span v-if="product.originalPrice && product.originalPrice > product.price" 
-                      class="text-2xl text-gray-500 line-through mb-2">
+                <span v-if="product.originalPrice && product.originalPrice > product.price"
+                  class="text-2xl text-gray-500 line-through mb-2">
                   ¥{{ product.originalPrice.toLocaleString() }}
                 </span>
                 <span v-if="product.originalPrice && product.originalPrice > product.price"
-                      class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg text-sm font-medium border border-red-400/30 mb-2">
+                  class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg text-sm font-medium border border-red-400/30 mb-2">
                   省{{ Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) }}%
                 </span>
               </div>
@@ -205,17 +212,19 @@
               </label>
               <div class="flex items-center gap-6">
                 <div class="flex items-center border border-gray-600/50 rounded-xl bg-gray-800/30 backdrop-blur-sm">
-                  <button @click="decreaseQuantity" 
-                          class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-l-xl transition-all duration-300 border-r border-gray-600/50">
+                  <button @click="decreaseQuantity"
+                    class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-l-xl transition-all duration-300 border-r border-gray-600/50">
                     <i class="bi bi-dash-lg text-lg font-bold"></i>
                   </button>
-                  <span class="px-8 py-3 text-white font-bold text-lg min-w-[80px] text-center bg-gray-700/30">{{ quantity }}</span>
-                  <button @click="increaseQuantity" 
-                          class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-r-xl transition-all duration-300 border-l border-gray-600/50">
+                  <span class="px-8 py-3 text-white font-bold text-lg min-w-[80px] text-center bg-gray-700/30">{{
+                    quantity }}</span>
+                  <button @click="increaseQuantity"
+                    class="px-5 py-3 text-white hover:bg-cyan-500/20 hover:text-cyan-300 rounded-r-xl transition-all duration-300 border-l border-gray-600/50">
                     <i class="bi bi-plus-lg text-lg font-bold"></i>
                   </button>
                 </div>
-                <div class="flex items-center gap-2 text-gray-300 bg-gray-800/30 px-4 py-2 rounded-lg border border-gray-600/30 backdrop-blur-sm">
+                <div
+                  class="flex items-center gap-2 text-gray-300 bg-gray-800/30 px-4 py-2 rounded-lg border border-gray-600/30 backdrop-blur-sm">
                   <i class="bi bi-box text-green-400"></i>
                   <span>库存：<span class="text-green-400 font-bold">{{ product.stockCount }}</span> 件</span>
                 </div>
@@ -223,25 +232,30 @@
             </div>
 
             <!-- 未登录提示 -->
-            <div v-if="!userStore.isLoggedIn" class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl backdrop-blur-sm">
+            <div v-if="!userStore.isLoggedIn"
+              class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl backdrop-blur-sm">
               <div class="flex items-center gap-2 text-yellow-400 mb-2">
                 <i class="bi bi-info-circle"></i>
                 <span class="font-medium">购买提示</span>
               </div>
               <p class="text-yellow-300 text-sm">
-                <NuxtLink to="/auth/login" class="text-yellow-400 hover:text-yellow-300 underline font-medium">登录</NuxtLink> 
+                <NuxtLink to="/auth/login" class="text-yellow-400 hover:text-yellow-300 underline font-medium">登录
+                </NuxtLink>
                 后即可将商品添加到购物车，享受更便捷的购物体验。
               </p>
             </div>
 
             <!-- 购买按钮 - 增强版 -->
             <div class="space-y-4 mb-8">
-              <button @click="addToCart" 
-                      :disabled="!product.inStock || showSuccessMessage || isAddingToCart || !userStore.isLoggedIn"
-                      data-add-to-cart
-                      class="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:via-blue-500 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <div v-if="isAddingToCart" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <button @click="addToCart"
+                :disabled="!product.inStock || showSuccessMessage || isAddingToCart || !userStore.isLoggedIn"
+                data-add-to-cart
+                class="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:via-blue-500 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700">
+                </div>
+                <div v-if="isAddingToCart"
+                  class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 <i v-else class="bi bi-cart-plus text-xl"></i>
                 <span v-if="!userStore.isLoggedIn">请先登录</span>
                 <span v-else-if="!product.inStock">暂时缺货</span>
@@ -249,10 +263,11 @@
                 <span v-else>加入购物车</span>
               </button>
 
-              <button @click="buyNow" 
-                      :disabled="!product.inStock || !userStore.isLoggedIn"
-                      class="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-500 hover:via-emerald-500 hover:to-green-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              <button @click="buyNow" :disabled="!product.inStock || !userStore.isLoggedIn"
+                class="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-500 hover:via-emerald-500 hover:to-green-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 relative overflow-hidden group">
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700">
+                </div>
                 <i class="bi bi-lightning-fill text-xl"></i>
                 <span v-if="!userStore.isLoggedIn">请先登录</span>
                 <span v-else>立即购买</span>
@@ -262,20 +277,24 @@
             <!-- 保障信息 - 增强版 -->
             <div class="pt-6 border-t border-gray-700/50">
               <div class="grid grid-cols-3 gap-4 text-center">
-                <div class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/30 hover:border-green-400/50 transition-all duration-300 group">
+                <div
+                  class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/30 hover:border-green-400/50 transition-all duration-300 group">
                   <div class="p-3 bg-green-500/20 rounded-full group-hover:scale-110 transition-transform duration-300">
                     <i class="bi bi-truck text-2xl text-green-400"></i>
                   </div>
                   <span class="text-sm text-gray-300 font-medium">免费配送</span>
                 </div>
-                <div class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-400/30 hover:border-blue-400/50 transition-all duration-300 group">
+                <div
+                  class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-400/30 hover:border-blue-400/50 transition-all duration-300 group">
                   <div class="p-3 bg-blue-500/20 rounded-full group-hover:scale-110 transition-transform duration-300">
                     <i class="bi bi-shield-check text-2xl text-blue-400"></i>
                   </div>
                   <span class="text-sm text-gray-300 font-medium">两年保修</span>
                 </div>
-                <div class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/30 hover:border-purple-400/50 transition-all duration-300 group">
-                  <div class="p-3 bg-purple-500/20 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <div
+                  class="flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/30 hover:border-purple-400/50 transition-all duration-300 group">
+                  <div
+                    class="p-3 bg-purple-500/20 rounded-full group-hover:scale-110 transition-transform duration-300">
                     <i class="bi bi-arrow-repeat text-2xl text-purple-400"></i>
                   </div>
                   <span class="text-sm text-gray-300 font-medium">30天退换</span>
@@ -287,7 +306,8 @@
       </div>
 
       <!-- 详细规格 - 增强版 -->
-      <div class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 mb-12 backdrop-blur-xl">
+      <div
+        class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 mb-12 backdrop-blur-xl">
         <h2 class="text-3xl font-bold text-white mb-8 flex items-center gap-4">
           <div class="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg shadow-lg">
             <i class="bi bi-gear-fill text-white text-2xl"></i>
@@ -295,10 +315,11 @@
           <span class="bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">技术规格</span>
         </h2>
         <div v-if="product.specs && Object.keys(product.specs).length > 0" class="grid md:grid-cols-2 gap-6">
-          <div v-for="(value, key) in product.specs" :key="key" 
-               class="group flex justify-between items-center p-5 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 backdrop-blur-sm">
+          <div v-for="(value, key) in product.specs" :key="key"
+            class="group flex justify-between items-center p-5 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 backdrop-blur-sm">
             <span class="text-gray-300 font-semibold text-lg">{{ translateSpecKey(key) }}</span>
-            <span class="font-bold text-white text-lg group-hover:text-cyan-300 transition-colors duration-300">{{ value }}</span>
+            <span class="font-bold text-white text-lg group-hover:text-cyan-300 transition-colors duration-300">{{ value
+            }}</span>
           </div>
         </div>
         <div v-else class="text-gray-400 text-center py-8">
@@ -308,57 +329,61 @@
       </div>
 
       <!-- 用户评价 - 增强版 -->
-      <div class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
+      <div
+        class="glass-card-enhanced rounded-2xl border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 p-8 backdrop-blur-xl">
         <h2 class="text-3xl font-bold text-white mb-8 flex items-center gap-4">
           <div class="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg shadow-lg">
             <i class="bi bi-chat-dots-fill text-white text-2xl"></i>
           </div>
           <span class="bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">用户评价</span>
         </h2>
-        
+
         <!-- 评价统计 - 增强版 -->
         <div v-if="reviewStats" class="grid md:grid-cols-2 gap-8 mb-8">
-          <div class="text-center p-6 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-400/30">
-            <div class="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-4">{{ reviewStats.average_rating }}</div>
+          <div
+            class="text-center p-6 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-400/30">
+            <div
+              class="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-4">
+              {{ reviewStats.average_rating }}</div>
             <div class="flex justify-center mb-4">
-              <i v-for="i in 5" :key="i" 
-                 :class="i <= Math.round(reviewStats.average_rating) ? 'text-yellow-400' : 'text-gray-600'"
-                 class="bi bi-star-fill text-2xl drop-shadow-lg"></i>
+              <i v-for="i in 5" :key="i"
+                :class="i <= Math.round(reviewStats.average_rating) ? 'text-yellow-400' : 'text-gray-600'"
+                class="bi bi-star-fill text-2xl drop-shadow-lg"></i>
             </div>
-            <div class="text-gray-300 text-lg">基于 <span class="text-yellow-400 font-bold">{{ reviewStats.total_reviews }}</span> 条评价</div>
+            <div class="text-gray-300 text-lg">基于 <span class="text-yellow-400 font-bold">{{ reviewStats.total_reviews
+            }}</span> 条评价</div>
           </div>
-          
+
           <div class="space-y-4">
-            <div v-for="item in reviewStats.rating_distribution" :key="item.rating" 
-                 class="flex items-center gap-4">
+            <div v-for="item in reviewStats.rating_distribution" :key="item.rating" class="flex items-center gap-4">
               <span class="text-white w-12 flex-shrink-0 font-bold">{{ item.rating }}星</span>
-              <div class="flex-1 bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm border border-gray-600/30">
-                <div class="bg-gradient-to-r from-yellow-400 to-orange-400 h-3 rounded-full transition-all duration-500 hover:shadow-lg hover:shadow-yellow-500/30" 
-                     :style="{ width: `${item.percentage}%` }"></div>
+              <div
+                class="flex-1 bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm border border-gray-600/30">
+                <div
+                  class="bg-gradient-to-r from-yellow-400 to-orange-400 h-3 rounded-full transition-all duration-500 hover:shadow-lg hover:shadow-yellow-500/30"
+                  :style="{ width: `${item.percentage}%` }"></div>
               </div>
               <span class="text-gray-400 w-16 text-sm flex-shrink-0 font-medium">{{ item.count }} 条</span>
             </div>
           </div>
         </div>
-        
+
         <!-- 加载中状态 -->
         <div v-else-if="isLoadingReviews" class="text-center py-8">
-          <div class="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div class="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4">
+          </div>
           <p class="text-gray-300">正在加载评论统计...</p>
         </div>
 
         <!-- 发表评论组件 -->
         <div class="mb-8">
-          <ReviewForm 
-            v-if="product" 
-            :product-id="product.id" 
-            @review-submitted="handleReviewSubmitted" />
+          <ReviewForm v-if="product" :product-id="product.id" @review-submitted="handleReviewSubmitted" />
         </div>
 
         <!-- 评论筛选和排序 -->
         <div class="flex flex-wrap gap-4 mb-6">
-          <select v-model="reviewFilters.rating" @change="handleFilterChange" 
-                  class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
+          <select v-model="reviewFilters.rating" @change="handleFilterChange"
+            class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
             <option value="all">所有评分</option>
             <option value="5">5星</option>
             <option value="4">4星</option>
@@ -366,9 +391,9 @@
             <option value="2">2星</option>
             <option value="1">1星</option>
           </select>
-          
+
           <select v-model="reviewFilters.sort" @change="handleFilterChange"
-                  class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
+            class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:ring-2 focus:ring-cyan-500">
             <option value="newest">最新发布</option>
             <option value="oldest">最早发布</option>
             <option value="rating_high">评分从高到低</option>
@@ -379,16 +404,15 @@
 
         <!-- 评价列表 - 增强版 -->
         <div v-if="!isLoadingReviews && reviews.length > 0" class="space-y-6">
-          <div v-for="review in reviews" :key="review.id" 
-               class="p-6 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-sm">
+          <div v-for="review in reviews" :key="review.id"
+            class="p-6 bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl border border-gray-600/30 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-sm">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-4">
                 <!-- 用户头像 -->
-                <div class="w-14 h-14 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full flex items-center justify-center border border-cyan-400/40 shadow-lg overflow-hidden">
-                  <img v-if="review.user_info?.avatar && !review.is_anonymous" 
-                       :src="review.user_info.avatar" 
-                       :alt="review.author"
-                       class="w-full h-full object-cover">
+                <div
+                  class="w-14 h-14 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full flex items-center justify-center border border-cyan-400/40 shadow-lg overflow-hidden">
+                  <img v-if="review.user_info?.avatar && !review.is_anonymous" :src="review.user_info.avatar"
+                    :alt="review.author" class="w-full h-full object-cover">
                   <i v-else class="bi bi-person-fill text-cyan-400 text-xl"></i>
                 </div>
                 <div>
@@ -398,14 +422,14 @@
                       {{ review.is_anonymous ? '匿名用户' : (review.user_info?.nickname || review.author) }}
                     </div>
                     <!-- 匿名标识 -->
-                    <span v-if="review.is_anonymous" 
-                          class="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded-full border border-gray-400/30">
+                    <span v-if="review.is_anonymous"
+                      class="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded-full border border-gray-400/30">
                       <i class="bi bi-incognito mr-1"></i>
                       匿名
                     </span>
                     <!-- 已验证购买标识 -->
-                    <span v-if="review.verified_purchase" 
-                          class="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-400/30">
+                    <span v-if="review.verified_purchase"
+                      class="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-400/30">
                       <i class="bi bi-check-circle mr-1"></i>
                       已购买
                     </span>
@@ -415,26 +439,24 @@
                 </div>
               </div>
               <div class="flex gap-1">
-                <i v-for="i in 5" :key="i" 
-                   :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-600'"
-                   class="bi bi-star-fill text-lg drop-shadow-lg"></i>
+                <i v-for="i in 5" :key="i" :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-600'"
+                  class="bi bi-star-fill text-lg drop-shadow-lg"></i>
               </div>
             </div>
             <p class="text-gray-300 leading-relaxed text-lg mb-4">{{ review.comment }}</p>
-            
+
             <!-- 评论图片 -->
             <div v-if="review.images && review.images.length > 0" class="grid grid-cols-3 gap-2 mb-4">
-              <img v-for="(image, index) in review.images" :key="index"
-                   :src="image" :alt="`评论图片${index + 1}`"
-                   class="w-full h-20 object-cover rounded-lg border border-gray-600/30">
+              <img v-for="(image, index) in review.images" :key="index" :src="image" :alt="`评论图片${index + 1}`"
+                class="w-full h-20 object-cover rounded-lg border border-gray-600/30">
             </div>
-            
+
             <!-- 点赞功能 -->
             <div class="flex items-center justify-between pt-4 border-t border-gray-700/50">
               <span class="text-gray-400 text-sm">这条评论有帮助吗？</span>
               <div class="flex items-center gap-4">
                 <button @click="toggleReviewHelpful(review.id, true)"
-                        class="flex items-center gap-2 px-3 py-1 text-gray-400 hover:text-green-400 transition-colors duration-200">
+                  class="flex items-center gap-2 px-3 py-1 text-gray-400 hover:text-green-400 transition-colors duration-200">
                   <i class="bi bi-hand-thumbs-up"></i>
                   <span>有帮助 ({{ review.helpful_count || 0 }})</span>
                 </button>
@@ -442,7 +464,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 无评论状态 -->
         <div v-else-if="!isLoadingReviews && reviews.length === 0" class="text-center py-12">
           <div class="text-4xl text-gray-400 mb-4">
@@ -451,57 +473,55 @@
           <h3 class="text-xl font-semibold text-white mb-2">暂无评论</h3>
           <p class="text-gray-400 mb-6">成为第一个评价此产品的用户</p>
         </div>
-        
-                 <!-- 评论加载中 -->
-         <div v-else-if="isLoadingReviews" class="text-center py-8">
-           <div class="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-           <p class="text-gray-300">正在加载评论...</p>
-         </div>
-         
-         <!-- 评论分页 -->
-         <div v-if="!isLoadingReviews && reviews.length > 0" class="mt-8 flex justify-center">
-           <div class="flex items-center gap-2">
-             <button 
-               @click="goToPage(currentPage - 1)" 
-               :disabled="currentPage <= 1"
-               class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-               <i class="bi bi-chevron-left"></i>
-               上一页
-             </button>
-             
-             <span class="px-4 py-2 text-gray-300">
-               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
-             </span>
-             
-             <button 
-               @click="goToPage(currentPage + 1)" 
-               :disabled="currentPage >= totalPages"
-               class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-               下一页
-               <i class="bi bi-chevron-right"></i>
-             </button>
-           </div>
-         </div>
-       </div>
-     </div>
+
+        <!-- 评论加载中 -->
+        <div v-else-if="isLoadingReviews" class="text-center py-8">
+          <div class="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4">
+          </div>
+          <p class="text-gray-300">正在加载评论...</p>
+        </div>
+
+        <!-- 评论分页 -->
+        <div v-if="!isLoadingReviews && reviews.length > 0" class="mt-8 flex justify-center">
+          <div class="flex items-center gap-2">
+            <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1"
+              class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+              <i class="bi bi-chevron-left"></i>
+              上一页
+            </button>
+
+            <span class="px-4 py-2 text-gray-300">
+              第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
+            </span>
+
+            <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages"
+              class="px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+              下一页
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 错误状态 - 深色主题 -->
     <div v-else-if="error && !loading" class="container mx-auto px-6 py-20 relative z-10">
       <div class="text-center">
-        <div class="inline-flex flex-col items-center glass-card-enhanced rounded-2xl border border-red-400/40 p-16 shadow-2xl shadow-red-500/25 backdrop-blur-xl max-w-md mx-auto">
+        <div
+          class="inline-flex flex-col items-center glass-card-enhanced rounded-2xl border border-red-400/40 p-16 shadow-2xl shadow-red-500/25 backdrop-blur-xl max-w-md mx-auto">
           <div class="text-8xl text-red-400 mb-8">
             <i class="bi bi-exclamation-triangle-fill"></i>
           </div>
           <h3 class="text-3xl font-bold text-white mb-4">加载失败</h3>
           <p class="text-gray-400 text-lg mb-8">{{ error }}</p>
           <div class="space-y-3 w-full">
-            <button @click="loadProductDetail" 
-                    class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40">
+            <button @click="loadProductDetail"
+              class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40">
               <i class="bi bi-arrow-clockwise mr-2"></i>
               重新加载
             </button>
-            <button @click="$router.go(-1)" 
-                    class="w-full border border-gray-600/50 hover:border-cyan-400/50 text-gray-300 hover:text-white hover:bg-cyan-500/10 py-3 px-6 rounded-xl font-semibold transition-all duration-300 backdrop-blur-sm">
+            <button @click="$router.go(-1)"
+              class="w-full border border-gray-600/50 hover:border-cyan-400/50 text-gray-300 hover:text-white hover:bg-cyan-500/10 py-3 px-6 rounded-xl font-semibold transition-all duration-300 backdrop-blur-sm">
               返回上页
             </button>
           </div>
@@ -512,7 +532,8 @@
     <!-- 加载状态 - 增强版 -->
     <div v-else-if="loading" class="container mx-auto px-6 py-20 relative z-10">
       <div class="text-center">
-        <div class="inline-flex flex-col items-center glass-card-enhanced rounded-2xl border border-cyan-400/40 p-16 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
+        <div
+          class="inline-flex flex-col items-center glass-card-enhanced rounded-2xl border border-cyan-400/40 p-16 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
           <div class="relative mb-8">
             <div class="w-20 h-20 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
             <div class="absolute inset-0 w-20 h-20 border-4 border-blue-500/30 rounded-full animate-pulse"></div>
@@ -524,26 +545,19 @@
     </div>
 
     <!-- 购买成功提示 - 增强版 -->
-    <div v-if="showSuccessMessage" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <!-- 撒花动画背景 -->
+    <div v-if="showSuccessMessage"
+      class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <!-- 撒花动画背景 - 围绕弹窗 -->
       <div class="confetti-container">
         <!-- 持续生成撒花 -->
         <div v-for="batch in confettiBatches" :key="batch.id">
-          <div v-for="i in 30" :key="`${batch.id}-${i}`" 
-               class="confetti-piece"
-               :class="getConfettiShape(i)"
-               :style="{
-                 left: Math.random() * 100 + '%',
-                 animationDelay: (Math.random() * 2 + batch.delay) + 's',
-                 animationDuration: '3s',
-                 backgroundColor: getConfettiColor(i + batch.id * 30),
-                 width: (8 + Math.random() * 6) + 'px',
-                 height: (8 + Math.random() * 6) + 'px'
-               }"></div>
+          <div v-for="i in 30" :key="`${batch.id}-${i}`" class="confetti-piece" :class="getConfettiShape(i)"
+            :style="getConfettiStyle(i, batch.delay)"></div>
         </div>
       </div>
-      
-      <div class="glass-card-enhanced rounded-2xl border border-green-400/50 shadow-2xl shadow-green-500/30 p-10 max-w-md w-full text-center backdrop-blur-xl transform animate-bounce-in">
+
+      <div
+        class="glass-card-enhanced rounded-2xl border border-green-400/50 shadow-2xl shadow-green-500/30 p-10 max-w-md w-full text-center backdrop-blur-xl transform animate-bounce-in">
         <div class="text-8xl text-green-400 mb-8 relative">
           <i class="bi bi-check-circle-fill drop-shadow-2xl animate-check-bounce"></i>
           <div class="absolute inset-0 text-green-400/30 animate-ping-once">
@@ -553,12 +567,12 @@
         <h3 class="text-3xl font-bold text-white mb-6">已加入购物车！</h3>
         <p class="text-gray-300 mb-8 text-lg leading-relaxed">{{ product?.name }} 已成功添加到购物车。</p>
         <div class="space-y-4">
-          <button @click="goToCheckout" 
-                  class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transform hover:scale-105">
+          <button @click="goToCheckout"
+            class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transform hover:scale-105">
             立即去结算
           </button>
-          <button @click="hideSuccessMessage" 
-                  class="w-full border border-gray-600/50 hover:border-green-400/50 text-gray-300 hover:text-white hover:bg-green-500/10 py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 backdrop-blur-sm">
+          <button @click="hideSuccessMessage"
+            class="w-full border border-gray-600/50 hover:border-green-400/50 text-gray-300 hover:text-white hover:bg-green-500/10 py-3 px-6 rounded-xl font-bold text-lg transition-all duration-300 backdrop-blur-sm">
             继续购物
           </button>
         </div>
@@ -567,7 +581,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup >
 // 导入路由参数
 const route = useRoute()
 const productId = parseInt(route.params.id)
@@ -630,10 +644,10 @@ const getProductCategory = (category) => {
 // 加载评论数据
 const loadReviews = async () => {
   if (!product.value) return
-  
+
   try {
     isLoadingReviews.value = true
-    
+
     // 获取评论列表
     const reviewsResponse = await reviewsApi.getProductReviews(product.value.id, {
       page: currentPage.value,
@@ -641,13 +655,13 @@ const loadReviews = async () => {
       rating: reviewFilters.value.rating === 'all' ? undefined : parseInt(reviewFilters.value.rating),
       sort: reviewFilters.value.sort
     })
-    
+
     if (reviewsResponse.success) {
       reviews.value = reviewsResponse.data.reviews
       // 更新分页信息
       totalPages.value = reviewsResponse.data.pagination.total_pages
     }
-    
+
     // 获取评论统计
     const statsResponse = await reviewsApi.getProductReviewStats(product.value.id)
     if (statsResponse.success) {
@@ -663,7 +677,7 @@ const loadReviews = async () => {
 // 分页导航
 const goToPage = async (page) => {
   if (page < 1 || page > totalPages.value || page === currentPage.value) return
-  
+
   currentPage.value = page
   await loadReviews()
 }
@@ -673,12 +687,12 @@ const loadProductDetail = async () => {
   try {
     loading.value = true
     error.value = null
-    
+
     const response = await productsApi.getProductById(productId)
-    
+
     if (response.success && response.data) {
       const apiProduct = response.data
-      
+
       // 转换API数据格式为页面所需格式
       product.value = {
         id: apiProduct.id,
@@ -703,10 +717,10 @@ const loadProductDetail = async () => {
         sku: apiProduct.sku,
         model: apiProduct.model
       }
-      
+
       // 检查收藏状态
       checkFavoriteStatus()
-      
+
       // 加载评论数据
       await loadReviews()
     } else {
@@ -742,7 +756,7 @@ const toggleReviewHelpful = async (reviewId, helpful) => {
     message.warning('请先登录后再进行操作')
     return
   }
-  
+
   try {
     const response = await reviewsApi.toggleReviewHelpful(reviewId, helpful)
     if (response.success) {
@@ -765,7 +779,7 @@ const handleReviewSubmitted = () => {
   // 重置到第一页并重新加载评论数据
   currentPage.value = 1
   loadReviews()
-  
+
   // 显示成功消息
   message.success('感谢您的评价！评论已发布')
 }
@@ -811,28 +825,28 @@ const toggleFavorite = () => {
 // 添加到购物车
 const addToCart = async () => {
   if (!product.value || !product.value.inStock || showSuccessMessage.value || isAddingToCart.value) return
-  
+
   // 检查用户登录状态
   if (!userStore.isLoggedIn) {
     // 未登录用户跳转到登录页面
     navigateTo('/auth/login')
     return
   }
-  
+
   try {
     isAddingToCart.value = true
-    
+
     const cartData = {
       productId: product.value.id,
       quantity: quantity.value
     }
-    
+
     const response = await cartApi.addToCart(cartData)
-    
+
     if (response.success) {
       showSuccessMessage.value = true
       playSuccessSound()
-      
+
       // 显示成功消息
       console.log('商品已成功添加到购物车')
     } else {
@@ -840,7 +854,7 @@ const addToCart = async () => {
     }
   } catch (err) {
     console.error('添加到购物车失败:', err)
-    
+
     // 显示错误消息
     if (err.message) {
       message.error('添加失败：' + err.message)
@@ -858,18 +872,18 @@ const buyNow = async () => {
     navigateTo('/auth/login')
     return
   }
-  
+
   if (!product.value || !product.value.inStock) return
-  
+
   try {
     // 直接添加到购物车并跳转到结算页面
     const cartData = {
       productId: product.value.id,
       quantity: quantity.value
     }
-    
+
     const response = await cartApi.addToCart(cartData)
-    
+
     if (response.success) {
       message.success('商品已添加到购物车，正在跳转到结算页面...')
       // 延迟跳转，让用户看到成功消息
@@ -901,18 +915,18 @@ const playSuccessSound = () => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)()
     const oscillator = audioContext.createOscillator()
     const gainNode = audioContext.createGain()
-    
+
     oscillator.connect(gainNode)
     gainNode.connect(audioContext.destination)
-    
+
     oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
     oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1)
     oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2)
-    
+
     gainNode.gain.setValueAtTime(0, audioContext.currentTime)
     gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01)
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-    
+
     oscillator.start(audioContext.currentTime)
     oscillator.stop(audioContext.currentTime + 0.3)
   } catch (error) {
@@ -926,7 +940,7 @@ watch(showSuccessMessage, (newValue) => {
   if (newValue) {
     // 开始撒花动画
     startConfettiAnimation()
-    
+
     // 撒花动画3秒后自动停止，但弹窗保持显示
     setTimeout(() => {
       stopConfettiAnimation()
@@ -941,20 +955,20 @@ watch(showSuccessMessage, (newValue) => {
 const startConfettiAnimation = () => {
   confettiBatches.value = []
   let batchId = 0
-  
+
   // 立即生成第一批撒花
   confettiBatches.value.push({
     id: batchId++,
     delay: 0
   })
-  
+
   // 每0.5秒生成新的撒花批次，让动画更连续
   confettiInterval = setInterval(() => {
     confettiBatches.value.push({
       id: batchId++,
       delay: 0
     })
-    
+
     // 保持最多6个批次，移除旧的批次
     if (confettiBatches.value.length > 6) {
       confettiBatches.value.shift()
@@ -971,10 +985,17 @@ const stopConfettiAnimation = () => {
   confettiBatches.value = []
 }
 
-// 获取撒花颜色
+// 生成撒花颜色
 const getConfettiColor = (index) => {
-  const colors = ['#00f5ff', '#0080ff', '#a855f7', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6']
-  return colors[index % colors.length]
+  const vibrantColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+    '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#F9E79F',
+    '#AED6F1', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#A3E4D7',
+    '#FFD93D', '#6BCF7F', '#4D96FF', '#9B59B6', '#1ABC9C',
+    '#E74C3C', '#F39C12', '#8E44AD', '#27AE60', '#3498DB'
+  ]
+  return vibrantColors[index % vibrantColors.length]
 }
 
 // 获取撒花形状
@@ -986,7 +1007,7 @@ const getConfettiShape = (index) => {
 const translateSpecKey = (key) => {
   const translations = {
     'TDP': 'TDP功耗',
-    '制程': '制程工艺', 
+    '制程': '制程工艺',
     '插槽': '接口插槽',
     '缓存': '缓存',
     'L2缓存': 'L2缓存',
@@ -1019,10 +1040,10 @@ const translateSpecKey = (key) => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 }
 
@@ -1051,6 +1072,36 @@ useHead({
     { name: 'description', content: computed(() => product.value?.description || '查看产品详细信息和技术规格') }
   ]
 })
+
+// 生成撒花样式
+const getConfettiStyle = (index, batchDelay) => {
+  // 创建圆形扩散效果
+  const angle = (index * 12) % 360 // 每个撒花不同角度
+  const radiusMultiplier = 0.5 + Math.random() * 0.5 // 随机半径
+
+  // 计算扩散方向
+  const radians = (angle * Math.PI) / 180
+  const endX = 50 + Math.cos(radians) * radiusMultiplier * 80 // 从中心扩散
+  const endY = 45 + Math.sin(radians) * radiusMultiplier * 60 // 从中心扩散
+
+  // 确保撒花在视窗内
+  const clampedEndX = Math.max(5, Math.min(95, endX))
+  const clampedEndY = Math.max(10, Math.min(90, endY))
+
+  return {
+    '--start-x': '50%',
+    '--start-y': '42%', // 弹窗底部中心
+    '--end-x': clampedEndX + '%',
+    '--end-y': clampedEndY + '%',
+    '--rotation': (Math.random() * 720 - 360) + 'deg',
+    animationDelay: (Math.random() * 1.2 + batchDelay) + 's',
+    animationDuration: (2.5 + Math.random() * 1.5) + 's',
+    backgroundColor: getConfettiColor(index),
+    width: (10 + Math.random() * 8) + 'px',
+    height: (10 + Math.random() * 8) + 'px',
+    boxShadow: `0 0 ${8 + Math.random() * 8}px rgba(255, 255, 255, 0.8)`
+  }
+}
 </script>
 
 <style scoped>
@@ -1072,10 +1123,10 @@ useHead({
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  background: linear-gradient(135deg, 
-    rgba(0, 245, 255, 0.15) 0%, 
-    rgba(0, 128, 255, 0.15) 50%, 
-    rgba(168, 85, 247, 0.15) 100%);
+  background: linear-gradient(135deg,
+      rgba(0, 245, 255, 0.15) 0%,
+      rgba(0, 128, 255, 0.15) 50%,
+      rgba(168, 85, 247, 0.15) 100%);
   padding: 2rem;
   text-align: center;
   position: relative;
@@ -1118,7 +1169,7 @@ useHead({
 .product-tech-pattern {
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle at 25% 25%, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
     linear-gradient(45deg, transparent 40%, rgba(0, 245, 255, 0.08) 50%, transparent 60%),
@@ -1143,18 +1194,23 @@ useHead({
 
 /* 硬件图标动画 */
 @keyframes hardwareIconPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1) rotate(0deg);
     filter: drop-shadow(0 0 25px currentColor);
   }
+
   25% {
     transform: scale(1.08) rotate(2deg);
     filter: drop-shadow(0 0 35px currentColor);
   }
+
   50% {
     transform: scale(1.15) rotate(0deg);
     filter: drop-shadow(0 0 30px currentColor);
   }
+
   75% {
     transform: scale(1.08) rotate(-2deg);
     filter: drop-shadow(0 0 35px currentColor);
@@ -1163,10 +1219,13 @@ useHead({
 
 /* 图标光晕动画 */
 @keyframes iconGlowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.3;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.3);
     opacity: 0.5;
@@ -1178,15 +1237,19 @@ useHead({
   0% {
     background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%;
   }
+
   25% {
     background-position: 25% 25%, -25% -25%, 25% 25%, -25% -25%;
   }
+
   50% {
     background-position: 50% 50%, -50% -50%, 50% 50%, -50% -50%;
   }
+
   75% {
     background-position: 75% 75%, -75% -75%, 75% 75%, -75% -75%;
   }
+
   100% {
     background-position: 100% 100%, -100% -100%, 100% 100%, -100% -100%;
   }
@@ -1197,7 +1260,7 @@ useHead({
   background: rgba(17, 24, 39, 0.7);
   backdrop-filter: blur(25px);
   border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   transition: all 0.4s ease;
@@ -1206,7 +1269,7 @@ useHead({
 .glass-card-enhanced:hover {
   background: rgba(17, 24, 39, 0.8);
   border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 
+  box-shadow:
     0 15px 50px rgba(0, 0, 0, 0.5),
     0 0 25px rgba(59, 130, 246, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -1223,9 +1286,12 @@ useHead({
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -1258,6 +1324,7 @@ useHead({
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -1293,7 +1360,7 @@ useHead({
 }
 
 .hover-glow:hover {
-  box-shadow: 
+  box-shadow:
     0 0 25px rgba(59, 130, 246, 0.5),
     0 0 50px rgba(59, 130, 246, 0.3),
     0 0 75px rgba(59, 130, 246, 0.15);
@@ -1302,10 +1369,13 @@ useHead({
 
 /* 脉冲动画 */
 @keyframes pulse-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.02);
@@ -1332,17 +1402,17 @@ useHead({
   .product-icon {
     font-size: 4rem;
   }
-  
+
   .product-icon-glow {
     width: 120px;
     height: 120px;
   }
-  
+
   .product-placeholder-text {
     font-size: 1.2rem;
     max-width: 90%;
   }
-  
+
   .glass-card-enhanced {
     backdrop-filter: blur(20px);
   }
@@ -1352,17 +1422,17 @@ useHead({
   .product-icon {
     font-size: 3.5rem;
   }
-  
+
   .product-icon-glow {
     width: 100px;
     height: 100px;
   }
-  
+
   .product-placeholder-text {
     font-size: 1rem;
     max-width: 95%;
   }
-  
+
   .glass-card-enhanced {
     backdrop-filter: blur(15px);
   }
@@ -1386,15 +1456,18 @@ useHead({
 /* 成功提示动画 */
 @keyframes bounce-in {
   0% {
-    transform: scale(0.3) rotate(-10deg);
+    transform: scale(0.3) rotate(-5deg);
     opacity: 0;
   }
+
   50% {
-    transform: scale(1.05) rotate(5deg);
+    transform: scale(1.05) rotate(2deg);
   }
+
   70% {
-    transform: scale(0.9) rotate(-2deg);
+    transform: scale(0.95) rotate(-1deg);
   }
+
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -1402,7 +1475,7 @@ useHead({
 }
 
 .animate-bounce-in {
-  animation: bounce-in 0.6s ease-out;
+  animation: bounce-in 0.6s ease-out forwards;
 }
 
 /* 评星动画 */
@@ -1440,6 +1513,7 @@ useHead({
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -1450,22 +1524,72 @@ useHead({
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 1000;
+  z-index: 60;
 }
 
 /* 撒花片段 */
 .confetti-piece {
   position: absolute;
-  width: 10px; /* 默认大小，会被内联样式覆盖 */
-  height: 10px; /* 默认大小，会被内联样式覆盖 */
-  top: -10px;
-  animation: confettiFall 3s linear infinite;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  width: 10px;
+  height: 10px;
+  left: var(--start-x);
+  top: var(--start-y);
+  transform-origin: center center;
+  animation: confettiFunnelSpread var(--duration, 3s) cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
   will-change: transform, opacity;
+}
+
+/* 撒花掉落扩散动画 - 漏斗效果 */
+@keyframes confettiFunnelSpread {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.2);
+    opacity: 0;
+  }
+
+  5% {
+    transform: translate(0, -20px) rotate(var(--rotation, 0deg)) scale(0.6);
+    opacity: 0.3;
+  }
+
+  15% {
+    transform: translate(0, -40px) rotate(calc(var(--rotation, 0deg) * 1.5)) scale(1);
+    opacity: 1;
+  }
+
+  30% {
+    transform: translate(calc((var(--end-x) - var(--start-x)) * 0.4),
+        calc((var(--end-y) - var(--start-y)) * 0.2 - 20px)) rotate(calc(var(--rotation, 0deg) * 3)) scale(1.1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(calc((var(--end-x) - var(--start-x)) * 0.8),
+        calc((var(--end-y) - var(--start-y)) * 0.6 + 80px)) rotate(calc(var(--rotation, 0deg) * 5)) scale(1);
+    opacity: 0.9;
+  }
+
+  70% {
+    transform: translate(calc((var(--end-x) - var(--start-x)) * 1.1),
+        calc((var(--end-y) - var(--start-y)) * 0.9 + 180px)) rotate(calc(var(--rotation, 0deg) * 7)) scale(0.8);
+    opacity: 0.7;
+  }
+
+  85% {
+    transform: translate(calc((var(--end-x) - var(--start-x)) * 1.3),
+        calc((var(--end-y) - var(--start-y)) * 1.1 + 280px)) rotate(calc(var(--rotation, 0deg) * 9)) scale(0.6);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translate(calc((var(--end-x) - var(--start-x)) * 1.5),
+        calc((var(--end-y) - var(--start-y)) * 1.3 + 400px)) rotate(calc(var(--rotation, 0deg) * 12)) scale(0.2);
+    opacity: 0;
+  }
 }
 
 /* 撒花形状 */
@@ -1487,50 +1611,21 @@ useHead({
   background: transparent !important;
 }
 
-/* 撒花掉落动画 */
-@keyframes confettiFall {
-  0% {
-    transform: translateY(-100vh) rotate(0deg) translateX(0) scale(1);
-    opacity: 1;
-  }
-  10% {
-    transform: translateY(-80vh) rotate(90deg) translateX(30px) scale(1.1);
-    opacity: 1;
-  }
-  25% {
-    transform: translateY(-50vh) rotate(180deg) translateX(-20px) scale(0.9);
-    opacity: 1;
-  }
-  40% {
-    transform: translateY(-20vh) rotate(270deg) translateX(40px) scale(1.05);
-    opacity: 0.9;
-  }
-  60% {
-    transform: translateY(20vh) rotate(450deg) translateX(-30px) scale(0.95);
-    opacity: 0.8;
-  }
-  80% {
-    transform: translateY(60vh) rotate(630deg) translateX(25px) scale(1);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(110vh) rotate(720deg) translateX(0) scale(0.8);
-    opacity: 0;
-  }
-}
-
 /* 一次性弹跳动画 */
 @keyframes bounce-in {
   0% {
     transform: scale(0.3) rotate(-5deg);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.05) rotate(2deg);
   }
+
   70% {
     transform: scale(0.95) rotate(-1deg);
   }
+
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -1546,9 +1641,11 @@ useHead({
   0% {
     transform: scale(0.8);
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
   }
@@ -1564,7 +1661,9 @@ useHead({
     transform: scale(1);
     opacity: 1;
   }
-  75%, 100% {
+
+  75%,
+  100% {
     transform: scale(2);
     opacity: 0;
   }
@@ -1573,4 +1672,4 @@ useHead({
 .animate-ping-once {
   animation: ping-once 1s cubic-bezier(0, 0, 0.2, 1) once;
 }
-</style> 
+</style>

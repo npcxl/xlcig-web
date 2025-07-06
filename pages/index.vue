@@ -309,7 +309,6 @@
 <script setup>
 import { productsApi } from '~/utils/api/products'
 import { useRouter, useRoute } from 'vue-router'
-import { ref, onMounted, watch, nextTick } from 'vue'
 
 const router = useRouter()
 const route = useRoute()

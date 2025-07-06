@@ -329,7 +329,7 @@ export interface Order {
   status: 'pending' | 'paid' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
   payment_method?: string
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
-  shipping_address: ShippingAddress
+  shipping_address: ShippingAddress | string // 可能是JSON字符串
   notes?: string
   remark?: string
   paid_at?: string
@@ -337,11 +337,32 @@ export interface Order {
   delivered_at?: string
   created_at: string
   updated_at: string
-  // 关联数据
-  user?: User
-  product?: Product
-  config?: ComputerConfig
-  merchant?: Merchant
+  
+  // 关联数据 - 从JOIN查询返回
+  username?: string
+  nickname?: string
+  user_email?: string
+  config_name?: string
+  config_price?: number
+  config_specs?: any
+  config_images?: any
+  config_warranty?: string
+  
+  // 前端兼容字段（计算得出或映射）
+  orderNumber?: string // 映射自 order_no
+  total?: number // 映射自 final_price
+  createdAt?: string // 映射自 created_at
+  items?: OrderItem[] // 单个订单的商品信息
+}
+
+export interface OrderItem {
+  id: number
+  name: string
+  brand?: string
+  price: number
+  quantity: number
+  image?: string
+  product_id?: number
 }
 
 export interface OrderCreateInput {

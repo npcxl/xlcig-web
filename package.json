@@ -1,7 +1,6 @@
 {
   "name": "pc-guide-frontend",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",

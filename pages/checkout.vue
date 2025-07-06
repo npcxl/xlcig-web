@@ -514,8 +514,22 @@
           <i class="bi bi-check-circle"></i>
         </div>
         <h3 class="text-2xl font-bold text-white mb-4">订单提交成功！</h3>
-        <p class="text-gray-300 mb-2">订单号：#{{ orderNumber }}</p>
-        <p class="text-gray-400 mb-8">感谢您的购买，您将很快收到确认邮件。</p>
+        <p class="text-gray-300 mb-2">
+          <span v-if="orderNumber.startsWith('BATCH-')">
+            批次号：#{{ orderNumber }}
+          </span>
+          <span v-else>
+            订单号：#{{ orderNumber }}
+          </span>
+        </p>
+        <p class="text-gray-400 mb-8">
+          <span v-if="orderNumber.startsWith('BATCH-')">
+            您的购物车商品已分别创建订单，感谢您的购买！
+          </span>
+          <span v-else>
+            感谢您的购买，您将很快收到确认邮件。
+          </span>
+        </p>
         <div class="space-y-3">
           <button @click="goToOrders" 
                   class="w-full bg-green-600 hover:bg-green-500 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300">
@@ -532,11 +546,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
 import { createDiscreteApi } from 'naive-ui'
 import { useUserStore } from '../stores/user'
 import { useAddressStore } from '../stores/address'
 import { cartApi } from '../utils/api/cart'
+import { ordersApi } from '../utils/api/orders'
 
 // 创建消息API
 const { message } = createDiscreteApi(['message'])
@@ -803,25 +817,81 @@ const submitOrder = async () => {
   isProcessing.value = true
   
   try {
-    // 模拟订单处理
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // 获取收货地址
+    const shippingAddress = userStore.isLoggedIn ? 
+      addressStore.addresses.find(addr => addr.id === selectedAddressId.value) : 
+      guestAddressForm.value
+
+    // 收集要下单的购物车项目 ID
+    const cartItemIds = cartItems.value.map(item => item.id)
+    console.log('准备下单的购物车项目ID:', cartItemIds)
+
+    // 为每个购物车商品创建单独的订单
+    const orderPromises = cartItems.value.map(item => {
+      const orderData = {
+        config_id: item.product_id,  // 使用 config_id 字段
+        quantity: item.quantity,
+        shipping_address: shippingAddress,
+        notes: `通过购物车下单，支付方式：${selectedPaymentMethod.value}`
+      }
+      return ordersApi.createOrder(orderData)
+    })
+
+    // 并行创建所有订单
+    const orderResponses = await Promise.all(orderPromises)
     
-    // 生成订单号
-    orderNumber.value = 'ORD' + Date.now().toString().slice(-8)
-    
-    // 清空购物车
-    if (userStore.isLoggedIn) {
-      await cartApi.clearCart()
+    // 检查是否所有订单都创建成功
+    const failedOrders = orderResponses.filter(response => !response.success)
+    if (failedOrders.length > 0) {
+      console.error('订单创建失败:', failedOrders)
+      throw new Error(`${failedOrders.length}个订单创建失败`)
     }
-    cartItems.value = []
+
+    // 获取成功创建的订单
+    const successOrders = orderResponses.map(response => response.data)
+    console.log('订单创建成功:', successOrders.length, '个订单')
+    
+    // 生成主订单号（用于显示）
+    orderNumber.value = successOrders.length > 1 ? 
+      `BATCH-${Date.now().toString().slice(-8)}` : 
+      (successOrders[0].order_no || successOrders[0].order_number)
+    
+    // 只有在所有订单都创建成功后，才删除已下单的购物车商品
+    if (userStore.isLoggedIn) {
+      try {
+        if (cartItemIds.length === 1) {
+          // 单个商品删除
+          console.log('删除单个购物车商品:', cartItemIds[0])
+          await cartApi.removeCartItem(cartItemIds[0])
+        } else {
+          // 批量删除多个商品
+          console.log('批量删除购物车商品:', cartItemIds)
+          await cartApi.batchRemoveCartItems(cartItemIds)
+        }
+        console.log('购物车商品删除成功')
+      } catch (deleteError) {
+        console.error('删除购物车商品失败:', deleteError)
+        // 即使删除失败，订单已经创建成功，所以还是要更新本地数据
+        warning('订单创建成功，但清理购物车时出现问题，请刷新页面')
+      }
+    }
+    
+    // 从本地购物车数据中移除已下单的商品
+    const originalLength = cartItems.value.length
+    cartItems.value = cartItems.value.filter(item => !cartItemIds.includes(item.id))
+    console.log(`本地购物车数据更新: ${originalLength} -> ${cartItems.value.length}`)
     
     // 显示成功弹窗
     showSuccessModal.value = true
     
-    success('订单提交成功！')
+    const message = successOrders.length > 1 ? 
+      `成功创建${successOrders.length}个订单！` : 
+      '订单创建成功！'
+    success(message)
+    
   } catch (error) {
-    console.error('订单提交失败:', error)
-    error('订单提交失败，请重试。')
+    console.error('订单创建失败:', error)
+    error('订单创建失败：' + (error.message || '请重试'))
   } finally {
     isProcessing.value = false
   }
