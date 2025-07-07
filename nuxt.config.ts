@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     port: 8888,
     host: '0.0.0.0'
   },
+
   devtools: { 
     enabled: process.env.NODE_ENV === 'development' 
   },
@@ -52,7 +53,7 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NODE_ENV === 'production' 
         ? 'https://api.xlcig.cn'  // 生产环境使用API子域名
-        : 'http://192.168.11.193:9999'  // 开发环境保持不变
+        : 'http://192.168.11.194:9999'  // 开发环境保持不变
     }
   },
   

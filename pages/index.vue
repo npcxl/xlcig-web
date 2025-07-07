@@ -41,6 +41,16 @@
       <AppHeader :show-back-button="false" :show-nav-menu="true" :show-breadcrumb="false" :show-location="true"
         :show-search-button="true" :show-notification-button="true" :show-decorations="true" logo-size="large" />
 
+      <!-- 产品轮播图 -->
+      <section class="relative z-10 py-8">
+        <div class="container mx-auto px-6">
+          <div
+            class="glass-card-dark rounded-2xl p-8 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 backdrop-blur-xl">
+            <SteamCarousel />
+          </div>
+        </div>
+      </section>
+
       <!-- 装饰性图片布局区域 - 暂时注释掉 -->
       <!--
       <section class="relative z-10 py-8 mt-4">
@@ -69,37 +79,6 @@
         </div>
       </section>
       -->
-
-      <!-- 主横幅区域 -->
-      <section class="relative z-10 py-20">
-        <div class="container mx-auto px-6">
-          <div class="text-center">
-            <div
-              class="glass-card-dark rounded-3xl p-12 border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 max-w-4xl mx-auto">
-              <h1 class="text-5xl md:text-7xl font-bold text-white leading-tight mb-8">
-                专业<span class="text-cyan-400">xlCig</span>
-                <br>
-                <span class="text-3xl md:text-5xl text-gray-300 font-normal">PC硬件专家</span>
-              </h1>
-              <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                为您提供专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑
-              </p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <NuxtLink to="/products"
-                  class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transform hover:-translate-y-1 group">
-                  <i class="bi bi-lightning-fill mr-2 group-hover:animate-bounce"></i>
-                  立即开始
-                </NuxtLink>
-                <button
-                  class="inline-flex items-center px-8 py-3 border-2 border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white font-semibold rounded-xl transition-all duration-300 hover:bg-cyan-500/10 transform hover:-translate-y-1">
-                  <i class="bi bi-play-circle mr-2"></i>
-                  观看演示
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- 热门产品预览 -->
       <section class="relative z-10 py-16">
@@ -565,13 +544,12 @@ console.log('首页组件渲染, 状态:', {
   left: 1px;
   width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.9) 0%, 
-    rgba(255, 255, 255, 0.7) 30%,
-    rgba(255, 255, 255, 0.4) 60%,
-    rgba(255, 255, 255, 0.1) 90%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.7) 30%,
+      rgba(255, 255, 255, 0.4) 60%,
+      rgba(255, 255, 255, 0.1) 90%,
+      transparent 100%);
   border-radius: 2px;
   transform: translateX(-80px);
 }
@@ -629,12 +607,15 @@ console.log('首页组件渲染, 状态:', {
     transform: translateY(-50px) translateX(-50px) rotate(45deg);
     opacity: 0;
   }
+
   5% {
     opacity: 1;
   }
+
   95% {
     opacity: 1;
   }
+
   100% {
     transform: translateY(100vh) translateX(100vh) rotate(45deg);
     opacity: 0;
@@ -661,7 +642,7 @@ console.log('首页组件渲染, 状态:', {
 }
 
 .stars-1 {
-  box-shadow: 
+  box-shadow:
     100px 200px rgba(255, 255, 255, 0.9),
     300px 100px rgba(255, 255, 255, 0.7),
     500px 300px rgba(255, 255, 255, 0.8),
@@ -680,7 +661,7 @@ console.log('首页组件渲染, 状态:', {
 }
 
 .stars-2 {
-  box-shadow: 
+  box-shadow:
     150px 250px rgba(255, 255, 255, 0.8),
     350px 150px rgba(255, 255, 255, 0.6),
     550px 350px rgba(255, 255, 255, 0.9),
@@ -699,7 +680,7 @@ console.log('首页组件渲染, 状态:', {
 }
 
 .stars-3 {
-  box-shadow: 
+  box-shadow:
     75px 175px rgba(255, 255, 255, 0.7),
     275px 75px rgba(255, 255, 255, 0.9),
     475px 275px rgba(255, 255, 255, 0.6),
@@ -718,11 +699,14 @@ console.log('首页组件渲染, 状态:', {
 }
 
 @keyframes twinkle {
-  0%, 100% { 
+
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(0.8);
   }
-  50% { 
+
+  50% {
     opacity: 1;
     transform: scale(1.2);
   }
@@ -795,28 +779,28 @@ console.log('首页组件渲染, 状态:', {
     top: 10%;
     left: 5%;
   }
-  
+
   .decorative-image-wrapper.style-2 {
     width: 100px;
     height: 100px;
     top: 75%;
     left: 10%;
   }
-  
+
   .decorative-image-wrapper.style-3 {
     width: 140px;
     height: 140px;
     top: 8%;
     left: 55%;
   }
-  
+
   .decorative-image-wrapper.style-4 {
     width: 110px;
     height: 110px;
     top: 65%;
     left: 70%;
   }
-  
+
   .decorative-image-wrapper.style-5 {
     width: 90px;
     height: 90px;
@@ -832,28 +816,28 @@ console.log('首页组件渲染, 状态:', {
     top: 15%;
     left: 5%;
   }
-  
+
   .decorative-image-wrapper.style-2 {
     width: 70px;
     height: 70px;
     top: 80%;
     left: 10%;
   }
-  
+
   .decorative-image-wrapper.style-3 {
     width: 90px;
     height: 90px;
     top: 10%;
     left: 50%;
   }
-  
+
   .decorative-image-wrapper.style-4 {
     width: 75px;
     height: 75px;
     top: 70%;
     left: 65%;
   }
-  
+
   .decorative-image-wrapper.style-5 {
     width: 65px;
     height: 65px;

@@ -585,7 +585,6 @@
 // 导入路由参数
 const route = useRoute()
 const productId = parseInt(route.params.id)
-
 // 导入API和stores
 import { productsApi } from '~/utils/api'
 import { cartApi } from '~/utils/api/cart'

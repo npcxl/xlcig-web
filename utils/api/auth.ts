@@ -169,12 +169,12 @@ export const authApi = {
       smtpEmail = '18569795073@163.com'
       smtpCodeType = '163'
     }
-
+    const title = 'xlCig'
     // 邮件请求的共同参数配置
     const mailRequestData = {
       ColaKey: apiKey,           // API密钥
       tomail: data.email,        // 目标邮箱地址
-      fromTitle:"xlCig",      // 邮件标题（发件人名称）
+      fromTitle:title,      // 邮件标题（发件人名称）
       subject: 'register is to xlCig',  // 邮件主题
       content: messageHtml.trim(), // 邮件内容(html)
       isTextContent: false,      // 邮件内容是HTML格式

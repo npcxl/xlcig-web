@@ -89,6 +89,15 @@
             <button v-if="showNotificationButton" class="p-2 text-gray-300 hover:text-cyan-400 transition-colors duration-200">
               <i class="bi bi-bell text-xl"></i>
             </button>
+
+            <!-- 客服按钮 -->
+            <button 
+              @click="openCustomerService" 
+              class="p-2 text-gray-300 hover:text-cyan-400 transition-colors duration-200"
+              title="在线客服"
+            >
+              <i class="bi bi-headset text-xl"></i>
+            </button>
             
             <!-- 登录状态检测 -->
             <div v-if="!userStore.isLoggedIn" class="flex items-center space-x-3">
@@ -196,6 +205,7 @@ const route = useRoute()
 const navItems = [
   { path: '/', label: '首页' },
   { path: '/products', label: '产品中心' },
+  { path: '/customer-service', label: '在线客服' },
   { path: '/checkout', label: '购物车' },
   { path: '/orders', label: '订单' }
 ]
@@ -247,6 +257,11 @@ const userMenuOptions = computed(() => {
       icon: () => h('i', { class: 'bi bi-geo-alt' })
     },
     {
+      label: '客服',
+      key: 'customerService',
+      icon: () => h('i', { class: 'bi bi-headset' })
+    },
+    {
       type: 'divider'
     },
     {
@@ -282,6 +297,10 @@ const handleUserMenuSelect = (key) => {
     case 'addresses':
       router.push('/addresses')
       break
+    case 'customerService':
+      // 跳转到客服页面
+      router.push('/customer-service')
+      break
     case 'logout':
       userStore.logout()
       router.push('/auth/login')
@@ -294,6 +313,11 @@ const handleAvatarError = (event) => {
   if (event.target) {
     event.target.style.display = 'none'
   }
+}
+
+const openCustomerService = () => {
+  // 跳转到客服页面
+  router.push('/customer-service')
 }
 </script>
 

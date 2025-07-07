@@ -1,0 +1,5 @@
+const orders_vue_vue_type_style_index_0_scoped_4003d8de_lang = ".glass-card-dark[data-v-4003d8de]{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:#1f2937cc}.order-item-image-container[data-v-4003d8de],.order-item-placeholder[data-v-4003d8de]{align-items:center;background:linear-gradient(135deg,#1f2937cc,#111827cc);display:flex;height:100%;justify-content:center;width:100%}.order-item-placeholder[data-v-4003d8de]{color:#9ca3af}.animate-spin-slow[data-v-4003d8de]{animation:spin-4003d8de 20s linear infinite}@keyframes spin-4003d8de{0%{transform:rotate(0)}to{transform:rotate(1turn)}}";
+export {
+  orders_vue_vue_type_style_index_0_scoped_4003d8de_lang as default
+};
+//# sourceMappingURL=orders-styles-1.mjs-BvEXD65q.js.map

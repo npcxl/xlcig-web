@@ -39,14 +39,6 @@
       </div>
     </section>
 
-    <section class="relative z-10">
-      <div class="container mx-auto px-6 py-6">
-        <div class="glass-card-enhanced rounded-2xl p-8 border border-cyan-400/40 shadow-2xl shadow-cyan-500/25 backdrop-blur-xl">
-          <SteamCarousel />
-        </div>
-      </div>
-    </section>
-
     <!-- 粘性过滤栏 - 深色主题 -->
     <div class="sticky top-0 z-40 backdrop-blur-xl border-b border-cyan-400/20">
       <div class="container mx-auto px-6 py-4">
