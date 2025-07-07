@@ -101,6 +101,16 @@ declare module 'nuxt/schema' {
   }
   interface PublicRuntimeConfig {
    apiBase: string,
+
+   wsUrl: string,
+
+   appName: string,
+
+   appVersion: string,
+
+   debug: boolean,
+
+   environment: string,
   }
 }
 declare module 'vue' {

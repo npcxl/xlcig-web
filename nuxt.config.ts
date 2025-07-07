@@ -51,9 +51,29 @@ export default defineNuxtConfig({
   
   runtimeConfig: {
     public: {
-      apiBase: process.env.NODE_ENV === 'production' 
-        ? 'https://api.xlcig.cn'  // 生产环境使用API子域名
-        : 'http://192.168.11.194:9999'  // 开发环境保持不变
+      // API 基础地址
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || (
+        process.env.NODE_ENV === 'production' 
+          ? 'https://api.xlcig.cn'  // 生产环境
+          : 'http://192.168.11.194:9999'  // 开发环境
+      ),
+      
+      // WebSocket 地址
+      wsUrl: process.env.NUXT_PUBLIC_WS_URL || (
+        process.env.NODE_ENV === 'production'
+          ? 'wss://api.xlcig.cn/websocket'  // 生产环境使用wss
+          : 'ws://192.168.11.194:9999/websocket'  // 开发环境使用ws
+      ),
+      
+      // 应用信息
+      appName: process.env.NUXT_PUBLIC_APP_NAME || 'xlCig',
+      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '1.0.0',
+      
+      // 调试模式
+      debug: process.env.NUXT_PUBLIC_DEBUG === 'true' || process.env.NODE_ENV === 'development',
+      
+      // 环境标识
+      environment: process.env.NODE_ENV || 'development'
     }
   },
   

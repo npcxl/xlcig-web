@@ -513,6 +513,9 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useUserStore } from '~/stores/user'
 import { ChatApi } from '~/utils/api/chat'
 
+// 获取运行时配置
+const config = useRuntimeConfig()
+
 // 状态管理
 const userStore = useUserStore()
 const isConnected = ref(false)
@@ -586,7 +589,7 @@ const connectWebSocket = () => {
   }
 
   try {
-    const wsUrl = `ws://192.168.11.194:9999/websocket?token=${userStore.token}`
+    const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
     console.log('正在连接WebSocket:', wsUrl)
 
     websocket = new WebSocket(wsUrl)
