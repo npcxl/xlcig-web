@@ -1,12 +1,34 @@
-#  - 现代化PC硬件电商平台
-在线地址 https://xlCig.cn
+# xlCig - 现代化PC硬件电商平台
+
+> 🚀 专业的PC硬件电商平台，基于 Nuxt 3 + Vue 3 + TypeScript 构建，提供完整的产品展示、购物车、订单管理、在线客服等功能
+
+📍 **在线体验**: [https://xlCig.cn](https://xlCig.cn)
+
+## 🏷️ 项目标签
+
+`电商平台` `PC硬件` `Nuxt3` `Vue3` `TypeScript` `TailwindCSS` `前端开发` `响应式设计` `深色主题` `开源项目`
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Nuxt 3](https://img.shields.io/badge/Nuxt-3.x-00DC82.svg)](https://nuxt.com/)
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-4FC08D.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4.svg)](https://tailwindcss.com/)
 
-> 🚀 基于 Nuxt 3 构建的现代化PC硬件电商平台，提供完整的产品展示、购物车、订单管理等功能。
+## 📖 项目简介
+
+**xlCig** 是一个专业的PC硬件电商平台，采用现代化的前端技术栈构建。项目专注于为PC硬件爱好者提供优质的购物体验，包含完整的电商功能和硬件专业化特性。
+
+### 🎯 适用场景
+- **PC硬件商城** - 显卡、CPU、主板、内存等硬件产品销售
+- **装机配置平台** - 提供配置推荐和兼容性检查
+- **硬件评测展示** - 性能数据和用户评价
+- **电商学习项目** - 现代前端技术实践案例
+
+### 🔥 核心亮点
+- ⚡ **性能优异** - Nuxt 3 SSR/SPA 混合渲染，首屏加载速度快
+- 🎨 **UI精美** - 深色玻璃拟态设计，符合现代审美
+- 📱 **全端适配** - 完美支持桌面端、平板、手机
+- 🛡️ **类型安全** - 全栈 TypeScript，减少运行时错误
+- 🔧 **专业化** - 针对PC硬件领域的专业功能设计
 
 ## 必看
   在于 oxc-parser 这个包的 Windows 原生绑定文件缺失或损坏。这是一个常见的原生模块安装问题，特别是在 Windows 系统上。

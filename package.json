@@ -1,5 +1,29 @@
 {
-  "name": "pc-guide-frontend",
+  "name": "xlcig-web",
+  "version": "1.0.0",
+  "description": "现代化PC硬件电商平台 - 基于Nuxt3构建的专业电商前端应用",
+  "keywords": [
+    "电商平台",
+    "PC硬件",
+    "Nuxt3",
+    "Vue3",
+    "TypeScript",
+    "TailwindCSS",
+    "电子商务",
+    "前端开发",
+    "响应式设计",
+    "深色主题"
+  ],
+  "author": "xlCig Team",
+  "license": "MIT",
+  "homepage": "https://xlcig.cn",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/leheya/xlweb.git"
+  },
+  "bugs": {
+    "url": "https://gitee.com/leheya/xlweb/issues"
+  },
   "private": true,
   "scripts": {
     "build": "nuxt build",

@@ -589,16 +589,14 @@ const connectWebSocket = () => {
   }
 
   try {
-    const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
+    //const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
+    const wsUrl = `ws://192.168.11.194:9999/websocket?token=${userStore.token}`
     console.log('正在连接WebSocket:', wsUrl)
-
     websocket = new WebSocket(wsUrl)
-
     websocket.onopen = () => {
       console.log('WebSocket连接成功')
       isConnected.value = true
       startHeartbeat()
-      
       // 连接成功后，请求获取当前所有用户的在线状态
       setTimeout(() => {
         if (websocket && websocket.readyState === WebSocket.OPEN) {
@@ -1715,44 +1713,42 @@ onUnmounted(() => {
 
 /* 响应式设计优化 */
 @media (max-width: 1280px) {
-
-  .xl\\:col-span-1,
-  .xl\\:col-span-3 {
+  :deep(.xl\:col-span-1),
+  :deep(.xl\:col-span-3) {
     grid-column: span 1;
   }
 
-  .grid.xl\\:grid-cols-4 {
+  :deep(.grid.xl\:grid-cols-4) {
     grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 1rem;
   }
 }
 
 @media (max-width: 768px) {
-
   .animate-fade-in-left,
   .animate-fade-in-right {
     animation-delay: 0.1s;
   }
 
-  .h-\\[750px\\] {
+  :deep(.h-\[750px\]) {
     height: 500px;
   }
 
-  .px-6 {
+  :deep(.px-6) {
     padding-left: 1rem;
     padding-right: 1rem;
   }
 
-  .py-8 {
+  :deep(.py-8) {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
   }
 
-  .text-4xl {
+  :deep(.text-4xl) {
     font-size: 2rem;
   }
 
-  .text-2xl {
+  :deep(.text-2xl) {
     font-size: 1.5rem;
   }
 }

@@ -1,5 +1,0 @@
-const app_vue_vue_type_style_index_0_lang = ".app-container{background:#111827;min-height:100vh;position:relative}.app-content{animation:fadeIn .5s ease-in-out;min-height:100vh}.page-enter-active{transition:all .4s ease-out}.page-leave-active{transition:all .3s ease-in}.page-enter-from{opacity:0;transform:translateY(20px)}.page-leave-to{opacity:0;transform:translateY(-20px)}.layout-enter-active,.layout-leave-active{transition:all .4s}.layout-enter-from,.layout-leave-to{opacity:0;transform:translateY(30px)}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}*{-webkit-tap-highlight-color:transparent}body{overflow-x:hidden}*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.app-container::-webkit-scrollbar{display:none}.app-container{-ms-overflow-style:none;scrollbar-width:none}";
-export {
-  app_vue_vue_type_style_index_0_lang as default
-};
-//# sourceMappingURL=entry-styles-4.mjs-BSCo8kh0.js.map

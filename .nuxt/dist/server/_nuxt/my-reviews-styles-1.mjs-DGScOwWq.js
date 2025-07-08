@@ -1,5 +1,0 @@
-const myReviews_vue_vue_type_style_index_0_scoped_e32176e9_lang = ".glass-card-dark[data-v-e32176e9]{-webkit-backdrop-filter:blur(25px);backdrop-filter:blur(25px);background:#111827b3;border:1px solid rgba(59,130,246,.3);box-shadow:0 10px 40px #0006,inset 0 1px #ffffff1f;transition:all .4s ease}.glass-card-dark[data-v-e32176e9]:hover{background:#111827cc;border-color:#3b82f680;box-shadow:0 15px 50px #00000080,0 0 25px #3b82f626,inset 0 1px #ffffff2e}";
-export {
-  myReviews_vue_vue_type_style_index_0_scoped_e32176e9_lang as default
-};
-//# sourceMappingURL=my-reviews-styles-1.mjs-DGScOwWq.js.map

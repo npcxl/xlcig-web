@@ -35,10 +35,17 @@ export default defineNuxtConfig({
         { name: 'description', content: '专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑' },
         { name: 'keywords', content: 'xlCig,PC硬件,电脑配置,显卡,CPU,装机' },
         { name: 'author', content: 'xlCig' },
+        // 百度站点验证
+        { name: 'baidu-site-verification', content: 'codeva-2z90c1PlRw' },
+        // SEO meta tags
         { property: 'og:title', content: 'xlCig - 专业PC硬件产品和装机服务' },
         { property: 'og:description', content: '专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑' },
         { property: 'og:type', content: 'website' },
-        { name: 'theme-color', content: '#00f5ff' }
+        { property: 'og:url', content: 'https://www.xlcig.cn' },
+        { property: 'og:site_name', content: 'xlCig' },
+        { name: 'theme-color', content: '#00f5ff' },
+        // robots meta
+        { name: 'robots', content: 'index, follow' }
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/logo.png' },
