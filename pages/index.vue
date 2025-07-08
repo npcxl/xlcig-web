@@ -36,7 +36,6 @@
           class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full filter blur-3xl animate-spin-slow">
         </div>
       </div>
-
       <!-- 导航栏 -->
       <AppHeader :show-back-button="false" :show-nav-menu="true" :show-breadcrumb="false" :show-location="true"
         :show-search-button="true" :show-notification-button="true" :show-decorations="true" logo-size="large" />
@@ -104,7 +103,7 @@
               </button>
             </div>
           </div>
-
+  
           <!-- 产品列表 -->
           <div v-else class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="product in featuredProducts" :key="product.id"

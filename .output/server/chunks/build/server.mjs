@@ -403,64 +403,64 @@ const _routes = [
   {
     name: "index",
     path: "/",
-    component: () => import('./index-CA_8y5qD.mjs')
+    component: () => import('./index-CK1NITyQ.mjs')
   },
   {
     name: "orders",
     path: "/orders",
-    component: () => import('./orders-BLP9_JDl.mjs')
+    component: () => import('./orders-DqH0sbHD.mjs')
   },
   {
     name: "profile",
     path: "/profile",
-    component: () => import('./profile-Bw8VwHqf.mjs')
+    component: () => import('./profile-OaQnor4W.mjs')
   },
   {
     name: "checkout",
     path: "/checkout",
-    component: () => import('./checkout-CKrazAFu.mjs')
+    component: () => import('./checkout-qfZw1bZw.mjs')
   },
   {
     name: "addresses",
     path: "/addresses",
-    component: () => import('./addresses-Ho7HDO_J.mjs')
+    component: () => import('./addresses-DLAP5VMY.mjs')
   },
   {
     name: "auth-login",
     path: "/auth/login",
-    component: () => import('./login-CtCQrGSg.mjs')
+    component: () => import('./login-BletZ7CZ.mjs')
   },
   {
     name: "my-reviews",
     path: "/my-reviews",
     meta: { "middleware": "auth" },
-    component: () => import('./my-reviews-DjbDLTTk.mjs')
+    component: () => import('./my-reviews-CRRIjOaI.mjs')
   },
   {
     name: "auth-register",
     path: "/auth/register",
-    component: () => import('./register-Czcv4L0a.mjs')
+    component: () => import('./register-CA1-zeUQ.mjs')
   },
   {
     name: "location-test",
     path: "/location-test",
     meta: __nuxt_page_meta || {},
-    component: () => import('./location-test-BRrV9y_A.mjs')
+    component: () => import('./location-test-IFtrobEa.mjs')
   },
   {
     name: "products-id",
     path: "/products/:id()",
-    component: () => import('./_id_-B6z3t6qP.mjs')
+    component: () => import('./_id_-ea4HeLwY.mjs')
   },
   {
     name: "products",
     path: "/products",
-    component: () => import('./index-CoxVy8Ub.mjs')
+    component: () => import('./index-D_ORhjjb.mjs')
   },
   {
     name: "customer-service",
     path: "/customer-service",
-    component: () => import('./customer-service-BvTi1C1u.mjs')
+    component: () => import('./customer-service-yiFHJ4vN.mjs')
   }
 ];
 const ROUTE_KEY_PARENTHESES_RE = /(:\w+)\([^)]+\)/g;
@@ -1134,8 +1134,8 @@ const _sfc_main$1 = {
     const statusMessage = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import('./error-404-B_7QGlg2.mjs'));
-    const _Error = defineAsyncComponent(() => import('./error-500-VLhr_h-L.mjs'));
+    const _Error404 = defineAsyncComponent(() => import('./error-404-K3IFp1Cx.mjs'));
+    const _Error = defineAsyncComponent(() => import('./error-500-B3uY9rp7.mjs'));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
       _push(ssrRenderComponent(unref(ErrorTemplate), mergeProps({ statusCode: unref(statusCode), statusMessage: unref(statusMessage), description: unref(description), stack: unref(stack) }, _attrs), null, _parent));

@@ -1,6 +1,6 @@
 {
-  "name": "pc-guide-frontend-prod",
-  "version": "0.0.0",
+  "name": "xlcig-web-prod",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "dependencies": {
