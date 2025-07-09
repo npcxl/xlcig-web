@@ -12,7 +12,8 @@ type HydrationStrategies = {
 }
 type LazyComponent<T> = (T & DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }>)
 interface _GlobalComponents {
-      'AppHeader': typeof import("../components/AppHeader.vue")['default']
+      'AiChatComponent': typeof import("../components/AiChatComponent.vue")['default']
+    'AppHeader': typeof import("../components/AppHeader.vue")['default']
     'AppLogo': typeof import("../components/AppLogo.vue")['default']
     'LatestReviews': typeof import("../components/LatestReviews.vue")['default']
     'LoadingScreen': typeof import("../components/LoadingScreen.vue")['default']
@@ -45,7 +46,8 @@ interface _GlobalComponents {
     'Body': typeof import("../node_modules/nuxt/dist/head/runtime/components")['Body']
     'NuxtIsland': typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
     'NuxtRouteAnnouncer': IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
-      'LazyAppHeader': LazyComponent<typeof import("../components/AppHeader.vue")['default']>
+      'LazyAiChatComponent': LazyComponent<typeof import("../components/AiChatComponent.vue")['default']>
+    'LazyAppHeader': LazyComponent<typeof import("../components/AppHeader.vue")['default']>
     'LazyAppLogo': LazyComponent<typeof import("../components/AppLogo.vue")['default']>
     'LazyLatestReviews': LazyComponent<typeof import("../components/LatestReviews.vue")['default']>
     'LazyLoadingScreen': LazyComponent<typeof import("../components/LoadingScreen.vue")['default']>
@@ -84,6 +86,7 @@ declare module 'vue' {
   export interface GlobalComponents extends _GlobalComponents { }
 }
 
+export const AiChatComponent: typeof import("../components/AiChatComponent.vue")['default']
 export const AppHeader: typeof import("../components/AppHeader.vue")['default']
 export const AppLogo: typeof import("../components/AppLogo.vue")['default']
 export const LatestReviews: typeof import("../components/LatestReviews.vue")['default']
@@ -117,6 +120,7 @@ export const Html: typeof import("../node_modules/nuxt/dist/head/runtime/compone
 export const Body: typeof import("../node_modules/nuxt/dist/head/runtime/components")['Body']
 export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
 export const NuxtRouteAnnouncer: IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
+export const LazyAiChatComponent: LazyComponent<typeof import("../components/AiChatComponent.vue")['default']>
 export const LazyAppHeader: LazyComponent<typeof import("../components/AppHeader.vue")['default']>
 export const LazyAppLogo: LazyComponent<typeof import("../components/AppLogo.vue")['default']>
 export const LazyLatestReviews: LazyComponent<typeof import("../components/LatestReviews.vue")['default']>

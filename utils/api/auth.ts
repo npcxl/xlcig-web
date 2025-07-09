@@ -88,7 +88,7 @@ export const authApi = {
           <div style="background: #000000; padding: 24px 20px; text-align: center; border-bottom: 1px solid #333;">
             <div style="margin-bottom: 12px;">
               <!-- Logo -->
-              <img src="https://xlcig.oss-cn-beijing.aliyuncs.com/avatars/logo.png?Expires=1751639237&OSSAccessKeyId=TMP.3KmZD6t8o3n1rKuSyCorjaftjmjgbsmLYDq74CzmdgC4XQGqBuLsum69r8snmQ2jFs2XMgB46rvT87S3VB9otvmzTpL3fB&Signature=Oax6b3GJVc%2BpH9f69iGgtpTbQdg%3D" alt="xlCig" style="height: 40px; max-width: 160px; display: inline-block;">
+              <img src="https://xlcig.oss-cn-beijing.aliyuncs.com/avatars/logo" alt="xlCig" style="height: 40px; max-width: 160px; display: inline-block;">
             </div>
             <p style="color: #888888; margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
               邮箱验证

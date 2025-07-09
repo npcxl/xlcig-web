@@ -1,1 +1,1 @@
-export { default } from "file:///D:/codeGitee/xlweb/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"
+export { default } from "file:///D:/code/xlweb/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"

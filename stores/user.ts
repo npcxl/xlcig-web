@@ -34,6 +34,16 @@ export const useUserStore = defineStore('user', {
     // 检查是否有真实头像图片
     hasAvatarImage: (state): boolean => {
       return !!state.user?.avatar
+    },
+
+    // 检查是否为管理员
+    isAdmin: (state): boolean => {
+      return state.user?.role === 'admin'
+    },
+
+    // 获取用户角色
+    userRole: (state): string => {
+      return state.user?.role || 'user'
     }
   },
 
