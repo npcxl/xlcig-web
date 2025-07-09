@@ -133,6 +133,44 @@ class ApiClient {
       }
     })
   }
+
+  // 流式请求（用于SSE）
+  async stream(
+    endpoint: string,
+    body?: any,
+    config?: Omit<RequestInterceptorConfig, 'method' | 'body'>
+  ): Promise<Response> {
+    const url = `${this.baseURL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`
+    
+    try {
+      // 使用请求拦截器处理认证等
+      const requestConfig = await requestInterceptor(url, {
+        ...config,
+        method: 'POST',
+        body,
+        headers: {
+          'Accept': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          ...(config?.headers || {})
+        },
+        timeout: this.timeout
+      })
+
+      // 发送流式请求
+      const response = await fetch(url, requestConfig)
+      
+      // 检查响应状态
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      return response
+    } catch (error) {
+      // 应用错误拦截器
+      throw errorInterceptor(error, 'POST', endpoint)
+    }
+  }
 }
 
 // 创建并导出API客户端实例

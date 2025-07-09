@@ -46,6 +46,8 @@
     "axios": "^1.6.2",
     "bootstrap-icons": "^1.11.2",
     "china-division": "^2.7.0",
+    "github-markdown-css": "^5.8.1",
+    "marked": "^15.0.12",
     "naive-ui": "^2.34.4",
     "pinia": "^3.0.3",
     "province-city-china": "^8.5.8",

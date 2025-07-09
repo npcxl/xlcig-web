@@ -10,6 +10,8 @@ export default defineNuxtConfig({
   devtools: { 
     enabled: process.env.NODE_ENV === 'development' 
   },
+
+
   ssr: true,
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
@@ -94,8 +96,21 @@ export default defineNuxtConfig({
     }
   },
   
-  // 优化SSR性能
+  // 优化SSR性能和开发代理
   nitro: {
-    compressPublicAssets: true
+    compressPublicAssets: true,
+    // 开发环境代理配置
+    devProxy: {
+      '/api': {
+        target: 'http://192.168.11.194:9999/api',
+        changeOrigin: true,
+        prependPath: true,
+      },
+      '/websocket': {
+        target: 'ws://192.168.11.194:9999',
+        ws: true,
+        changeOrigin: true,
+      }
+    }
   }
 }) 

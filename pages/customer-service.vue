@@ -70,8 +70,9 @@
                 <i class="bi bi-chat-dots text-cyan-400"></i>
                 <span class="text-white font-medium">当前模式：</span>
                 <span class="text-cyan-300">
-                  {{ selectedSession ? `与 ${selectedSession.user_nickname || selectedSession.user_name || '用户'} 对话` :
-                  '客服团队模式' }}
+                  {{ isAiChatMode ? 'AI智能助手模式' :
+                    selectedSession ? `与 ${selectedSession.user_nickname || selectedSession.user_name || '用户'} 对话` :
+                      '客服团队模式' }}
                 </span>
               </div>
               <div v-if="selectedSession" class="flex items-center gap-2">
@@ -117,7 +118,10 @@
                   </h3>
                   <p class="text-xs text-gray-400">
                     {{ sessions.length }} 个会话
-                    <span v-if="selectedSession" class="text-cyan-400 ml-2">
+                    <span v-if="isAiChatMode" class="text-cyan-400 ml-2">
+                      · 已选中 AI装机助手
+                    </span>
+                    <span v-else-if="selectedSession" class="text-cyan-400 ml-2">
                       · 已选中 {{ selectedSession.user_nickname || selectedSession.user_name || `用户
                       #${selectedSession.user_id}` }}
                     </span>
@@ -125,7 +129,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                   <!-- 返回客服模式按钮 -->
-                  <button v-if="selectedSession" @click="backToCustomerService"
+                  <button v-if="selectedSession || isAiChatMode" @click="backToCustomerService"
                     class="p-2 text-gray-400 hover:text-cyan-300 hover:bg-gray-700/50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
                     title="返回客服模式">
                     <i class="bi bi-arrow-left text-lg"></i>
@@ -153,6 +157,74 @@
               </div>
 
               <div v-else class="p-4 space-y-3">
+                <!-- AI聊天选项 - 固定在第一位 -->
+                <div @click="selectAiChat"
+                  class="relative p-4 rounded-xl cursor-pointer transition-all duration-300 group hover:scale-[1.01] animate-fade-in-up border border-transparent hover:border-gray-600/50"
+                  :class="[
+                    isAiChatMode
+                      ? 'session-selected border-cyan-500/50'
+                      : 'hover:bg-gray-800/30'
+                  ]">
+                  <!-- 选中状态指示器 -->
+                  <div v-if="isAiChatMode"
+                    class="absolute top-3 left-3 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg"></div>
+
+                  <!-- AI聊天信息 -->
+                  <div class="flex items-center space-x-4">
+                    <!-- AI头像 -->
+                    <div class="relative flex-shrink-0">
+                      <div class="w-14 h-14 rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-lg"
+                        :class="isAiChatMode ? 'border-cyan-400/70 shadow-cyan-400/20' : 'border-gray-700/50'">
+                        <div
+                          class="w-full h-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                          <i class="bi bi-robot text-white text-xl"></i>
+                        </div>
+                      </div>
+                      <!-- 在线状态指示器 -->
+                      <div
+                        class="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
+                        <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                      </div>
+                    </div>
+
+                    <!-- AI聊天信息 -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-white font-semibold text-base truncate flex items-center gap-2">
+                          AI装机助手
+                          <span
+                            class="text-xs text-cyan-400 bg-cyan-500/20 px-2 py-1 rounded-full border border-cyan-500/30">
+                            AI
+                          </span>
+                        </h4>
+                      </div>
+
+                      <!-- 描述 -->
+                      <div class="mb-2">
+                        <p class="text-sm text-gray-400 truncate leading-relaxed">
+                          专业的装机指导和硬件咨询服务
+                        </p>
+                      </div>
+
+                      <!-- 状态信息 -->
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                          <span
+                            class="text-xs px-2 py-1 rounded-lg font-medium bg-green-500/20 text-green-300 border border-green-500/30">
+                            智能助手
+                          </span>
+                        </div>
+
+                        <!-- 在线状态 -->
+                        <div class="flex items-center gap-1">
+                          <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                          <span class="text-xs text-green-400">在线</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div v-for="(session, index) in sessions" :key="session.id" @click="selectSession(session)"
                   class="relative p-4 rounded-xl cursor-pointer transition-all duration-300 group hover:scale-[1.01] animate-fade-in-up border border-transparent hover:border-gray-600/50"
                   :class="[
@@ -186,8 +258,8 @@
                       <!-- 在线状态指示器 -->
                       <div
                         class="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
-                        <div class="w-3 h-3 rounded-full" 
-                             :class="session.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></div>
+                        <div class="w-3 h-3 rounded-full"
+                          :class="session.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></div>
                       </div>
                     </div>
 
@@ -229,10 +301,9 @@
 
                         <!-- 在线状态 -->
                         <div class="flex items-center gap-1">
-                          <div class="w-2 h-2 rounded-full" 
-                               :class="session.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></div>
-                          <span class="text-xs" 
-                                :class="session.isOnline ? 'text-green-400' : 'text-gray-400'">
+                          <div class="w-2 h-2 rounded-full"
+                            :class="session.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></div>
+                          <span class="text-xs" :class="session.isOnline ? 'text-green-400' : 'text-gray-400'">
                             {{ session.isOnline ? '在线' : '离线' }}
                           </span>
                         </div>
@@ -261,9 +332,11 @@
                       class="w-full h-full object-cover" @error="handleAvatarError" />
                     <div v-else class="w-full h-full flex items-center justify-center animate-pulse-gentle" :class="currentChatUser.isCustomerService
                       ? 'bg-gradient-to-r from-cyan-500 to-blue-500'
-                      : 'bg-gradient-to-r from-gray-500 to-gray-600'">
+                      : currentChatUser.isAiChat
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500'
+                        : 'bg-gradient-to-r from-gray-500 to-gray-600'">
                       <i class="text-white text-xl"
-                        :class="currentChatUser.isCustomerService ? 'bi bi-headset' : 'bi bi-person'"></i>
+                        :class="currentChatUser.isCustomerService ? 'bi bi-headset' : currentChatUser.isAiChat ? 'bi bi-robot' : 'bi bi-person'"></i>
                     </div>
                   </div>
                   <div>
@@ -273,10 +346,9 @@
                         class="bi bi-patch-check-fill text-cyan-400 text-lg"></i>
                     </h3>
                     <p class="text-sm text-gray-400 flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full"
-                      :class="currentChatUser.isCustomerService 
-                        ? (isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-500')
-                        : (currentChatUser.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500')">
+                    <div class="w-2 h-2 rounded-full" :class="currentChatUser.isCustomerService
+                      ? (isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-500')
+                      : (currentChatUser.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500')">
                     </div>
                     {{ currentChatUser.status }}
                     </p>
@@ -315,11 +387,13 @@
                   <i class="bi bi-chat-heart text-4xl text-cyan-400"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-white mb-3">
-                  {{ selectedSession ? `与 ${selectedSession.user_nickname || selectedSession.user_name || `用户
+                  {{ isAiChatMode ? 'AI装机助手' :
+                    selectedSession ? `与 ${selectedSession.user_nickname || selectedSession.user_name || `用户
                   #${selectedSession.user_id}`} 的对话` : '欢迎使用在线客服' }}
                 </h3>
                 <p class="text-gray-400 mb-8 text-lg leading-relaxed max-w-md mx-auto">
-                  {{ selectedSession ? '您正在与该用户进行私人对话，可以实时交流解决问题' : '有任何问题都可以在这里与我们沟通，您也可以从左侧选择特定用户进行对话' }}
+                  {{ isAiChatMode ? '您好！我是AI装机助手，专为您提供装机指导和硬件咨询服务。请告诉我您的需求，我会为您推荐最适合的配置方案。' :
+                    selectedSession ? '您正在与该用户进行私人对话，可以实时交流解决问题' : '有任何问题都可以在这里与我们沟通，您也可以从左侧选择特定用户进行对话' }}
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
                   <button v-for="(quickMsg, index) in quickMessages" :key="quickMsg" @click="sendQuickMessage(quickMsg)"
@@ -353,24 +427,72 @@
                         <img v-if="getMessageAvatar(message)" :src="getMessageAvatar(message)"
                           :alt="getMessageNickname(message)" class="w-full h-full object-cover"
                           @error="handleAvatarError" @load="handleAvatarLoad" />
-                        <div v-else class="w-full h-full rounded-full flex items-center justify-center"
-                          :class="isCustomerServiceMessage(message) ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-gray-500 to-gray-600'">
-                          <i class="text-white text-sm"
-                            :class="isCustomerServiceMessage(message) ? 'bi bi-person-badge' : 'bi bi-person'"></i>
+                        <div v-else class="w-full h-full rounded-full flex items-center justify-center" :class="isCustomerServiceMessage(message)
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+                          : message.isAiMessage
+                            ? 'bg-gradient-to-r from-cyan-500 to-blue-500'
+                            : 'bg-gradient-to-r from-gray-500 to-gray-600'">
+                          <i class="text-white text-sm" :class="isCustomerServiceMessage(message)
+                            ? 'bi bi-person-badge'
+                            : message.isAiMessage
+                              ? 'bi bi-robot'
+                              : 'bi bi-person'"></i>
                         </div>
                       </div>
                       <div>
                         <div class="bg-gray-700/50 border border-gray-600/30 rounded-2xl rounded-tl-sm p-3 text-white">
-                          {{ message.message || message.data?.message }}
+
+                          <!-- AI消息 - 使用分块Markdown渲染 -->
+                          <div v-if="message.isAiMessage" class="ai-message-container">
+                            <!-- 分块渲染模式（实时流式消息） -->
+                            <template v-if="message.isChunked && message.chunks && message.chunks.length > 0">
+                              <div v-for="chunk in message.chunks" 
+                                   :key="chunk.id"
+                                   class="markdown-body ai-message-content ai-chunk"
+                                   :class="{ 'ai-chunk-animate': chunk.timestamp > Date.now() - 1000 }"
+                                   v-html="chunk.rendered"></div>
+                              <!-- 如果还在流式传输中，显示最新内容的预览 -->
+                              <div v-if="message.isStreaming && aiMessageBuffer && message.chunks.length > 0"
+                                   class="markdown-body ai-message-content ai-chunk ai-chunk-preview"
+                                   v-html="renderMarkdown(getUnrenderedContent(message))"></div>
+                            </template>
+                            <!-- 历史消息渲染模式（使用预渲染内容） -->
+                            <template v-else-if="message.renderedContent">
+                              <div class="markdown-body ai-message-content ai-history-message"
+                                   v-html="message.renderedContent" 
+                                   ref="markdownContainer"></div>
+
+                            </template>
+                            <!-- 常规渲染模式（用于短内容或非流式） -->
+                            <div v-else
+                                 class="markdown-body ai-message-content"
+                                 v-html="getAiMessageContent(message)"></div>
+                          </div>
+                          <!-- 普通消息 - 使用文本显示 -->
+                          <template v-else>
+                            {{ message.message || message.data?.message }}
+                          </template>
+                          <!-- 流式输入指示器 -->
+                          <span v-if="message.isStreaming" class="inline-flex items-center ml-2">
+                            <div class="flex gap-1">
+                              <div class="w-1 h-1 bg-cyan-400 rounded-full animate-bounce"></div>
+                              <div class="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                              <div class="w-1 h-1 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                            </div>
+                          </span>
                         </div>
                         <div class="flex items-center gap-2 mt-1 ml-1">
-                          <span class="text-xs"
-                            :class="isCustomerServiceMessage(message) ? 'text-green-400' : 'text-gray-400'">
-                            {{ message.nickname || message.data?.nickname || (isCustomerServiceMessage(message) ? '客服' :
-                            '用户') }}
+                          <span class="text-xs" :class="isCustomerServiceMessage(message)
+                            ? 'text-green-400'
+                            : message.isAiMessage
+                              ? 'text-cyan-400'
+                              : 'text-gray-400'">
+                            {{ message.nickname || message.data?.nickname ||
+                              (isCustomerServiceMessage(message) ? '客服' :
+                                message.isAiMessage ? 'AI装机助手' : '用户') }}
                           </span>
                           <span class="text-xs text-gray-500">{{ formatTime(message.timestamp || message.created_at)
-                            }}</span>
+                          }}</span>
                         </div>
                       </div>
                     </div>
@@ -390,11 +512,12 @@
                       <div class="text-right">
                         <div
                           class="bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl rounded-tr-sm p-3 text-white">
+                          <!-- 当前用户消息永远不是AI消息，只显示普通文本 -->
                           {{ message.message || message.data?.message }}
                         </div>
                         <div class="flex items-center gap-2 mt-1 justify-end mr-1">
                           <span class="text-xs text-gray-500">{{ formatTime(message.timestamp || message.created_at)
-                            }}</span>
+                          }}</span>
                           <span class="text-xs text-cyan-400">
                             {{ getUserNickname(message) }}
                           </span>
@@ -407,29 +530,27 @@
 
                 <!-- 正在输入提示 -->
                 <div v-if="isTyping && typingUsers.size > 0" class="flex justify-start mt-4">
-                  <div v-for="[userId, userInfo] in typingUsers" :key="userId" class="flex items-start gap-3 max-w-[70%] animate-fade-in-up mb-2">
+                  <div v-for="[userId, userInfo] in typingUsers" :key="userId"
+                    class="flex items-start gap-3 max-w-[70%] animate-fade-in-up mb-2">
                     <!-- 用户头像 -->
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-600/30">
-                      <img 
-                        v-if="userInfo.avatar" 
-                        :src="userInfo.avatar" 
-                        :alt="userInfo.nickname"
-                        class="w-full h-full object-cover"
-                        @error="$event.target.style.display = 'none'"
-                      />
-                      <div 
-                        v-else
+                    <div
+                      class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-600/30">
+                      <img v-if="userInfo.avatar" :src="userInfo.avatar" :alt="userInfo.nickname"
+                        class="w-full h-full object-cover" @error="$event.target.style.display = 'none'" />
+                      <div v-else
                         class="w-full h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse-gentle">
                         <i class="bi bi-person-badge text-white text-sm"></i>
                       </div>
                     </div>
-                    
+
                     <div>
                       <div class="bg-gray-700/50 border border-gray-600/30 rounded-2xl rounded-tl-sm p-3">
                         <div class="flex gap-1">
                           <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s">
+                          </div>
+                          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s">
+                          </div>
                         </div>
                       </div>
                       <div class="flex items-center gap-2 mt-1 ml-1">
@@ -458,7 +579,7 @@
                     <i class="bi bi-emoji-smile text-lg"></i>
                   </button>
                 </div>
-                
+
                 <!-- 输入提示工具栏 -->
                 <div class="flex items-center gap-3">
                   <span class="text-xs text-gray-500 flex items-center gap-1">
@@ -476,14 +597,17 @@
                 </div>
               </div>
 
-              <!-- 输入框和发送按钮 -->
-              <div class="flex items-end gap-3">
-                <!-- 输入框区域 -->
-                <div class="flex-1 relative">
-                  <textarea v-model="newMessage" @keydown.enter.exact.prevent="sendMessage"
-                    @input="adjustTextareaHeight" @focus="handleInputFocus" @blur="handleInputBlur"
-                    :disabled="!isConnected" placeholder="输入您的消息... (Enter 发送，Shift+Enter 换行)" rows="1"
-                    class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 hide-scrollbar"></textarea>
+                              <!-- 输入框和发送按钮 -->
+                <div class="flex items-end gap-3">
+                  <!-- 输入框区域 -->
+                  <div class="flex-1 relative">
+                    <textarea v-model="newMessage" @keydown.enter.exact.prevent="sendMessage"
+                      @input="adjustTextareaHeight" @focus="handleInputFocus" @blur="handleInputBlur"
+                      :disabled="!isConnected || isAiTyping" 
+                      :placeholder="isAiTyping ? 'AI正在回复中...' : (isAiChatMode ? '向AI装机助手提问... (Enter 发送，Shift+Enter 换行)' : '输入您的消息... (Enter 发送，Shift+Enter 换行)')" 
+                      rows="1"
+                      class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 hide-scrollbar"
+                      :class="{ 'opacity-50 cursor-not-allowed': isAiTyping }"></textarea>
                   <!-- 输入状态指示 -->
                   <div v-if="isInputFocused"
                     class="absolute -top-6 left-2 text-xs text-cyan-400 bg-gray-800/80 px-2 py-1 rounded-lg">
@@ -491,12 +615,13 @@
                   </div>
                 </div>
 
-                <!-- 发送按钮 -->
-                <button @click="sendMessage" :disabled="!newMessage.trim() || !isConnected"
-                  class="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:shadow-none flex items-center gap-2 hover:scale-105 active:scale-95 min-h-[48px] flex-shrink-0">
-                  <i class="bi bi-send text-lg"></i>
-                  <span class="hidden sm:inline">发送</span>
-                </button>
+                                  <!-- 发送按钮 -->
+                  <button @click="sendMessage" :disabled="!newMessage.trim() || !isConnected || isAiTyping"
+                    class="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:shadow-none flex items-center gap-2 hover:scale-105 active:scale-95 min-h-[48px] flex-shrink-0">
+                    <i v-if="!isAiTyping" class="bi bi-send text-lg"></i>
+                    <i v-else class="bi bi-hourglass-split text-lg animate-spin"></i>
+                    <span class="hidden sm:inline">{{ isAiTyping ? '回复中' : '发送' }}</span>
+                  </button>
               </div>
             </div>
           </div>
@@ -512,9 +637,163 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useUserStore } from '~/stores/user'
 import { ChatApi } from '~/utils/api/chat'
+import { AiChatApi } from '~/utils/api/aiChat'
+import { marked } from 'marked'
+// import 'github-markdown-css/github-markdown-light.css' // 暂时注释掉，可能冲突
 
 // 获取运行时配置
 const config = useRuntimeConfig()
+
+// 配置 marked
+marked.setOptions({
+  breaks: true, // 支持换行符转换为 <br>
+  gfm: true, // 启用 GitHub Flavored Markdown
+  sanitize: false // 允许HTML（谨慎使用）
+})
+
+// 基础Markdown渲染函数
+const renderMarkdown = (text) => {
+  if (!text) return ''
+  try {
+    const result = marked(text)
+    return result
+  } catch (error) {
+    console.error('❌ Markdown渲染失败:', error)
+    return text // 出错时返回原文本
+  }
+}
+
+// 增量处理AI消息chunk
+const processIncrementalChunk = (newChunk, messageIndex) => {
+  // 将新chunk添加到缓冲区
+  aiMessageBuffer.value += newChunk
+  
+  // 节流更新渲染
+  if (renderThrottleTimer) {
+    clearTimeout(renderThrottleTimer)
+  }
+  
+  renderThrottleTimer = setTimeout(() => {
+    throttledRenderAiMessage(messageIndex)
+  }, RENDER_THROTTLE_DELAY)
+}
+
+// 节流渲染AI消息
+const throttledRenderAiMessage = (messageIndex) => {
+  const fullText = aiMessageBuffer.value
+  
+  // 将内容分块处理
+  const newChunks = splitIntoRenderChunks(fullText)
+  
+  // 检查是否有新内容需要渲染
+  if (newChunks.length > aiMessageChunks.value.length) {
+    // 只渲染新增的块
+    const chunksToAdd = newChunks.slice(aiMessageChunks.value.length)
+    const maxNewChunks = Math.min(chunksToAdd.length, MAX_CHUNKS_PER_UPDATE)
+    
+    for (let i = 0; i < maxNewChunks; i++) {
+      const chunk = chunksToAdd[i]
+      const renderedChunk = renderMarkdown(chunk)
+      aiMessageChunks.value.push({
+        id: aiMessageChunks.value.length,
+        content: chunk,
+        rendered: renderedChunk,
+        timestamp: Date.now()
+      })
+    }
+    
+    // 更新消息对象
+    if (messageIndex >= 0 && messages.value[messageIndex]) {
+      messages.value[messageIndex].message = fullText
+      messages.value[messageIndex].chunks = aiMessageChunks.value
+      messages.value[messageIndex].isChunked = true
+    }
+    
+    console.log('🚀 增量渲染:', {
+      新增块数: maxNewChunks,
+      总块数: aiMessageChunks.value.length,
+      总内容长度: fullText.length
+    })
+  }
+}
+
+// 将文本分割成渲染块
+const splitIntoRenderChunks = (text) => {
+  if (!text) return []
+  
+  const chunks = []
+  let currentChunk = ''
+  let inCodeBlock = false
+  let inListItem = false
+  
+  const lines = text.split('\n')
+  
+  for (const line of lines) {
+    // 检测代码块
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock
+    }
+    
+    // 检测列表项
+    if (line.trim().match(/^[\-\*\+]\s/) || line.trim().match(/^\d+\.\s/)) {
+      inListItem = true
+    } else if (line.trim() === '' && inListItem) {
+      inListItem = false
+    }
+    
+    currentChunk += line + '\n'
+    
+    // 决定是否应该分块
+    const shouldSplit = 
+      currentChunk.length >= CHUNK_SIZE && 
+      !inCodeBlock && 
+      !inListItem &&
+      (line.trim() === '' || line.trim().endsWith('.') || line.trim().endsWith('！') || line.trim().endsWith('？'))
+    
+    if (shouldSplit) {
+      chunks.push(currentChunk.trim())
+      currentChunk = ''
+    }
+  }
+  
+  // 添加剩余内容
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim())
+  }
+  
+  return chunks
+}
+
+// 重置AI消息状态
+const resetAiMessageState = () => {
+  aiMessageChunks.value = []
+  aiMessageBuffer.value = ''
+  if (renderThrottleTimer) {
+    clearTimeout(renderThrottleTimer)
+    renderThrottleTimer = null
+  }
+}
+
+// 获取AI消息的完整渲染内容
+const getAiMessageContent = (message) => {
+  if (message.isChunked && message.chunks) {
+    return message.chunks.map(chunk => chunk.rendered).join('')
+  }
+  return renderMarkdown(message.message || message.data?.message)
+}
+
+// 获取未渲染的内容（用于流式传输预览）
+const getUnrenderedContent = (message) => {
+  if (!message.chunks || message.chunks.length === 0) {
+    return aiMessageBuffer.value
+  }
+  
+  const renderedLength = message.chunks.reduce((total, chunk) => total + chunk.content.length, 0)
+  const remainingContent = aiMessageBuffer.value.substring(renderedLength)
+  
+  // 只显示最后几十个字符的预览，避免重复渲染
+  return remainingContent.substring(Math.max(0, remainingContent.length - 100))
+}
 
 // 状态管理
 const userStore = useUserStore()
@@ -527,6 +806,19 @@ const messages = ref([])
 const sessions = ref([])
 const messagesContainer = ref()
 const selectedSession = ref(null) // 当前选中的会话
+const isAiChatMode = ref(false) // 是否为AI聊天模式
+const currentAiSessionId = ref(null) // 当前AI聊天会话ID
+const isAiTyping = ref(false) // AI是否正在输入
+const currentStreamingMessage = ref('') // 当前流式消息内容
+const aiChatCallbacks = ref(null) // AI聊天WebSocket回调引用
+
+// AI消息渲染优化相关
+const aiMessageChunks = ref([]) // AI消息分块存储
+const aiMessageBuffer = ref('') // AI消息缓冲区
+let renderThrottleTimer = null // 渲染节流定时器
+const RENDER_THROTTLE_DELAY = 100 // 渲染节流延迟(ms)
+const CHUNK_SIZE = 500 // 每个渲染块的字符大小
+const MAX_CHUNKS_PER_UPDATE = 3 // 每次更新最大块数
 
 // 服务状态
 const serviceStatus = ref({
@@ -541,18 +833,41 @@ let websocket = null
 let heartbeatTimer = null
 
 // 快速消息
-const quickMessages = [
-  '你好，请问有什么可以帮助您的？',
-  '我想了解产品信息',
-  '订单相关问题',
-  '技术支持'
-]
+const quickMessages = computed(() => {
+  if (isAiChatMode.value) {
+    return [
+      '我想装一台游戏电脑',
+      '帮我推荐办公电脑配置',
+      '预算5000元的配置方案',
+      '什么CPU性价比最高？',
+      '如何选择显卡？'
+    ]
+  }
+  return [
+    '你好，请问有什么可以帮助您的？',
+    '我想了解产品信息',
+    '订单相关问题',
+    '技术支持'
+  ]
+})
 
 // 计算属性
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 
 // 当前聊天对象信息
 const currentChatUser = computed(() => {
+  if (isAiChatMode.value) {
+    return {
+      name: 'AI装机助手',
+      avatar: null,
+      status: '在线 - AI智能回复',
+      isCustomerService: false,
+      isAiChat: true,
+      userId: 'ai_assistant',
+      sessionId: currentAiSessionId.value
+    }
+  }
+
   if (!selectedSession.value) {
     return {
       name: 'xlCig 客服团队',
@@ -600,7 +915,7 @@ const connectWebSocket = () => {
       // 连接成功后，请求获取当前所有用户的在线状态
       setTimeout(() => {
         if (websocket && websocket.readyState === WebSocket.OPEN) {
-          websocket.send(JSON.stringify({ 
+          websocket.send(JSON.stringify({
             type: 'get_users_status',
             data: {}
           }))
@@ -774,6 +1089,87 @@ const handleWebSocketMessage = (message) => {
     case 'error':
       console.error('WebSocket错误:', message.data)
       break
+
+    // AI聊天相关消息
+    case 'ai_chat_start':
+      console.log('AI聊天开始:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onStart) {
+        aiChatCallbacks.value.onStart({
+          type: 'start',
+          sessionId: message.sessionId,
+          userMessage: message.data.userMessage,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_progress':
+      console.log('AI聊天进度:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onProgress) {
+        aiChatCallbacks.value.onProgress({
+          type: 'progress',
+          message: message.data.message,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_chunk':
+      console.log('AI聊天内容块:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onChunk) {
+        aiChatCallbacks.value.onChunk({
+          type: 'chunk',
+          content: message.data.content,
+          fullResponse: message.data.fullResponse,
+          chunkIndex: message.data.chunkIndex,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_done':
+      console.log('AI聊天完成:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onDone) {
+        aiChatCallbacks.value.onDone({
+          type: 'done',
+          fullResponse: message.data.fullResponse,
+          chunkCount: message.data.chunkCount,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_saved':
+      console.log('AI聊天已保存:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onSaved) {
+        aiChatCallbacks.value.onSaved({
+          type: 'saved',
+          message: message.data.message,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_error':
+      console.error('AI聊天错误:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onError) {
+        aiChatCallbacks.value.onError({
+          type: 'error',
+          message: message.data.message,
+          error: message.data.error,
+          timestamp: message.data.timestamp
+        })
+      }
+      break
+
+    case 'ai_chat_end':
+      console.log('AI聊天结束:', message.data)
+      if (aiChatCallbacks.value && aiChatCallbacks.value.onEnd) {
+        aiChatCallbacks.value.onEnd()
+      }
+      // 清除回调引用
+      aiChatCallbacks.value = null
+      break
   }
 }
 
@@ -788,14 +1184,14 @@ const clearTypingStates = () => {
 const handleTypingMessage = (data, isTyping) => {
   const userId = data.userId || data.user_id || data.senderId
   const targetUserId = data.targetUserId || data.target_user_id
-  
+
   console.log('处理输入状态:', { userId, targetUserId, isTyping, currentSession: selectedSession.value?.user_id })
-  
+
   // 如果是在特定用户对话模式下
   if (selectedSession.value) {
     // 只有当前选中用户或者目标用户是当前选中用户时，才显示typing状态
     const isCurrentSessionUser = userId === selectedSession.value.user_id || targetUserId === selectedSession.value.user_id
-    
+
     if (isCurrentSessionUser) {
       if (isTyping) {
         // 添加/更新正在输入的用户
@@ -834,18 +1230,18 @@ const handleTypingMessage = (data, isTyping) => {
 // 更新用户在线状态
 const updateUserOnlineStatus = (userId, isOnline, userData = {}) => {
   if (!userId) return
-  
+
   console.log(`更新用户 ${userId} 在线状态:`, isOnline, userData)
-  
+
   // 更新会话列表中的用户状态
   const sessionIndex = sessions.value.findIndex(session => session.user_id === userId)
   if (sessionIndex >= 0) {
     const session = sessions.value[sessionIndex]
     const previousStatus = session.isOnline
-    
+
     // 更新在线状态
     session.isOnline = isOnline
-    
+
     // 如果有新的用户数据，更新相关信息
     if (userData.userName && userData.userName !== session.user_name) {
       session.user_name = userData.userName
@@ -859,16 +1255,16 @@ const updateUserOnlineStatus = (userId, isOnline, userData = {}) => {
       session.avatar = userData.avatar
       session.user_avatar = userData.avatar
     }
-    
+
     // 状态变化提示
     if (previousStatus !== isOnline) {
       const userName = session.displayName || session.user_nickname || session.user_name || `用户 #${userId}`
       console.log(`📱 ${userName} ${isOnline ? '🟢 上线了' : '🔴 下线了'}`)
-      
+
       // 可以在这里添加Toast提示或其他视觉反馈
       // 例如：showToast(`${userName} ${isOnline ? '上线了' : '下线了'}`)
     }
-    
+
     console.log(`会话列表中用户 ${userId} 状态已更新:`, session)
   } else {
     // 如果会话列表中没有这个用户，且用户上线了，可以考虑重新加载会话列表
@@ -877,11 +1273,11 @@ const updateUserOnlineStatus = (userId, isOnline, userData = {}) => {
       loadChatSessions()
     }
   }
-  
+
   // 如果当前选中的用户状态发生变化，触发计算属性更新
   if (selectedSession.value && selectedSession.value.user_id === userId) {
     selectedSession.value.isOnline = isOnline
-    
+
     // 更新选中用户的其他信息
     if (userData.userName) selectedSession.value.user_name = userData.userName
     if (userData.nickname) selectedSession.value.user_nickname = userData.nickname
@@ -889,7 +1285,7 @@ const updateUserOnlineStatus = (userId, isOnline, userData = {}) => {
       selectedSession.value.avatar = userData.avatar
       selectedSession.value.user_avatar = userData.avatar
     }
-    
+
     console.log(`当前选中用户 ${userId} 状态已更新`, selectedSession.value)
   }
 }
@@ -901,6 +1297,178 @@ const adjustTextareaHeight = (event) => {
   textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px' // 最大高度128px
 }
 
+// 发送流式AI消息
+const sendStreamMessage = async (messageText) => {
+  try {
+    // 立即添加用户消息到界面
+    const userMessage = {
+      id: Date.now(),
+      user_id: userStore.user?.id,
+      message: messageText,
+      message_type: 'user',
+      created_at: new Date().toISOString(),
+      nickname: userStore.user?.nickname || userStore.userDisplayName,
+      avatar: userStore.user?.avatar,
+      isAdmin: false
+    }
+    messages.value.push(userMessage)
+    
+    // 重置AI消息状态
+    resetAiMessageState()
+    
+    // 创建一个临时的AI消息用于显示流式内容
+    const tempAiMessage = {
+      id: Date.now() + 1,
+      user_id: 'ai_assistant',
+      message: '',
+      message_type: 'assistant',
+      created_at: new Date().toISOString(),
+      nickname: 'AI装机助手',
+      avatar: null,
+      isAdmin: false,
+      isAiMessage: true,
+      isStreaming: true,
+      isChunked: false,
+      chunks: []
+    }
+    messages.value.push(tempAiMessage)
+    
+    // 滚动到底部
+    scrollToBottom()
+    
+    // 设置AI正在输入状态
+    isAiTyping.value = true
+    currentStreamingMessage.value = ''
+    
+    let fullResponse = ''
+    
+    // 检查token状态
+    console.log('当前用户token:', userStore.token ? `${userStore.token.substring(0, 10)}...` : 'null')
+    console.log('localStorage token:', localStorage.getItem('authToken') ? `${localStorage.getItem('authToken').substring(0, 10)}...` : 'null')
+    
+    // 定义回调函数
+    const callbacks = {
+      onStart: (data) => {
+        console.log('🚀 AI开始响应:', data)
+        if (!currentAiSessionId.value && data.sessionId) {
+          currentAiSessionId.value = data.sessionId
+        }
+      },
+      
+      onConnected: (data) => {
+        console.log('✅ AI服务连接成功:', data.message)
+      },
+      
+      onProgress: (data) => {
+        console.log('⏳ 进度:', data.message)
+      },
+      
+      onRetry: (data) => {
+        console.log('🔄 重试中:', data.message)
+      },
+      
+      onChunk: (data) => {
+        if (data.content) {
+          const tempMessageIndex = messages.value.length - 1
+          
+          // 使用增量处理而不是累积全部内容
+          processIncrementalChunk(data.content, tempMessageIndex)
+          
+          // 更新流式消息状态
+          currentStreamingMessage.value = aiMessageBuffer.value
+          
+          // 节流滚动到底部
+          nextTick(() => {
+            scrollToBottom()
+          })
+        }
+      },
+      
+      onDone: (data) => {
+        console.log('✅ AI响应完成:', data)
+        isAiTyping.value = false
+        
+        // 确保处理完所有剩余内容
+        const finalMessageIndex = messages.value.length - 1
+        if (finalMessageIndex >= 0) {
+          // 强制处理所有剩余的缓冲区内容
+          if (renderThrottleTimer) {
+            clearTimeout(renderThrottleTimer)
+            throttledRenderAiMessage(finalMessageIndex)
+          }
+          
+          // 更新最终消息状态
+          const finalMessage = messages.value[finalMessageIndex]
+          finalMessage.isStreaming = false
+          finalMessage.message = aiMessageBuffer.value || data.fullResponse || finalMessage.message
+          
+          console.log('🎯 AI响应最终完成:', {
+            总块数: aiMessageChunks.value.length,
+            总长度: aiMessageBuffer.value.length,
+            是否分块: finalMessage.isChunked
+          })
+        }
+      },
+      
+      onSaved: (data) => {
+        console.log('💾 对话已保存:', data.message)
+      },
+      
+      onError: (data) => {
+        console.error('❌ AI响应错误:', data)
+        isAiTyping.value = false
+        
+        // 更新错误消息
+        const errorMessageIndex = messages.value.length - 1
+        if (errorMessageIndex >= 0) {
+          messages.value[errorMessageIndex].message = data.message || '抱歉，处理您的请求时出现了错误'
+          messages.value[errorMessageIndex].isStreaming = false
+        }
+      },
+      
+      onEnd: () => {
+        console.log('🏁 流式连接结束')
+        isAiTyping.value = false
+      }
+    }
+    
+    // 存储回调引用，供WebSocket消息处理使用
+    aiChatCallbacks.value = callbacks
+    
+    // 使用新的API方法发送流式消息
+    await AiChatApi.sendStreamMessage(
+      messageText,
+      currentAiSessionId.value,
+      callbacks,
+      userStore.token // 显式传递token
+    )
+    
+  } catch (error) {
+    console.error('流式AI聊天错误:', error)
+    isAiTyping.value = false
+    
+    // 根据错误类型显示不同的错误信息
+    let errorMessage = '抱歉，AI服务暂时不可用，请稍后重试';
+    if (error.message) {
+      if (error.message.includes('无效的授权令牌')) {
+        errorMessage = '登录已过期，请重新登录';
+        // 可以在这里添加跳转到登录页的逻辑
+      } else if (error.message.includes('未登录')) {
+        errorMessage = '请先登录后再使用AI聊天功能';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    // 更新错误消息
+    const errorMessageIndex = messages.value.length - 1
+    if (errorMessageIndex >= 0) {
+      messages.value[errorMessageIndex].message = errorMessage
+      messages.value[errorMessageIndex].isStreaming = false
+    }
+  }
+}
+
 // 发送消息
 const sendMessage = async () => {
   if (!newMessage.value.trim()) {
@@ -910,10 +1478,15 @@ const sendMessage = async () => {
   const messageText = newMessage.value.trim()
 
   try {
-    if (selectedSession.value) {
-      // 选中了特定用户，使用API发送消息
-      console.log('向用户发送消息:', selectedSession.value.user_id, messageText)
-      const response = await ChatApi.sendMessage(messageText, selectedSession.value.user_id)
+    if (isAiChatMode.value) {
+      // AI聊天模式 - 使用流式响应
+      console.log('向AI发送流式消息:', messageText)
+      newMessage.value = '' // 立即清空输入框
+      await sendStreamMessage(messageText)
+      return
+    } else if (selectedSession.value) {
+      // 用户对话模式 - 使用传统API
+             const response = await ChatApi.sendMessage(messageText, selectedSession.value.user_id)
 
       if (response.success) {
         // 添加消息到本地显示（客服发送的消息）
@@ -1183,6 +1756,24 @@ const scrollToBottom = () => {
 
 // 判断是否为当前用户的消息
 const isCurrentUserMessage = (message) => {
+  // AI消息永远显示在左边（非当前用户）
+  if (message.isAiMessage || message.user_id === 'ai_assistant' || message.message_type === 'assistant') {
+    return false
+  }
+
+  // 在AI聊天模式下，根据message_type判断
+  if (isAiChatMode.value) {
+    const result = message.message_type === 'user'
+    // 临时调试信息
+    console.log('🔍 AI模式消息判断:', {
+      message_type: message.message_type,
+      isCurrentUser: result,
+      messageContent: message.message?.substring(0, 30)
+    })
+    return result
+  }
+
+  // 在普通聊天模式下，使用原有逻辑
   const currentUserId = userStore.user?.id
 
   // 如果是客服消息类型，检查是否是当前管理员发送的
@@ -1383,6 +1974,14 @@ const selectSession = async (session) => {
   // 清除之前的typing状态
   clearTypingStates()
   
+  // 清除AI聊天状态
+  if (isAiChatMode.value) {
+    isAiTyping.value = false
+    currentStreamingMessage.value = ''
+  }
+  
+  // 退出AI聊天模式
+  isAiChatMode.value = false
   selectedSession.value = session
 
   // 加载该用户的聊天记录
@@ -1393,6 +1992,93 @@ const selectSession = async (session) => {
     await markSessionAsRead(session.user_id)
     // 更新会话列表中的未读数量
     session.unread_count = 0
+  }
+}
+
+// 选择AI聊天
+const selectAiChat = async () => {
+  console.log('选中AI聊天')
+  
+  // 清除之前的typing状态
+  clearTypingStates()
+  
+  // 清除流式状态
+  isAiTyping.value = false
+  currentStreamingMessage.value = ''
+  
+  // 退出用户会话模式
+  selectedSession.value = null
+  isAiChatMode.value = true
+
+  // 等待DOM更新
+  await nextTick()
+  console.log('🔧 设置AI模式完成, isAiChatMode.value:', isAiChatMode.value)
+
+  // 加载AI聊天历史
+  await loadAiChatHistory()
+  
+  // 再次等待DOM更新
+  await nextTick()
+  console.log('✅ AI聊天设置完成')
+}
+
+// 加载AI聊天历史
+const loadAiChatHistory = async () => {
+  try {
+    console.log('🤖 开始加载AI聊天历史, isAiChatMode.value:', isAiChatMode.value)
+    const response = await AiChatApi.getChatHistory({
+      sessionId: currentAiSessionId.value,
+      limit: 50
+    })
+
+    if (response.success && response.data && response.data.records) {
+      messages.value = response.data.records.map(msg => {
+        // 更robust的AI消息判断逻辑
+        const isAiMessage = msg.message_type === 'assistant' || 
+                           msg.user_id === 'ai_assistant' ||
+                           (msg.user_id && msg.user_id.toString().includes('ai'))
+        
+        // 临时调试信息
+        console.log('📝 消息处理:', {
+          originalType: msg.message_type,
+          user_id: msg.user_id,
+          isAiMessage: isAiMessage,
+          content: msg.content?.substring(0, 30)
+        })
+        
+        const renderedContent = isAiMessage ? renderMarkdown(msg.content) : null
+        
+        return {
+          ...msg,
+          id: msg.id,
+          user_id: isAiMessage ? 'ai_assistant' : msg.user_id,
+          message: msg.content,
+          message_type: msg.message_type || (isAiMessage ? 'assistant' : 'user'),
+          created_at: msg.created_at,
+          nickname: isAiMessage ? 'AI装机助手' : (userStore.user?.nickname || userStore.userDisplayName),
+          avatar: isAiMessage ? null : userStore.user?.avatar,
+          isAdmin: false,
+          isAiMessage: isAiMessage,
+          isStreaming: false,
+          isChunked: false,
+          chunks: [],
+          // 为历史AI消息预渲染Markdown
+          renderedContent: renderedContent
+        }
+      })
+      console.log('🔄 AI聊天历史加载完成:', {
+        消息数量: messages.value.length,
+        AI消息数: messages.value.filter(m => m.isAiMessage).length,
+        用户消息数: messages.value.filter(m => !m.isAiMessage).length
+      })
+      scrollToBottom()
+    } else {
+      // 如果没有历史记录，清空消息列表
+      messages.value = []
+    }
+  } catch (error) {
+    console.error('加载AI聊天历史失败:', error)
+    messages.value = []
   }
 }
 
@@ -1461,7 +2147,17 @@ const backToCustomerService = () => {
   // 清除typing状态
   clearTypingStates()
   
+  // 清除AI聊天状态
+  if (isAiChatMode.value) {
+    isAiTyping.value = false
+    currentStreamingMessage.value = ''
+  }
+  
+  // 退出AI聊天模式和用户会话模式
   selectedSession.value = null
+  isAiChatMode.value = false
+  currentAiSessionId.value = null
+  
   // 重新加载默认的聊天记录
   loadChatHistory()
 }
@@ -1500,6 +2196,8 @@ onMounted(async () => {
     return
   }
 
+
+
   // 加载页面数据
   await Promise.all([
     loadServiceStatus(),
@@ -1512,6 +2210,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   disconnectWebSocket()
+  // 清理AI消息渲染相关的定时器和状态
+  resetAiMessageState()
 })
 </script>
 
@@ -1541,16 +2241,150 @@ onUnmounted(() => {
   background: rgba(156, 163, 175, 0.7);
 }
 
+/* AI消息样式 */
+.ai-message-container {
+  max-width: 100%;
+}
+
+.ai-message-content {
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+
+.ai-history-message {
+  opacity: 0.95;
+}
+
+.ai-chunk {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.ai-chunk-animate {
+  animation: fadeInUp 0.3s ease-out, glow 0.5s ease-out;
+}
+
+.ai-chunk-preview {
+  opacity: 0.8;
+  border-left: 2px solid #06b6d4;
+  padding-left: 12px;
+  margin-top: 8px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+}
+
+/* Markdown内容样式 */
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  color: #60a5fa;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-body p {
+  margin-bottom: 0.8em;
+}
+
+.markdown-body code {
+  background-color: rgba(55, 65, 81, 0.8);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #fbbf24;
+  font-size: 0.9em;
+}
+
+.markdown-body pre {
+  background-color: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+  color: #e5e7eb;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.2em;
+  margin-bottom: 0.8em;
+}
+
+.markdown-body li {
+  margin-bottom: 0.3em;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #06b6d4;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.markdown-body th, .markdown-body td {
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown-body th {
+  background-color: rgba(55, 65, 81, 0.5);
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.markdown-body strong {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.markdown-body em {
+  color: #a78bfa;
+  font-style: italic;
+}
+
 /* 隐藏输入框滚动条 */
 .hide-scrollbar {
   /* 隐藏 Webkit 浏览器滚动条 */
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 和 Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 和 Edge */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 /* 自定义动画 */
@@ -1713,6 +2547,7 @@ onUnmounted(() => {
 
 /* 响应式设计优化 */
 @media (max-width: 1280px) {
+
   :deep(.xl\:col-span-1),
   :deep(.xl\:col-span-3) {
     grid-column: span 1;
@@ -1725,6 +2560,7 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+
   .animate-fade-in-left,
   .animate-fade-in-right {
     animation-delay: 0.1s;
@@ -1751,5 +2587,208 @@ onUnmounted(() => {
   :deep(.text-2xl) {
     font-size: 1.5rem;
   }
+}
+
+/* AI消息 Markdown 样式 */
+.ai-message-content.markdown-body {
+  /* 覆盖 github-markdown-css 的默认样式以适配暗色主题 */
+  background-color: transparent !important;
+  color: white !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: 1.6 !important;
+}
+
+.ai-message-content.markdown-body h1,
+.ai-message-content.markdown-body h2,
+.ai-message-content.markdown-body h3,
+.ai-message-content.markdown-body h4,
+.ai-message-content.markdown-body h5,
+.ai-message-content.markdown-body h6 {
+  color: #60a5fa !important; /* 蓝色标题 */
+  border-bottom-color: rgba(96, 165, 250, 0.3) !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.ai-message-content.markdown-body p {
+  margin-bottom: 0.5rem !important;
+  color: white !important;
+}
+
+.ai-message-content.markdown-body code {
+  background-color: rgba(107, 114, 126, 0.3) !important;
+  color: #fbbf24 !important; /* 黄色代码 */
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
+}
+
+.ai-message-content.markdown-body pre {
+  background-color: rgba(17, 24, 39, 0.8) !important;
+  border: 1px solid rgba(107, 114, 126, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 1rem !important;
+  overflow-x: auto !important;
+  margin: 0.5rem 0 !important;
+}
+
+.ai-message-content.markdown-body pre code {
+  background-color: transparent !important;
+  color: #e5e7eb !important;
+  padding: 0 !important;
+}
+
+.ai-message-content.markdown-body blockquote {
+  border-left: 4px solid #06b6d4 !important; /* 青色引用边框 */
+  background-color: rgba(6, 182, 212, 0.1) !important;
+  color: #e5e7eb !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0.5rem 0 !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+
+.ai-message-content.markdown-body ul,
+.ai-message-content.markdown-body ol {
+  margin: 0.5rem 0 !important;
+  padding-left: 1.5rem !important;
+  color: white !important;
+}
+
+.ai-message-content.markdown-body li {
+  margin-bottom: 0.2rem !important;
+  color: white !important;
+}
+
+.ai-message-content.markdown-body a {
+  color: #60a5fa !important; /* 蓝色链接 */
+  text-decoration: underline !important;
+}
+
+.ai-message-content.markdown-body a:hover {
+  color: #93c5fd !important;
+}
+
+.ai-message-content.markdown-body strong {
+  color: #fbbf24 !important; /* 黄色加粗 */
+  font-weight: 600 !important;
+}
+
+.ai-message-content.markdown-body em {
+  color: #a78bfa !important; /* 紫色斜体 */
+}
+
+.ai-message-content.markdown-body table {
+  border-collapse: collapse !important;
+  margin: 0.5rem 0 !important;
+  width: 100% !important;
+  border: 1px solid rgba(107, 114, 126, 0.3) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+.ai-message-content.markdown-body th,
+.ai-message-content.markdown-body td {
+  border: 1px solid rgba(107, 114, 126, 0.3) !important;
+  padding: 0.5rem !important;
+  text-align: left !important;
+  color: white !important;
+}
+
+.ai-message-content.markdown-body th {
+  background-color: rgba(107, 114, 126, 0.2) !important;
+  font-weight: 600 !important;
+}
+
+.ai-message-content.markdown-body hr {
+  border: none !important;
+  border-top: 2px solid rgba(107, 114, 126, 0.3) !important;
+  margin: 1rem 0 !important;
+}
+
+/* 确保所有文本都是白色 */
+.ai-message-content.markdown-body * {
+  color: inherit !important;
+}
+
+/* AI消息分块渲染优化样式 */
+.ai-message-container {
+  position: relative;
+}
+
+.ai-chunk {
+  margin-bottom: 0.25rem !important;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.ai-chunk:last-child {
+  margin-bottom: 0 !important;
+}
+
+.ai-chunk-animate {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.ai-chunk-preview {
+  opacity: 0.7;
+  border-left: 2px solid #06b6d4;
+  padding-left: 0.5rem;
+  background-color: rgba(6, 182, 212, 0.05) !important;
+}
+
+/* 分块渲染时的流畅过渡 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 长内容优化 */
+.ai-message-container {
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(6, 182, 212, 0.3) transparent;
+}
+
+.ai-message-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ai-message-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-message-container::-webkit-scrollbar-thumb {
+  background-color: rgba(6, 182, 212, 0.3);
+  border-radius: 2px;
+}
+
+.ai-message-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(6, 182, 212, 0.5);
+}
+
+/* 针对长AI回复的分页指示器 */
+.ai-chunk-indicator {
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: linear-gradient(to bottom, #06b6d4, #0891b2);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+/* 性能优化：减少重绘 */
+.ai-chunk {
+  will-change: opacity;
+  transform: translateZ(0);
 }
 </style>
