@@ -352,6 +352,21 @@ const reloadPage = () => {
 onMounted(() => {
   console.log('首页组件 onMounted 触发')
   loadPageData()
+  
+  // 应用首页专用滚动条样式
+  if (process.client) {
+    document.body.classList.add('home-page-scrollbar')
+  }
+})
+
+// 页面卸载时清理
+onUnmounted(() => {
+  console.log('首页组件卸载')
+  
+  // 移除首页专用滚动条样式
+  if (process.client) {
+    document.body.classList.remove('home-page-scrollbar')
+  }
 })
 
 // 监听路由变化
@@ -360,6 +375,16 @@ watch(() => route.path, (newPath, oldPath) => {
   if (newPath === '/') {
     console.log('返回首页，重新加载数据')
     loadPageData()
+    
+    // 重新应用首页专用滚动条样式
+    if (process.client) {
+      document.body.classList.add('home-page-scrollbar')
+    }
+  } else {
+    // 离开首页时移除专用滚动条样式
+    if (process.client) {
+      document.body.classList.remove('home-page-scrollbar')
+    }
   }
 })
 
@@ -516,6 +541,8 @@ console.log('首页组件渲染, 状态:', {
 </script>
 
 <style scoped>
+/* 首页滚动条样式已通过全局CSS优化，此处保留首页特有样式 */
+
 /* 简化优美的流星特效 */
 .meteors-container {
   position: absolute;

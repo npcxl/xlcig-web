@@ -63,7 +63,7 @@
             </div>
 
             <!-- 会话列表内容 -->
-            <div class="flex-1 overflow-y-auto">
+                         <div class="flex-1 overflow-y-auto custom-scrollbar-dark">
               <div v-if="!userStore.isAdmin || sessions.length === 0"
                 class="flex flex-col items-center justify-center h-full text-center p-8">
                 <div
@@ -382,7 +382,7 @@
               </div>
 
               <!-- 聊天消息区域 -->
-              <div class="flex-1 overflow-y-auto p-6" ref="messagesContainer">
+                             <div class="flex-1 overflow-y-auto p-6 chat-scrollbar" ref="messagesContainer">
                 <!-- 欢迎消息 -->
                 <div v-if="messages.length === 0" class="text-center py-16">
                   <div
@@ -604,7 +604,7 @@
                     :disabled="!isConnected || isAiTyping"
                     :placeholder="isAiTyping ? 'AI正在回复中...' : (isAiChatMode ? '向AI装机助手提问... (Enter 发送，Shift+Enter 换行)' : '输入您的消息... (Enter 发送，Shift+Enter 换行)')"
                     rows="1"
-                    class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 overflow-y-auto custom-scrollbar"
+                                         class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 overflow-y-auto input-scrollbar"
                     :class="{ 'opacity-50 cursor-not-allowed': isAiTyping }"></textarea>
                   <!-- 输入状态指示 -->
                   <div v-if="isInputFocused"
@@ -750,7 +750,7 @@ const connectWebSocket = () => {
 
   try {
     //const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
-    const wsUrl = `ws://192.168.0.108:9999/websocket?token=${userStore.token}`
+    const wsUrl = `ws://192.168.11.194:9999/websocket?token=${userStore.token}`
     console.log('正在连接WebSocket:', wsUrl)
     websocket = new WebSocket(wsUrl)
     websocket.onopen = () => {
@@ -1781,24 +1781,7 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* 滚动条样式 */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: rgba(55, 65, 81, 0.3);
-  border-radius: 3px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 3px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.7);
-}
+/* 滚动条样式已移至全局 main.css 中统一管理 */
 
 /* AI消息样式 */
 .ai-message-container {

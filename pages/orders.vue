@@ -305,7 +305,7 @@
 
       <!-- 批量支付弹窗 -->
       <div v-if="showBatchPayment" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar-dark">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-white flex items-center gap-3">
               <i class="bi bi-credit-card text-cyan-400"></i>
@@ -319,7 +319,7 @@
           <!-- 选中订单列表 -->
           <div class="mb-6">
             <h4 class="text-lg font-semibold text-white mb-4">选中的订单</h4>
-            <div class="space-y-3 max-h-60 overflow-y-auto">
+                          <div class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar-dark">
               <div v-for="order in pendingOrders.filter(o => selectedOrders.has(o.id))" :key="order.id"
                    class="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-700/30">
                 <div>

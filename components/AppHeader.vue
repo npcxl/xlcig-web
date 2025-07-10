@@ -94,7 +94,7 @@
             <button 
               @click="openCustomerService" 
               class="p-2 text-gray-300 hover:text-cyan-400 transition-colors duration-200"
-              title="在线客服"
+              title="AiChat"
             >
               <i class="bi bi-headset text-xl"></i>
             </button>
@@ -205,7 +205,7 @@ const route = useRoute()
 const navItems = [
   { path: '/', label: '首页' },
   { path: '/products', label: '产品中心' },
-  { path: '/customer-service', label: '在线客服' },
+  { path: '/customer-service', label: 'AiChat' },
   { path: '/checkout', label: '购物车' },
   { path: '/orders', label: '订单' }
 ]

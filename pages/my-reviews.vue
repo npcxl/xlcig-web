@@ -169,7 +169,7 @@
 
     <!-- 编辑评论弹窗 -->
     <div v-if="showEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar-dark">
         <div class="p-8">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-white flex items-center gap-3">

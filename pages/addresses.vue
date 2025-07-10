@@ -78,13 +78,14 @@
                 <div class="flex items-center gap-3 mb-4">
                   <h3 class="text-xl font-semibold text-white">{{ address.name }}</h3>
                   <span class="text-gray-300">{{ address.phone }}</span>
-                  <span 
+                  <div 
                     v-if="address.is_default" 
-                    class="px-3 py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm font-medium rounded-full"
+                    class="default-address-badge"
                   >
-                    <i class="bi bi-star-fill mr-1"></i>
-                    默认地址
-                  </span>
+                    <i class="bi bi-star-fill"></i>
+                    <span>默认地址</span>
+                    <div class="badge-glow"></div>
+                  </div>
                 </div>
                 
                 <!-- 详细地址 -->
@@ -101,10 +102,12 @@
                   v-if="!address.is_default"
                   @click="setDefault(address.id)"
                   :disabled="settingDefault"
-                  class="btn-outline-dark px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50"
+                  class="btn-set-default px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50"
                 >
                   <i class="bi bi-star mr-1"></i>
-                  设为默认
+                  <span v-if="settingDefault">设置中...</span>
+                  <span v-else>设为默认</span>
+                  <div class="btn-shine"></div>
                 </button>
                 <button 
                   @click="editAddress(address)"
@@ -130,7 +133,7 @@
 
     <!-- 添加/编辑地址弹窗 -->
     <div v-if="showAddModal || showEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
-      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 animate-scale-in w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 animate-scale-in w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar-dark">
         <div class="p-8">
           <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
             <i class="bi bi-geo-alt text-cyan-400"></i>
@@ -370,6 +373,13 @@ const addAddress = async () => {
     submitting.value = true
     const response = await addressApi.createAddress(form)
     if (response.success && response.data) {
+      // 如果新地址是默认地址，需要更新其他地址的默认状态
+      if (response.data.is_default) {
+        addresses.value.forEach(addr => {
+          addr.is_default = false
+        })
+      }
+      
       addresses.value.push(response.data)
       closeModal()
       success('地址添加成功')
@@ -415,6 +425,15 @@ const updateAddress = async () => {
     submitting.value = true
     const response = await addressApi.updateAddress(editingAddress.value.id, form)
     if (response.success && response.data) {
+      // 如果更新的地址被设为默认地址，需要更新其他地址的默认状态
+      if (response.data.is_default) {
+        addresses.value.forEach(addr => {
+          if (addr.id !== response.data!.id) {
+            addr.is_default = false
+          }
+        })
+      }
+      
       const index = addresses.value.findIndex(addr => addr.id === editingAddress.value!.id)
       if (index !== -1) {
         addresses.value[index] = response.data
@@ -590,6 +609,68 @@ onMounted(() => {
   color: white;
 }
 
+/* 默认地址徽章样式 */
+.default-address-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #00f5ff 0%, #0080ff 50%, #8b5cf6 100%);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  box-shadow: 
+    0 4px 15px rgba(0, 245, 255, 0.4),
+    0 0 30px rgba(0, 245, 255, 0.3);
+  overflow: hidden;
+  animation: badge-pulse 2s ease-in-out infinite alternate;
+}
+
+.default-address-badge i {
+  animation: star-twinkle 1.5s ease-in-out infinite;
+}
+
+.badge-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: badge-shine 3s ease-in-out infinite;
+}
+
+/* 设为默认按钮样式 */
+.btn-set-default {
+  position: relative;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  color: white;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(251, 191, 36, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.btn-set-default:hover {
+  box-shadow: 
+    0 6px 20px rgba(251, 191, 36, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: btn-shine 2s ease-in-out infinite;
+}
+
 /* 加载动画 */
 .loading-spinner {
   width: 2rem;
@@ -660,6 +741,54 @@ onMounted(() => {
   }
   60% {
     transform: translateY(-3px);
+  }
+}
+
+@keyframes badge-pulse {
+  0% {
+    box-shadow: 
+      0 4px 15px rgba(0, 245, 255, 0.4),
+      0 0 30px rgba(0, 245, 255, 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 6px 25px rgba(0, 245, 255, 0.6),
+      0 0 50px rgba(0, 245, 255, 0.5);
+  }
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.2);
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes badge-shine {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes btn-shine {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
   }
 }
 

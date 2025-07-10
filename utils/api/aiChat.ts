@@ -8,16 +8,22 @@ export interface AiChatMessage {
   session_id: string;
   message_type: "user" | "assistant";
   content: string;
+  contentHtml?: string; // 后端渲染的HTML版本（仅AI消息）
   created_at: string;
 }
 
 // AI聊天会话类型
 export interface AiChatSession {
-  session_id: string;
-  first_message_time: string;
-  last_message_time: string;
-  message_count: number;
-  first_user_message: string;
+  sessionId: string;
+  firstMessageTime: string;
+  lastMessageTime: string;
+  messageCount: number;
+  userMessageCount: number;
+  assistantMessageCount: number;
+  firstUserMessage: string;
+  lastMessage: string;
+  lastMessageHtml?: string; // HTML版本的最后一条消息
+  title: string;
 }
 
 // 流式响应事件类型
@@ -25,6 +31,7 @@ export interface StreamEvent {
   type:
     | "start"
     | "chunk"
+    | "html_update" // 保留但可能不再使用
     | "done"
     | "error"
     | "progress"
@@ -34,7 +41,11 @@ export interface StreamEvent {
     | "cancelled"
     | "retry";
   content?: string;
+  htmlChunk?: string; // 新增：每个chunk的HTML片段
+  htmlContent?: string; // 完整HTML内容
+  markdownContent?: string; // Markdown内容
   fullResponse?: string;
+  htmlResponse?: string; // 完整的HTML响应
   chunkIndex?: number;
   sessionId?: string;
   userMessage?: string;
@@ -44,12 +55,14 @@ export interface StreamEvent {
   retryCount?: number;
   maxRetries?: number;
   chunkCount?: number;
+  isPartial?: boolean;
 }
 
 // 流式回调函数类型
 export interface StreamCallbacks {
   onStart?: (data: StreamEvent) => void;
   onChunk?: (data: StreamEvent) => void;
+  onHtmlUpdate?: (data: StreamEvent) => void; // 保留兼容性
   onProgress?: (data: StreamEvent) => void;
   onDone?: (data: StreamEvent) => void;
   onError?: (data: StreamEvent) => void;

@@ -3,37 +3,37 @@ import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, getRequestURL, getResponseHeader, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, createError, getRouterParam, getResponseStatusText } from 'file://D:/code/xlweb/node_modules/h3/dist/index.mjs';
-import { escapeHtml } from 'file://D:/code/xlweb/node_modules/@vue/shared/dist/shared.cjs.js';
-import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file://D:/code/xlweb/node_modules/vue-bundle-renderer/dist/runtime.mjs';
-import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, joinRelativeURL } from 'file://D:/code/xlweb/node_modules/ufo/dist/index.mjs';
-import { renderToString } from 'file://D:/code/xlweb/node_modules/vue/server-renderer/index.mjs';
-import { klona } from 'file://D:/code/xlweb/node_modules/klona/dist/index.mjs';
-import defu, { defuFn } from 'file://D:/code/xlweb/node_modules/defu/dist/defu.mjs';
-import destr, { destr as destr$1 } from 'file://D:/code/xlweb/node_modules/destr/dist/index.mjs';
-import { snakeCase } from 'file://D:/code/xlweb/node_modules/scule/dist/index.mjs';
-import { createHead as createHead$1, propsToString, renderSSRHead } from 'file://D:/code/xlweb/node_modules/unhead/dist/server.mjs';
-import { stringify, uneval } from 'file://D:/code/xlweb/node_modules/devalue/index.js';
-import { isVNode, toValue, isRef } from 'file://D:/code/xlweb/node_modules/vue/index.mjs';
-import { DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'file://D:/code/xlweb/node_modules/unhead/dist/plugins.mjs';
-import { createHooks } from 'file://D:/code/xlweb/node_modules/hookable/dist/index.mjs';
-import { createFetch, Headers as Headers$1 } from 'file://D:/code/xlweb/node_modules/ofetch/dist/node.mjs';
-import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file://D:/code/xlweb/node_modules/node-mock-http/dist/index.mjs';
-import { createStorage, prefixStorage } from 'file://D:/code/xlweb/node_modules/unstorage/dist/index.mjs';
-import unstorage_47drivers_47fs from 'file://D:/code/xlweb/node_modules/unstorage/drivers/fs.mjs';
-import { digest } from 'file://D:/code/xlweb/node_modules/ohash/dist/index.mjs';
-import { toRouteMatcher, createRouter } from 'file://D:/code/xlweb/node_modules/radix3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, getRequestURL, getResponseHeader, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, createError, getRouterParam, getResponseStatusText } from 'file://D:/codeGitee/xlweb/node_modules/h3/dist/index.mjs';
+import { escapeHtml } from 'file://D:/codeGitee/xlweb/node_modules/@vue/shared/dist/shared.cjs.js';
+import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file://D:/codeGitee/xlweb/node_modules/vue-bundle-renderer/dist/runtime.mjs';
+import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, joinRelativeURL } from 'file://D:/codeGitee/xlweb/node_modules/ufo/dist/index.mjs';
+import { renderToString } from 'file://D:/codeGitee/xlweb/node_modules/vue/server-renderer/index.mjs';
+import { klona } from 'file://D:/codeGitee/xlweb/node_modules/klona/dist/index.mjs';
+import defu, { defuFn } from 'file://D:/codeGitee/xlweb/node_modules/defu/dist/defu.mjs';
+import destr, { destr as destr$1 } from 'file://D:/codeGitee/xlweb/node_modules/destr/dist/index.mjs';
+import { snakeCase } from 'file://D:/codeGitee/xlweb/node_modules/scule/dist/index.mjs';
+import { createHead as createHead$1, propsToString, renderSSRHead } from 'file://D:/codeGitee/xlweb/node_modules/unhead/dist/server.mjs';
+import { stringify, uneval } from 'file://D:/codeGitee/xlweb/node_modules/devalue/index.js';
+import { isVNode, toValue, isRef } from 'file://D:/codeGitee/xlweb/node_modules/vue/index.mjs';
+import { DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'file://D:/codeGitee/xlweb/node_modules/unhead/dist/plugins.mjs';
+import { createHooks } from 'file://D:/codeGitee/xlweb/node_modules/hookable/dist/index.mjs';
+import { createFetch, Headers as Headers$1 } from 'file://D:/codeGitee/xlweb/node_modules/ofetch/dist/node.mjs';
+import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file://D:/codeGitee/xlweb/node_modules/node-mock-http/dist/index.mjs';
+import { createStorage, prefixStorage } from 'file://D:/codeGitee/xlweb/node_modules/unstorage/dist/index.mjs';
+import unstorage_47drivers_47fs from 'file://D:/codeGitee/xlweb/node_modules/unstorage/drivers/fs.mjs';
+import { digest } from 'file://D:/codeGitee/xlweb/node_modules/ohash/dist/index.mjs';
+import { toRouteMatcher, createRouter } from 'file://D:/codeGitee/xlweb/node_modules/radix3/dist/index.mjs';
 import { readFile } from 'node:fs/promises';
-import consola, { consola as consola$1 } from 'file://D:/code/xlweb/node_modules/consola/dist/index.mjs';
-import { ErrorParser } from 'file://D:/code/xlweb/node_modules/youch-core/build/index.js';
-import { Youch } from 'file://D:/code/xlweb/node_modules/nitropack/node_modules/youch/build/index.js';
-import { SourceMapConsumer } from 'file://D:/code/xlweb/node_modules/source-map/source-map.js';
+import consola, { consola as consola$1 } from 'file://D:/codeGitee/xlweb/node_modules/consola/dist/index.mjs';
+import { ErrorParser } from 'file://D:/codeGitee/xlweb/node_modules/youch-core/build/index.js';
+import { Youch } from 'file://D:/codeGitee/xlweb/node_modules/nitropack/node_modules/youch/build/index.js';
+import { SourceMapConsumer } from 'file://D:/codeGitee/xlweb/node_modules/source-map/source-map.js';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { getContext } from 'file://D:/code/xlweb/node_modules/unctx/dist/index.mjs';
-import { captureRawStackTrace, parseRawStackTrace } from 'file://D:/code/xlweb/node_modules/errx/dist/index.js';
-import { walkResolver } from 'file://D:/code/xlweb/node_modules/unhead/dist/utils.mjs';
+import { getContext } from 'file://D:/codeGitee/xlweb/node_modules/unctx/dist/index.mjs';
+import { captureRawStackTrace, parseRawStackTrace } from 'file://D:/codeGitee/xlweb/node_modules/errx/dist/index.js';
+import { walkResolver } from 'file://D:/codeGitee/xlweb/node_modules/unhead/dist/utils.mjs';
 
-const serverAssets = [{"baseName":"server","dir":"D:/code/xlweb/server/assets"}];
+const serverAssets = [{"baseName":"server","dir":"D:/codeGitee/xlweb/server/assets"}];
 
 const assets = createStorage();
 
@@ -45,11 +45,11 @@ const storage = createStorage({});
 
 storage.mount('/assets', assets);
 
-storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:/code/xlweb","watchOptions":{"ignored":[null]}}));
-storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:/code/xlweb/server","watchOptions":{"ignored":[null]}}));
-storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:/code/xlweb/.nuxt"}));
-storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:/code/xlweb/.nuxt/cache"}));
-storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"D:/code/xlweb/.data/kv"}));
+storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:/codeGitee/xlweb","watchOptions":{"ignored":[null]}}));
+storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:/codeGitee/xlweb/server","watchOptions":{"ignored":[null]}}));
+storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:/codeGitee/xlweb/.nuxt"}));
+storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:/codeGitee/xlweb/.nuxt/cache"}));
+storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"D:/codeGitee/xlweb/.data/kv"}));
 
 function useStorage(base = "") {
   return base ? prefixStorage(storage, base) : storage;
@@ -1012,13 +1012,13 @@ if (!window.__NUXT_DEVTOOLS_TIME_METRIC__) {
 window.__NUXT_DEVTOOLS_TIME_METRIC__.appInit = Date.now()
 `;
 
-const __0FwVmpFGWJ0YunnzpF_B0ceQMcfudbSb5ffnfYDjQQ = (function(nitro) {
+const _J6LvJiluqKuLqhyUju8jsCR4ImRSdBGE206RAPQUV4 = (function(nitro) {
   nitro.hooks.hook("render:html", (htmlContext) => {
     htmlContext.head.push(`<script>${script}<\/script>`);
   });
 });
 
-const rootDir = "D:/code/xlweb";
+const rootDir = "D:/codeGitee/xlweb";
 
 const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑"},{"name":"keywords","content":"xlCig,PC硬件,电脑配置,显卡,CPU,装机"},{"name":"author","content":"xlCig"},{"name":"baidu-site-verification","content":"codeva-2z90c1PlRw"},{"property":"og:title","content":"xlCig - 专业PC硬件产品和装机服务"},{"property":"og:description","content":"专业的PC硬件产品和装机建议，助您打造梦想中的高性能电脑"},{"property":"og:type","content":"website"},{"property":"og:url","content":"https://www.xlcig.cn"},{"property":"og:site_name","content":"xlCig"},{"name":"theme-color","content":"#00f5ff"},{"name":"robots","content":"index, follow"}],"link":[{"rel":"icon","type":"image/png","href":"/logo.png"},{"rel":"apple-touch-icon","sizes":"180x180","href":"/logo.png"},{"rel":"icon","type":"image/png","sizes":"32x32","href":"/logo.png"},{"rel":"icon","type":"image/png","sizes":"16x16","href":"/logo.png"}],"style":[],"script":[],"noscript":[],"title":"xlCig - 专业PC硬件产品和装机服务"};
 
@@ -1037,7 +1037,7 @@ const devReducers = {
   URL: (data) => data instanceof URL ? data.toString() : void 0
 };
 const asyncContext = getContext("nuxt-dev", { asyncContext: true, AsyncLocalStorage });
-const _7oeU5c9MVw_95lyR6k8ZR1nhKA2dqmR3iUlMVcwR16s = (nitroApp) => {
+const _RBSXuiW5hvoqn887YI3XkG5K1FQFC2u4Ja46N7VnA_I = (nitroApp) => {
   const handler = nitroApp.h3App.handler;
   nitroApp.h3App.handler = (event) => {
     return asyncContext.callAsync({ logs: [], event }, () => handler(event));
@@ -1107,8 +1107,8 @@ function onConsoleLog(callback) {
 }
 
 const plugins = [
-  __0FwVmpFGWJ0YunnzpF_B0ceQMcfudbSb5ffnfYDjQQ,
-_7oeU5c9MVw_95lyR6k8ZR1nhKA2dqmR3iUlMVcwR16s
+  _J6LvJiluqKuLqhyUju8jsCR4ImRSdBGE206RAPQUV4,
+_RBSXuiW5hvoqn887YI3XkG5K1FQFC2u4Ja46N7VnA_I
 ];
 
 const VueResolver = (_, value) => {
@@ -1182,8 +1182,8 @@ function publicAssetsURL(...path) {
 
 const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
 const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
-const getServerEntry = () => import('file://D:/code/xlweb/.nuxt/dist/server/server.mjs').then((r) => r.default || r);
-const getClientManifest = () => import('file://D:/code/xlweb/.nuxt/dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
+const getServerEntry = () => import('file://D:/codeGitee/xlweb/.nuxt/dist/server/server.mjs').then((r) => r.default || r);
+const getClientManifest = () => import('file://D:/codeGitee/xlweb/.nuxt/dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
 const getSSRRenderer = lazyCachedFunction(async () => {
   const manifest = await getClientManifest();
   if (!manifest) {
@@ -1429,12 +1429,12 @@ async function getIslandContext(event) {
   return ctx;
 }
 
-const _lazy_F3cj9i = () => Promise.resolve().then(function () { return renderer$1; });
+const _lazy_xESVHG = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
-  { route: '/__nuxt_error', handler: _lazy_F3cj9i, lazy: true, middleware: false, method: undefined },
+  { route: '/__nuxt_error', handler: _lazy_xESVHG, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: _SxA8c9, lazy: false, middleware: false, method: undefined },
-  { route: '/**', handler: _lazy_F3cj9i, lazy: true, middleware: false, method: undefined }
+  { route: '/**', handler: _lazy_xESVHG, lazy: true, middleware: false, method: undefined }
 ];
 
 function createNitroApp() {

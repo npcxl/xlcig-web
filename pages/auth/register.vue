@@ -320,7 +320,7 @@
 
     <!-- 用户协议弹窗 -->
     <div v-if="showTerms" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto custom-scrollbar-dark">
         <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
           <i class="bi bi-file-text text-cyan-400"></i>
           用户服务协议
@@ -357,7 +357,7 @@
 
     <!-- 隐私政策弹窗 -->
     <div v-if="showPrivacy" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="glass-card-dark rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto custom-scrollbar-dark">
         <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
           <i class="bi bi-shield-check text-cyan-400"></i>
           隐私政策
@@ -737,24 +737,7 @@ input[type="checkbox"]:checked {
   border-color: rgb(6 182 212);
 }
 
-/* 自定义滚动条 */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: rgba(55, 65, 81, 0.3);
-  border-radius: 3px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.5);
-  border-radius: 3px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: rgba(6, 182, 212, 0.7);
-}
+/* 滚动条样式已移至全局 main.css 中统一管理 */
 
 /* 响应式设计 */
 @media (max-width: 640px) {
