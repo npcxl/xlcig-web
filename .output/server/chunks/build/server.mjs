@@ -403,64 +403,64 @@ const _routes = [
   {
     name: "index",
     path: "/",
-    component: () => import('./index-CK1NITyQ.mjs')
+    component: () => import('./index-KLHvv1kS.mjs')
   },
   {
     name: "orders",
     path: "/orders",
-    component: () => import('./orders-DqH0sbHD.mjs')
+    component: () => import('./orders-BsJng6wf.mjs')
   },
   {
     name: "profile",
     path: "/profile",
-    component: () => import('./profile-OaQnor4W.mjs')
+    component: () => import('./profile-Cbvb-ZsI.mjs')
   },
   {
     name: "checkout",
     path: "/checkout",
-    component: () => import('./checkout-qfZw1bZw.mjs')
+    component: () => import('./checkout-B7M91ud5.mjs')
   },
   {
     name: "addresses",
     path: "/addresses",
-    component: () => import('./addresses-DLAP5VMY.mjs')
+    component: () => import('./addresses-BPCHn4Oj.mjs')
   },
   {
     name: "auth-login",
     path: "/auth/login",
-    component: () => import('./login-BletZ7CZ.mjs')
+    component: () => import('./login-C8P9xApR.mjs')
   },
   {
     name: "my-reviews",
     path: "/my-reviews",
     meta: { "middleware": "auth" },
-    component: () => import('./my-reviews-CRRIjOaI.mjs')
+    component: () => import('./my-reviews-DCzte3st.mjs')
   },
   {
     name: "auth-register",
     path: "/auth/register",
-    component: () => import('./register-CA1-zeUQ.mjs')
+    component: () => import('./register-CeiEZD5c.mjs')
   },
   {
     name: "location-test",
     path: "/location-test",
     meta: __nuxt_page_meta || {},
-    component: () => import('./location-test-IFtrobEa.mjs')
+    component: () => import('./location-test-B9WarcDJ.mjs')
   },
   {
     name: "products-id",
     path: "/products/:id()",
-    component: () => import('./_id_-ea4HeLwY.mjs')
+    component: () => import('./_id_-BQlCXwL6.mjs')
   },
   {
     name: "products",
     path: "/products",
-    component: () => import('./index-D_ORhjjb.mjs')
+    component: () => import('./index-Da5wag4a.mjs')
   },
   {
     name: "customer-service",
     path: "/customer-service",
-    component: () => import('./customer-service-yiFHJ4vN.mjs')
+    component: () => import('./customer-service-CRyBHgtO.mjs')
   }
 ];
 const ROUTE_KEY_PARENTHESES_RE = /(:\w+)\([^)]+\)/g;
@@ -1008,6 +1008,16 @@ const useUserStore = defineStore("user", {
     hasAvatarImage: (state) => {
       var _a;
       return !!((_a = state.user) == null ? void 0 : _a.avatar);
+    },
+    // 检查是否为管理员
+    isAdmin: (state) => {
+      var _a;
+      return ((_a = state.user) == null ? void 0 : _a.role) === "admin";
+    },
+    // 获取用户角色
+    userRole: (state) => {
+      var _a;
+      return ((_a = state.user) == null ? void 0 : _a.role) || "user";
     }
   },
   actions: {

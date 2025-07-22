@@ -63,23 +63,22 @@
             </div>
 
             <!-- 会话列表内容 -->
-                         <div class="flex-1 overflow-y-auto custom-scrollbar-dark">
-              <div v-if="!userStore.isAdmin || sessions.length === 0"
+            <div class="flex-1 overflow-y-auto custom-scrollbar-dark">
+              <!-- 管理员：暂无对话时的提示 -->
+              <div v-if="userStore.isAdmin && sessions.length === 0"
                 class="flex flex-col items-center justify-center h-full text-center p-8">
                 <div
                   class="w-20 h-20 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-full flex items-center justify-center mb-6">
-                  <i :class="userStore.isAdmin ? 'bi bi-chat-dots' : 'bi bi-headset'"
-                    class="text-3xl text-gray-500"></i>
+                  <i class="bi bi-chat-dots text-3xl text-gray-500"></i>
                 </div>
-                <h4 class="text-xl font-semibold text-white mb-3">
-                  {{ userStore.isAdmin ? '暂无对话' : '选择服务类型' }}
-                </h4>
+                <h4 class="text-xl font-semibold text-white mb-3">暂无对话</h4>
                 <p class="text-gray-400 text-sm leading-relaxed">
-                  {{ userStore.isAdmin ? '等待用户开始对话<br>或选择AI助手开始' : '请选择AI助手或人工客服<br>开始您的咨询' }}
+                  等待用户开始对话<br>或选择AI助手开始
                 </p>
               </div>
 
-              <div v-else class="p-4 space-y-3">
+              <!-- 会话列表：管理员有会话时显示，普通用户始终显示服务选项 -->
+              <div class="p-4 space-y-3">
                 <!-- AI聊天选项 - 固定在第一位 -->
                 <div @click="selectAiChat"
                   class="relative p-4 rounded-xl cursor-pointer transition-all duration-300 group hover:scale-[1.01] animate-fade-in-up border border-transparent hover:border-gray-600/50"
@@ -323,8 +322,9 @@
             <AiChatComponent v-if="isAiChatMode" ref="aiChatComponentRef" :session-id="currentAiSessionId"
               @session-created="handleAiSessionCreated" />
 
-            <!-- 普通聊天区域 -->
-            <template v-else>
+            <!-- 普通聊天区域（人工客服） - 只在非AI模式下显示 -->
+            <template v-else-if="!isAiChatMode">
+
               <!-- 聊天头部 -->
               <div class="px-6 py-4 border-b border-gray-700/50 bg-gray-800/30">
                 <div class="flex items-center justify-between">
@@ -382,7 +382,7 @@
               </div>
 
               <!-- 聊天消息区域 -->
-                             <div class="flex-1 overflow-y-auto p-6 chat-scrollbar" ref="messagesContainer">
+              <div class="flex-1 overflow-y-auto p-6 chat-scrollbar" ref="messagesContainer">
                 <!-- 欢迎消息 -->
                 <div v-if="messages.length === 0" class="text-center py-16">
                   <div
@@ -420,11 +420,20 @@
                 <!-- 聊天消息列表 -->
                 <div class="space-y-4">
                   <TransitionGroup name="message" tag="div" class="space-y-4">
-                    <div v-for="message in messages" :key="message.id || message.timestamp" class="flex"
-                      :class="isCurrentUserMessage(message) ? 'justify-end' : 'justify-start'">
+                    <div v-for="message in messages" :key="message.id || message.timestamp"
+                      :class="message.isSystemMessage ? 'flex justify-center' : (isCurrentUserMessage(message) ? 'flex justify-end' : 'flex justify-start')">
+
+                      <!-- 系统消息（客服提示等）- 居中显示 -->
+                      <div v-if="message.isSystemMessage" class="text-center py-3">
+                        <div
+                          class="inline-block px-6 py-2 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-full text-green-300 text-sm backdrop-blur-sm shadow-lg animate-fade-in-up">
+                          <i class="bi bi-person-badge mr-2"></i>
+                          {{ message.content || message.message }}
+                        </div>
+                      </div>
 
                       <!-- 其他人的消息 (左边) - 包括客服 -->
-                      <div v-if="!isCurrentUserMessage(message)" class="flex items-start gap-3 max-w-[70%]">
+                      <div v-else-if="!isCurrentUserMessage(message)" class="flex items-start gap-3 max-w-[70%]">
                         <!-- 发送者头像 -->
                         <div
                           class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-600/30">
@@ -560,71 +569,74 @@
                   </div>
                 </div>
               </div>
+
+              <!-- 聊天输入区域（人工客服专用） -->
+              <div class="px-6 py-4 border-t border-gray-700/50 bg-gray-800/20">
+
+
+                <!-- 工具按钮组 -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <button
+                      class="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
+                      title="附件">
+                      <i class="bi bi-paperclip text-lg"></i>
+                    </button>
+                    <button
+                      class="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
+                      title="表情">
+                      <i class="bi bi-emoji-smile text-lg"></i>
+                    </button>
+                  </div>
+
+                  <!-- 输入提示工具栏 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs text-gray-500 flex items-center gap-1">
+                      <i class="bi bi-keyboard"></i>
+                      Enter 发送，Shift+Enter 换行
+                    </span>
+                    <div v-if="newMessage.length > 0" class="text-xs text-gray-500">
+                      {{ newMessage.length }} 字符
+                    </div>
+                    <button v-if="unreadCount > 0" @click="markAllMessagesAsRead"
+                      class="text-xs text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-105 active:scale-95 px-3 py-1 rounded-lg hover:bg-cyan-500/10 border border-cyan-500/20">
+                      <i class="bi bi-check2-all mr-1"></i>
+                      标记已读 ({{ unreadCount }})
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 输入框和发送按钮 -->
+                <div class="flex items-start gap-3">
+                  <!-- 输入框区域 -->
+                  <div class="flex-1 relative">
+                    <textarea v-model="newMessage" @keydown.enter.exact.prevent="sendMessage"
+                      @input="adjustTextareaHeight" @focus="handleInputFocus" @blur="handleInputBlur"
+                      :disabled="!isConnected || isAiTyping"
+                      :placeholder="isAiTyping ? 'AI正在回复中...' : (isAiChatMode ? '向AI装机助手提问... (Enter 发送，Shift+Enter 换行)' : '输入您的消息... (Enter 发送，Shift+Enter 换行)')"
+                      rows="1"
+                      class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 overflow-y-auto input-scrollbar"
+                      :class="{ 'opacity-50 cursor-not-allowed': isAiTyping }"></textarea>
+                    <!-- 输入状态指示 -->
+                    <div v-if="isInputFocused"
+                      class="absolute -top-6 left-2 text-xs text-cyan-400 bg-gray-800/80 px-2 py-1 rounded-lg">
+                      正在输入...
+                    </div>
+                  </div>
+
+                  <!-- 发送按钮 -->
+                  <div class="flex-shrink-0">
+                    <button @click="sendMessage" :disabled="!newMessage.trim() || !isConnected || isAiTyping"
+                      class="px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:shadow-none flex items-center gap-2 hover:scale-105 active:scale-95 min-h-[48px]">
+                      <i v-if="!isAiTyping" class="bi bi-send text-lg"></i>
+                      <i v-else class="bi bi-hourglass-split text-lg animate-spin"></i>
+                      <span class="hidden sm:inline">{{ isAiTyping ? '回复中' : '发送' }}</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
             </template>
-            <!-- 聊天输入区域 -->
-            <div class="px-6 py-4 border-t border-gray-700/50 bg-gray-800/20">
-              <!-- 工具按钮组 -->
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <button
-                    class="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
-                    title="附件">
-                    <i class="bi bi-paperclip text-lg"></i>
-                  </button>
-                  <button
-                    class="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
-                    title="表情">
-                    <i class="bi bi-emoji-smile text-lg"></i>
-                  </button>
-                </div>
-
-                <!-- 输入提示工具栏 -->
-                <div class="flex items-center gap-3">
-                  <span class="text-xs text-gray-500 flex items-center gap-1">
-                    <i class="bi bi-keyboard"></i>
-                    Enter 发送，Shift+Enter 换行
-                  </span>
-                  <div v-if="newMessage.length > 0" class="text-xs text-gray-500">
-                    {{ newMessage.length }} 字符
-                  </div>
-                  <button v-if="unreadCount > 0" @click="markAllMessagesAsRead"
-                    class="text-xs text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-105 active:scale-95 px-3 py-1 rounded-lg hover:bg-cyan-500/10 border border-cyan-500/20">
-                    <i class="bi bi-check2-all mr-1"></i>
-                    标记已读 ({{ unreadCount }})
-                  </button>
-                </div>
-              </div>
-
-              <!-- 输入框和发送按钮 -->
-              <div class="flex items-start gap-3">
-                <!-- 输入框区域 -->
-                <div class="flex-1 relative">
-                  <textarea v-model="newMessage" @keydown.enter.exact.prevent="sendMessage"
-                    @input="adjustTextareaHeight" @focus="handleInputFocus" @blur="handleInputBlur"
-                    :disabled="!isConnected || isAiTyping"
-                    :placeholder="isAiTyping ? 'AI正在回复中...' : (isAiChatMode ? '向AI装机助手提问... (Enter 发送，Shift+Enter 换行)' : '输入您的消息... (Enter 发送，Shift+Enter 换行)')"
-                    rows="1"
-                                         class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-400 text-white placeholder-gray-400 transition-all duration-300 resize-none hover:border-cyan-500/50 focus:scale-[1.01] min-h-[48px] max-h-32 overflow-y-auto input-scrollbar"
-                    :class="{ 'opacity-50 cursor-not-allowed': isAiTyping }"></textarea>
-                  <!-- 输入状态指示 -->
-                  <div v-if="isInputFocused"
-                    class="absolute -top-6 left-2 text-xs text-cyan-400 bg-gray-800/80 px-2 py-1 rounded-lg">
-                    正在输入...
-                  </div>
-                </div>
-
-                <!-- 发送按钮 -->
-                <div class="flex-shrink-0">
-                  <button @click="sendMessage" :disabled="!newMessage.trim() || !isConnected || isAiTyping"
-                    class="px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:shadow-none flex items-center gap-2 hover:scale-105 active:scale-95 min-h-[48px]">
-                    <i v-if="!isAiTyping" class="bi bi-send text-lg"></i>
-                    <i v-else class="bi bi-hourglass-split text-lg animate-spin"></i>
-                    <span class="hidden sm:inline">{{ isAiTyping ? '回复中' : '发送' }}</span>
-                  </button>
-                </div>
-
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -676,6 +688,7 @@ const selectedSession = ref(null) // 当前选中的会话
 const isAiChatMode = ref(true) // 是否为AI聊天模式 - 默认为true
 const currentAiSessionId = ref(null) // 当前AI聊天会话ID
 const aiChatComponentRef = ref(null) // AI聊天组件引用
+const lastCustomerServiceUser = ref(null) // 记录上一次的客服用户名
 
 // 服务状态
 const serviceStatus = ref({
@@ -749,14 +762,22 @@ const connectWebSocket = () => {
   }
 
   try {
-    //const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
-    const wsUrl = `ws://192.168.11.194:9999/websocket?token=${userStore.token}`
+    const wsUrl = `wss://api.xlcig.cn/websocket?token=${userStore.token}`
+    //const wsUrl = `ws://192.168.11.104:9999/websocket?token=${userStore.token}`
     console.log('正在连接WebSocket:', wsUrl)
     websocket = new WebSocket(wsUrl)
     websocket.onopen = () => {
       console.log('WebSocket连接成功')
       isConnected.value = true
       startHeartbeat()
+
+      // 如果是管理员，强制设置在线状态
+      if (userStore.isAdmin) {
+        serviceStatus.value.adminOnline = true
+        serviceStatus.value.adminCount = Math.max(1, serviceStatus.value.adminCount)
+        console.log('✅ 管理员已连接，设置客服在线状态:', serviceStatus.value)
+      }
+
       // 连接成功后，请求获取当前所有用户的在线状态
       setTimeout(() => {
         if (websocket && websocket.readyState === WebSocket.OPEN) {
@@ -765,6 +786,13 @@ const connectWebSocket = () => {
             data: {}
           }))
           console.log('已请求获取用户在线状态')
+
+          // 同时请求最新的服务状态
+          websocket.send(JSON.stringify({
+            type: 'get_service_status',
+            data: {}
+          }))
+          console.log('已请求获取服务状态')
         }
       }, 1000)
     }
@@ -835,6 +863,27 @@ const handleWebSocketMessage = (message) => {
       unreadCount.value = message.data.unreadCount || 0
       if (message.data.stats) {
         serviceStatus.value = message.data.stats
+        console.log('📊 服务状态已更新:', serviceStatus.value)
+      }
+      // 如果是管理员且状态显示离线，强制设置为在线
+      if (userStore.isAdmin && !serviceStatus.value.adminOnline) {
+        serviceStatus.value.adminOnline = true
+        serviceStatus.value.adminCount = Math.max(1, serviceStatus.value.adminCount)
+        console.log('🔧 管理员强制在线状态修正:', serviceStatus.value)
+      }
+      break
+
+    case 'service_status_response':
+      console.log('📊 收到服务状态响应:', message.data)
+      if (message.data) {
+        serviceStatus.value = { ...serviceStatus.value, ...message.data }
+        console.log('📊 服务状态已更新:', serviceStatus.value)
+      }
+      // 管理员在线时确保状态正确
+      if (userStore.isAdmin && !serviceStatus.value.adminOnline) {
+        serviceStatus.value.adminOnline = true
+        serviceStatus.value.adminCount = Math.max(1, serviceStatus.value.adminCount)
+        console.log('🔧 管理员在线状态修正:', serviceStatus.value)
       }
       break
 
@@ -898,6 +947,40 @@ const handleWebSocketMessage = (message) => {
     case 'stop_typing':
       console.log('收到停止输入消息:', message.data)
       handleTypingMessage(message.data, false)
+
+      // 检查是否是管理员停止输入，如果是新客服则显示提示
+      if (message.data && message.data.isAdmin && message.data.userName) {
+        const currentCustomerService = message.data.userName
+
+        // 如果客服用户名发生变化，显示客服提示
+        if (lastCustomerServiceUser.value !== currentCustomerService) {
+          lastCustomerServiceUser.value = currentCustomerService
+
+          // 添加客服提示消息到聊天框
+          const customerServiceNotice = {
+            id: `cs_notice_${Date.now()}`,
+            content: `----------------客服 ${currentCustomerService}------------------`,
+            message: `----------------客服 ${currentCustomerService}------------------`,
+            message_type: 'system',
+            isSystemMessage: true,
+            isAdmin: false,
+            isUser: false,
+            timestamp: Date.now(),
+            created_at: new Date().toISOString(),
+            data: {
+              type: 'customer_service_notice',
+              customerServiceName: currentCustomerService
+            }
+          }
+
+          // 只在非AI模式下显示客服提示
+          if (!isAiChatMode.value) {
+            messages.value.push(customerServiceNotice)
+            scrollToBottom()
+            console.log('✅ 客服提示已添加:', currentCustomerService)
+          }
+        }
+      }
       break
 
     case 'message_read':
@@ -965,6 +1048,12 @@ const clearTypingStates = () => {
   typingUsers.value.clear()
   isTyping.value = false
   console.log('已清除所有typing状态')
+}
+
+// 清除客服状态
+const clearCustomerServiceState = () => {
+  lastCustomerServiceUser.value = null
+  console.log('已清除客服状态')
 }
 
 // 处理输入状态消息
@@ -1367,6 +1456,11 @@ const scrollToBottom = () => {
 
 // 判断是否为当前用户的消息
 const isCurrentUserMessage = (message) => {
+  // 系统消息不属于任何用户
+  if (message.isSystemMessage) {
+    return false
+  }
+
   // AI消息永远显示在左边（非当前用户）
   if (message.isAiMessage || message.user_id === 'ai_assistant' || message.message_type === 'assistant') {
     return false
@@ -1585,6 +1679,9 @@ const selectSession = async (session) => {
   // 清除之前的typing状态
   clearTypingStates()
 
+  // 清除客服状态（进入特定用户会话）
+  clearCustomerServiceState()
+
   // 清除AI聊天状态
   if (isAiChatMode.value) {
     // AI聊天组件会自行处理状态清理
@@ -1613,6 +1710,9 @@ const selectAiChat = async () => {
   // 清除之前的typing状态
   clearTypingStates()
 
+  // 清除客服状态
+  clearCustomerServiceState()
+
   // 退出用户会话模式
   selectedSession.value = null
   isAiChatMode.value = true
@@ -1628,6 +1728,9 @@ const selectHumanService = async () => {
 
   // 清除之前的typing状态
   clearTypingStates()
+
+  // 清除客服状态（重新开始客服会话）
+  clearCustomerServiceState()
 
   // 退出AI聊天模式和用户会话模式
   selectedSession.value = null
@@ -1751,7 +1854,15 @@ onMounted(async () => {
     return
   }
 
+  // 清除客服状态（页面初始化）
+  clearCustomerServiceState()
 
+  // 如果是管理员，立即设置在线状态
+  if (userStore.isAdmin) {
+    serviceStatus.value.adminOnline = true
+    serviceStatus.value.adminCount = Math.max(1, serviceStatus.value.adminCount)
+    console.log('🎯 初始化：管理员在线状态已设置:', serviceStatus.value)
+  }
 
   // 加载页面数据
   const loadPromises = [
@@ -1766,6 +1877,14 @@ onMounted(async () => {
   }
 
   await Promise.all(loadPromises)
+
+  // 再次确认管理员在线状态（防止loadServiceStatus覆盖）
+  if (userStore.isAdmin) {
+    serviceStatus.value.adminOnline = true
+    serviceStatus.value.adminCount = Math.max(1, serviceStatus.value.adminCount)
+    console.log('🔄 加载完成后：管理员在线状态确认:', serviceStatus.value)
+  }
+
   connectWebSocket()
 })
 
