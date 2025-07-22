@@ -93,6 +93,16 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: ['naive-ui']
+    },
+    // 生产环境构建优化
+    build: {
+      // 生产环境移除 console 和 debugger
+      minify: 'esbuild',
+      target: 'es2020'
+    },
+    esbuild: {
+      // 生产环境下移除所有 console 语句和 debugger
+      drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
     }
   },
   

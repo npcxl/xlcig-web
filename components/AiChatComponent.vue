@@ -245,58 +245,95 @@ const quickMessages = ref([
 // AI聊天回调管理
 let aiChatCallbacks = null
 
-// ✅ 处理增量Markdown内容并实时渲染HTML
+//  处理增量Markdown内容并实时渲染HTML（核心流式渲染函数）
 const processIncrementalChunk = (newChunk, messageIndex) => {
     if (messageIndex >= 0 && messages.value[messageIndex]) {
         const message = messages.value[messageIndex]
         
+        console.log(' 开始处理流式内容块:', {
+            消息索引: messageIndex,
+            消息ID: message.id,
+            新增内容: newChunk.substring(0, 30) + '...',
+            新增长度: newChunk.length,
+            当前内容长度: message.content.length,
+            当前HTML长度: message.htmlContent?.length || 0,
+            流式状态: message.isStreaming
+        })
+        
         // 累积原始Markdown文本
         message.content += newChunk
         
-        // ✅ 核心：实时渲染完整Markdown为HTML
+        //  核心：实时渲染完整Markdown为HTML
         try {
-            message.htmlContent = md.render(message.content)
+            const renderedHtml = md.render(message.content)
+            message.htmlContent = renderedHtml
             
             // 为了保持v-for逻辑的兼容性，将完整HTML作为单个块
-            message.htmlChunks = [message.htmlContent]
+            message.htmlChunks = [renderedHtml]
             
-            console.log('🎨 前端Markdown实时渲染:', {
+            console.log('🎨 Markdown实时渲染成功:', {
                 新增文本: newChunk.substring(0, 20) + '...',
                 当前Markdown长度: message.content.length,
-                渲染HTML长度: message.htmlContent.length,
-                消息ID: message.id
+                渲染HTML长度: renderedHtml.length,
+                消息ID: message.id,
+                HTML预览: renderedHtml.substring(0, 100) + '...'
             })
         } catch (renderError) {
-            console.error('❌ Markdown渲染失败:', renderError)
+            console.error(' Markdown渲染失败:', renderError, {
+                内容: message.content,
+                新增块: newChunk
+            })
             // 渲染失败时使用纯文本
             message.htmlContent = message.content
             message.htmlChunks = [message.content]
         }
         
         // 强制触发Vue响应性更新
+        const oldTimestamp = message.timestamp
         message.timestamp = Date.now()
+        
+        console.log(' Vue响应性更新:', {
+            消息ID: message.id,
+            旧时间戳: oldTimestamp,
+            新时间戳: message.timestamp,
+            HTML内容已设置: !!message.htmlContent
+        })
         
         // 立即滚动到底部
         nextTick(() => {
             scrollToBottom()
             
-            // 调试：验证渲染结果
+            // 调试：验证DOM渲染结果
             const messageElement = document.querySelector(`[data-message-id="${message.id}"]`)
             if (messageElement) {
                 const htmlElement = messageElement.querySelector('.ai-rendered-content')
                 if (htmlElement) {
-                    console.log('✅ 前端Markdown实时渲染成功')
+                    console.log(' 流式渲染DOM验证成功:', {
+                        消息ID: message.id,
+                        HTML元素存在: true,
+                        元素类名: htmlElement.className,
+                        实际HTML长度: htmlElement.innerHTML.length,
+                        内容匹配: htmlElement.innerHTML === message.htmlContent
+                    })
                 } else {
-                    console.warn('⚠️ HTML渲染元素未找到')
+                    console.warn(' HTML渲染元素未找到，DOM结构:', messageElement.outerHTML.substring(0, 200) + '...')
                 }
+            } else {
+                console.error(' 消息DOM元素未找到，消息ID:', message.id)
             }
+        })
+    } else {
+        console.error(' processIncrementalChunk参数无效:', {
+            messageIndex,
+            消息存在: !!messages.value[messageIndex],
+            消息总数: messages.value.length
         })
     }
 }
 
 // 🗑️ 弃用：后端htmlChunk处理（后端单chunk渲染不完整）
 const processHtmlChunk = (htmlChunk, messageIndex) => {
-    console.warn('⚠️ 收到后端htmlChunk，但已弃用（单chunk渲染不完整）:', {
+    console.warn(' 收到后端htmlChunk，但已弃用（单chunk渲染不完整）:', {
         块长度: htmlChunk?.length || 0,
         块内容: htmlChunk?.substring(0, 50) + '...',
         消息索引: messageIndex
@@ -312,7 +349,7 @@ const updateMessageHtml = (htmlContent, messageIndex) => {
         // 确保Vue能检测到变化
         message.htmlContent = htmlContent
         
-        console.log('🎨 HTML内容更新 (兼容模式):', {
+        console.log(' HTML内容更新 (兼容模式):', {
             消息索引: messageIndex,
             HTML长度: htmlContent?.length || 0,
             内容预览: htmlContent?.substring(0, 100) + '...',
@@ -326,9 +363,9 @@ const updateMessageHtml = (htmlContent, messageIndex) => {
             // 调试：检查DOM是否正确更新
             const messageElement = document.querySelector(`[data-message-id="${message.id}"]`)
             if (messageElement) {
-                console.log('✅ DOM元素已找到，HTML已更新')
+                console.log(' DOM元素已找到，HTML已更新')
             } else {
-                console.warn('⚠️ 未找到对应的DOM元素')
+                console.warn(' 未找到对应的DOM元素')
             }
         })
     }
@@ -441,15 +478,15 @@ const sendMessage = async () => {
             },
 
             onConnected: (data) => {
-                console.log('✅ AI服务连接成功:', data.message)
+                console.log(' AI服务连接成功:', data.message)
             },
 
             onProgress: (data) => {
-                console.log('⏳ 进度:', data.message)
+                console.log(' 进度:', data.message)
             },
 
             onRetry: (data) => {
-                console.log('🔄 重试中:', data.message)
+                console.log(' 重试中:', data.message)
             },
 
             onChunk: (data) => {
@@ -463,24 +500,16 @@ const sendMessage = async () => {
                     块索引: data.chunkIndex
                 })
                 
-                if (data.content || data.htmlChunk) {
+                if (data.content) {
                     const aiMessageIndex = messages.value.length - 1
                     
-                    // 处理原始内容（用于打字机效果）
+                    //  核心：处理原始内容并实时渲染Markdown
                     if (data.content) {
                         processIncrementalChunk(data.content, aiMessageIndex)
-                        console.log('✅ 原始内容已处理')
-                    }
-                    
-                    // 处理HTML块（用于渲染显示）
-                    if (data.htmlChunk) {
-                        processHtmlChunk(data.htmlChunk, aiMessageIndex)
-                        console.log('✅ HTML块已处理')
-                    } else {
-                        console.warn('⚠️ 未收到HTML块，可能后端未发送')
+                        console.log(' 流式内容已处理，实时Markdown渲染完成')
                     }
                 } else {
-                    console.warn('❌ chunk数据无效，既没有content也没有htmlChunk')
+                    console.warn('chunk数据无效，缺少content字段')
                 }
             },
 
@@ -494,7 +523,7 @@ const sendMessage = async () => {
                     // 强制重新渲染
                     forceUpdateMessage(aiMessageIndex)
                     
-                    console.log('🎨 收到HTML更新:', {
+                    console.log(' 收到HTML更新:', {
                         是否部分更新: data.isPartial,
                         HTML长度: data.htmlContent.length,
                         消息索引: aiMessageIndex
@@ -503,7 +532,7 @@ const sendMessage = async () => {
             },
 
             onDone: (data) => {
-                console.log('✅ AI响应完成:', data)
+                console.log(' AI响应完成:', data)
                 isAiTyping.value = false
 
                 const aiMessageIndex = messages.value.length - 1
@@ -525,7 +554,7 @@ const sendMessage = async () => {
                         }
                         // 如果已有htmlChunks，验证完整性
                         else if (finalMessage.htmlContent !== data.htmlResponse) {
-                            console.log('🔄 完成时HTML内容不一致，使用完整版本')
+                            console.log(' 完成时HTML内容不一致，使用完整版本')
                             finalMessage.htmlContent = data.htmlResponse
                             finalMessage.htmlChunks = [data.htmlResponse]
                         }
@@ -534,7 +563,7 @@ const sendMessage = async () => {
                         forceUpdateMessage(aiMessageIndex)
                     }
                     
-                    console.log('🎯 AI响应最终完成:', {
+                    console.log(' AI响应最终完成:', {
                         Markdown长度: finalMessage.content.length,
                         HTML长度: finalMessage.htmlContent?.length || 0,
                         HTML块数: finalMessage.htmlChunks?.length || 0,
@@ -544,7 +573,7 @@ const sendMessage = async () => {
             },
 
             onSaved: (data) => {
-                console.log('💾 对话已保存:', data.message)
+                console.log(' 对话已保存:', data.message)
                 // 可能需要更新HTML内容
                 if (data.htmlContent) {
                     const aiMessageIndex = messages.value.length - 1
@@ -560,7 +589,7 @@ const sendMessage = async () => {
                         // 强制重新渲染
                         forceUpdateMessage(aiMessageIndex)
                         
-                        console.log('💾 保存回调HTML内容已更新:', {
+                        console.log(' 保存回调HTML内容已更新:', {
                             消息ID: message.id,
                             HTML长度: data.htmlContent.length,
                             HTML块数: message.htmlChunks?.length || 0
@@ -570,7 +599,7 @@ const sendMessage = async () => {
             },
 
             onError: (data) => {
-                console.error('❌ AI响应错误:', data)
+                console.error(' AI响应错误:', data)
                 isAiTyping.value = false
 
                 const aiMessageIndex = messages.value.length - 1
@@ -581,7 +610,7 @@ const sendMessage = async () => {
             },
 
             onEnd: () => {
-                console.log('🏁 流式连接结束')
+                console.log(' 流式连接结束')
                 isAiTyping.value = false
             }
         }
@@ -645,16 +674,16 @@ const loadChatHistory = async () => {
                         try {
                             mappedMessage.htmlContent = md.render(mappedMessage.content)
                             mappedMessage.htmlChunks = [mappedMessage.htmlContent]
-                            console.log('📋 历史消息使用前端渲染HTML')
+                            console.log(' 历史消息使用前端渲染HTML')
                         } catch (renderError) {
-                            console.warn('❌ 历史消息Markdown渲染失败:', renderError)
+                            console.warn(' 历史消息Markdown渲染失败:', renderError)
                             mappedMessage.htmlContent = mappedMessage.content
                             mappedMessage.htmlChunks = [mappedMessage.content]
                         }
                     }
                 }
                 
-                console.log('📋 历史消息处理完成:', {
+                console.log(' 历史消息处理完成:', {
                     ID: mappedMessage.id,
                     类型: mappedMessage.messageType,
                     内容长度: mappedMessage.content.length,
@@ -667,7 +696,7 @@ const loadChatHistory = async () => {
                 return mappedMessage
             })
 
-            console.log('🔄 AI聊天历史加载完成:', {
+            console.log(' AI聊天历史加载完成:', {
                 消息数量: messages.value.length,
                 AI消息数: messages.value.filter(m => !m.isUser).length,
                 用户消息数: messages.value.filter(m => m.isUser).length,
@@ -684,7 +713,7 @@ const loadChatHistory = async () => {
                 scrollToBottom()
             })
         } else {
-            console.log('📝 没有AI聊天历史记录')
+            console.log(' 没有AI聊天历史记录')
             messages.value = []
         }
     } catch (error) {
@@ -699,7 +728,7 @@ const handleWebSocketMessage = (message) => {
 
     switch (message.type) {
         case 'ai_chat_start':
-            console.log('🚀 AI聊天开始:', message)
+            console.log(' AI聊天开始:', message)
             if (!currentSessionId.value && message.sessionId) {
                 currentSessionId.value = message.sessionId
                 emit('session-created', message.sessionId)
@@ -707,12 +736,12 @@ const handleWebSocketMessage = (message) => {
             break
 
         case 'ai_chat_progress':
-            console.log('⏳ AI聊天进度:', message)
+            console.log(' AI聊天进度:', message)
             break
 
         case 'ai_chat_chunk':
             // 详细调试WebSocket消息结构
-            console.log('📝 AI聊天内容块 (WebSocket) - 完整消息:', JSON.stringify(message, null, 2))
+            console.log(' AI聊天内容块 (WebSocket) - 完整消息:', JSON.stringify(message, null, 2))
             
             // 尝试从不同位置获取content和htmlChunk
             let content = null
@@ -736,7 +765,7 @@ const handleWebSocketMessage = (message) => {
                 }
             }
             
-            console.log('🔍 解析后的数据:', {
+            console.log(' 解析后的数据:', {
                 消息类型: message.type,
                 原始内容: content?.substring(0, 50) + '...',
                 原始内容长度: content?.length || 0,
@@ -753,25 +782,19 @@ const handleWebSocketMessage = (message) => {
                 }
             })
             
-            // ✅ 核心：只处理原始内容，前端负责Markdown渲染
+            //  核心：只处理原始内容，前端负责Markdown渲染
             if (content) {
                 // 找到最后一条AI消息（非用户消息）
-                const lastAiMessage = messages.value.slice().reverse().find(msg => !msg.isUser)
+                const lastAiMessage = messages.value.slice().reverse().find(msg => !msg.isUser && msg.isStreaming)
 
-                if (lastAiMessage && lastAiMessage.isStreaming) {
+                if (lastAiMessage) {
                     const aiMessageIndex = messages.value.indexOf(lastAiMessage)
                     
-                    // ✅ 处理原始内容并实时渲染Markdown
+                    //  处理原始内容并实时渲染Markdown
                     processIncrementalChunk(content, aiMessageIndex)
-                    console.log('✅ 原始内容已处理，前端Markdown已实时渲染')
-                    
-                    // 忽略htmlChunk（记录但不处理）
-                    if (htmlChunk) {
-                        processHtmlChunk(htmlChunk, aiMessageIndex)
-                        console.log('ℹ️ 后端htmlChunk已收到但被忽略（前端渲染优先）')
-                    }
+                    console.log(' WebSocket流式内容已处理，实时Markdown渲染完成')
                 } else {
-                    console.log('🆕 创建新的AI消息')
+                    console.log(' 创建新的AI流式消息')
                     // 如果没有找到流式消息，创建一个新的AI消息
                     const newAiMessage = {
                         id: Date.now(),
@@ -787,27 +810,21 @@ const handleWebSocketMessage = (message) => {
                     
                     const aiMessageIndex = messages.value.length - 1
                     
-                    // ✅ 处理初始内容并实时渲染
+                    // 处理初始内容并实时渲染
                     processIncrementalChunk(content, aiMessageIndex)
-                    console.log('✅ 新消息内容已处理，前端Markdown已渲染')
-                    
-                    // 忽略htmlChunk
-                    if (htmlChunk) {
-                        processHtmlChunk(htmlChunk, aiMessageIndex)
-                        console.log('ℹ️ 新消息htmlChunk已收到但被忽略')
-                    }
+                    console.log(' 新流式消息已创建并开始实时渲染')
                     
                     scrollToBottom()
                 }
             } else {
-                console.error('❌ WebSocket chunk数据无效 - 缺少content')
-                console.error('📋 完整消息结构:', message)
+                console.error(' WebSocket chunk数据无效 - 缺少content')
+                console.error(' 完整消息结构:', message)
             }
             break
 
         case 'ai_chat_html_update':
-            console.log('🎨 AI HTML更新事件:', message)
-            console.log('📋 HTML更新数据:', {
+            console.log(' AI HTML更新事件:', message)
+            console.log(' HTML更新数据:', {
                 有data: !!message.data,
                 有htmlContent: !!(message.data?.htmlContent),
                 HTML长度: message.data?.htmlContent?.length || 0,
@@ -821,8 +838,8 @@ const handleWebSocketMessage = (message) => {
                 const lastAiMessage = messages.value.slice().reverse().find(msg => !msg.isUser)
                 if (lastAiMessage) {
                     const aiMessageIndex = messages.value.indexOf(lastAiMessage)
-                    
-                    console.log('🔍 当前最后AI消息状态:', {
+                
+                    console.log(' 当前最后AI消息状态:', {
                         消息ID: lastAiMessage.id,
                         流式状态: lastAiMessage.isStreaming,
                         当前HTML长度: lastAiMessage.htmlContent?.length || 0,
@@ -838,7 +855,7 @@ const handleWebSocketMessage = (message) => {
                     // 强制触发Vue响应性更新
                     lastAiMessage.timestamp = Date.now()
                     
-                    console.log('🎨 HTML内容已更新:', {
+                    console.log(' HTML内容已更新:', {
                         消息索引: aiMessageIndex,
                         消息ID: lastAiMessage.id,
                         新HTML长度: lastAiMessage.htmlContent.length,
@@ -855,24 +872,24 @@ const handleWebSocketMessage = (message) => {
                         if (messageElement) {
                             const htmlElement = messageElement.querySelector('.ai-rendered-content')
                             if (htmlElement) {
-                                console.log('✅ HTML元素已找到并更新，实际内容:', htmlElement.innerHTML.substring(0, 100) + '...')
+                                console.log(' HTML元素已找到并更新，实际内容:', htmlElement.innerHTML.substring(0, 100) + '...')
                             } else {
-                                console.warn('⚠️ HTML元素未找到，查找到的元素:', messageElement.outerHTML.substring(0, 200) + '...')
+                                console.warn(' HTML元素未找到，查找到的元素:', messageElement.outerHTML.substring(0, 200) + '...')
                             }
                         } else {
-                            console.error('❌ 未找到消息DOM元素，消息ID:', lastAiMessage.id)
+                            console.error(' 未找到消息DOM元素，消息ID:', lastAiMessage.id)
                         }
                     })
                 } else {
-                    console.warn('⚠️ 未找到AI消息进行HTML更新')
+                    console.warn(' 未找到AI消息进行HTML更新')
                 }
             } else {
-                console.error('❌ HTML更新事件无效 - 缺少htmlContent')
+                console.error('HTML更新事件无效 - 缺少htmlContent')
             }
             break
 
         case 'ai_chat_done':
-            console.log('✅ AI聊天完成:', message)
+            console.log(' AI聊天完成:', message)
             isAiTyping.value = false
             
             // 标记最后一条AI消息为完成状态
@@ -894,7 +911,7 @@ const handleWebSocketMessage = (message) => {
                     }
                     // 如果已有htmlChunks，验证完整性
                     else if (lastAiMessage.htmlContent !== message.data.htmlResponse) {
-                        console.log('🔄 HTML内容不一致，使用完整版本')
+                        console.log(' HTML内容不一致，使用完整版本')
                         lastAiMessage.htmlContent = message.data.htmlResponse
                         lastAiMessage.htmlChunks = [message.data.htmlResponse]
                     }
@@ -904,7 +921,7 @@ const handleWebSocketMessage = (message) => {
                     forceUpdateMessage(aiMessageIndex)
                 }
                 
-                console.log('🎯 AI响应最终完成 (WebSocket):', {
+                console.log(' AI响应最终完成 (WebSocket):', {
                     Markdown长度: lastAiMessage.content.length,
                     HTML长度: lastAiMessage.htmlContent?.length || 0,
                     HTML块数: lastAiMessage.htmlChunks?.length || 0,
@@ -914,8 +931,8 @@ const handleWebSocketMessage = (message) => {
             break
 
         case 'ai_chat_saved':
-            console.log('💾 AI聊天已保存事件:', message)
-            console.log('📋 保存数据详情:', {
+            console.log(' AI聊天已保存事件:', message)
+            console.log(' 保存数据详情:', {
                 有data: !!message.data,
                 有htmlContent: !!(message.data?.htmlContent),
                 HTML长度: message.data?.htmlContent?.length || 0,
@@ -924,11 +941,11 @@ const handleWebSocketMessage = (message) => {
                 消息内容: message.data?.message
             })
             
-            // 强制更新HTML内容（最终完整版本）
+            // 强制更新HTML内容
             if (message.data && message.data.htmlContent) {
                 const lastAiMessage = messages.value.slice().reverse().find(msg => !msg.isUser)
                 if (lastAiMessage) {
-                    console.log('🔍 当前最后AI消息状态（保存前）:', {
+                    console.log(' 当前最后AI消息状态（保存前）:', {
                         消息ID: lastAiMessage.id,
                         流式状态: lastAiMessage.isStreaming,
                         当前HTML长度: lastAiMessage.htmlContent?.length || 0,
@@ -936,7 +953,7 @@ const handleWebSocketMessage = (message) => {
                         当前HTML块数: lastAiMessage.htmlChunks?.length || 0
                     })
                     
-                    // ✅ 使用后端提供的完整HTML（备份前端渲染）
+                    //  使用后端提供的完整HTML（备份前端渲染）
                     lastAiMessage.htmlContent = message.data.htmlContent
                     
                     // 更新Markdown内容
@@ -947,7 +964,7 @@ const handleWebSocketMessage = (message) => {
                     // 保持兼容性：设置htmlChunks
                     lastAiMessage.htmlChunks = [message.data.htmlContent]
                     
-                    console.log('💾 保存时HTML内容验证:', {
+                    console.log('保存时HTML内容验证:', {
                         后端HTML长度: message.data.htmlContent.length,
                         前端HTML长度: lastAiMessage.htmlContent.length,
                         Markdown长度: lastAiMessage.content.length,
@@ -965,7 +982,7 @@ const handleWebSocketMessage = (message) => {
                     // 强制触发Vue响应性更新
                     lastAiMessage.timestamp = Date.now()
                     
-                    console.log('💾 保存时HTML内容已强制更新:', {
+                    console.log(' 保存时HTML内容已强制更新:', {
                         消息ID: lastAiMessage.id,
                         新HTML长度: lastAiMessage.htmlContent.length,
                         新文本长度: lastAiMessage.content.length,
@@ -983,27 +1000,27 @@ const handleWebSocketMessage = (message) => {
                         if (messageElement) {
                             const htmlElement = messageElement.querySelector('.ai-rendered-content')
                             if (htmlElement) {
-                                console.log('✅ 保存后HTML元素已更新，实际内容:', htmlElement.innerHTML.substring(0, 100) + '...')
-                                console.log('🎨 HTML元素类名:', htmlElement.className)
-                                console.log('🧪 HTML元素标签:', htmlElement.tagName)
+                                console.log(' 保存后HTML元素已更新，实际内容:', htmlElement.innerHTML.substring(0, 100) + '...')
+                                console.log(' HTML元素类名:', htmlElement.className)
+                                console.log(' HTML元素标签:', htmlElement.tagName)
                             } else {
-                                console.warn('⚠️ 保存后HTML元素未找到，消息元素:', messageElement.outerHTML.substring(0, 200) + '...')
+                                console.warn(' 保存后HTML元素未找到，消息元素:', messageElement.outerHTML.substring(0, 200) + '...')
                             }
                         } else {
-                            console.error('❌ 保存后未找到消息DOM元素，消息ID:', lastAiMessage.id)
+                            console.error(' 保存后未找到消息DOM元素，消息ID:', lastAiMessage.id)
                         }
                     })
                 } else {
-                    console.warn('⚠️ 保存事件中未找到AI消息')
+                    console.warn(' 保存事件中未找到AI消息')
                 }
             } else {
-                console.error('❌ 保存事件无效 - 缺少htmlContent')
-                console.error('📋 完整消息结构:', JSON.stringify(message, null, 2))
+                console.error(' 保存事件无效 - 缺少htmlContent')
+                console.error(' 完整消息结构:', JSON.stringify(message, null, 2))
             }
             break
 
         case 'ai_chat_error':
-            console.error('❌ AI聊天错误:', message)
+            console.error(' AI聊天错误:', message)
             isAiTyping.value = false
             // 显示错误消息
             const errorMessage = {
@@ -1021,12 +1038,12 @@ const handleWebSocketMessage = (message) => {
             break
 
         case 'ai_chat_end':
-            console.log('🏁 AI聊天结束:', message)
+            console.log(' AI聊天结束:', message)
             isAiTyping.value = false
             break
 
         default:
-            console.log('🤷 未知的AI消息类型:', message.type)
+            console.log(' 未知的AI消息类型:', message.type)
     }
 }
 
@@ -1055,12 +1072,12 @@ const testHtmlRendering = () => {
         
         // 检查DOM元素
         const messageElement = document.querySelector(`[data-message-id="${testMessage.id}"]`)
-        console.log('🔍 测试消息DOM元素:', messageElement)
+        console.log(' 测试消息DOM元素:', messageElement)
         
         if (messageElement) {
             const htmlElement = messageElement.querySelector('.ai-rendered-content')
-            console.log('🎨 HTML渲染元素:', htmlElement)
-            console.log('📝 实际HTML内容:', htmlElement?.innerHTML)
+            console.log(' HTML渲染元素:', htmlElement)
+            console.log(' 实际HTML内容:', htmlElement?.innerHTML)
         }
     })
 }
