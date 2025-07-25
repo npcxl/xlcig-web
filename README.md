@@ -1050,7 +1050,7 @@ sudo tail -f /var/log/nginx/error.log
 
 <div align="center">
 
-**Made with ❤️ by the xlCig Team**
+**Made with ❤️ by the xlCig **
 
 **如果这个项目对你有帮助，请给它一个 ⭐**
 
