@@ -1034,8 +1034,7 @@ sudo tail -f /var/log/nginx/error.log
 - [Nginx](https://nginx.org/) - 高性能 Web 服务器
 
 ## 📞 联系方式
-- **在线演示**: https://xlcig.cb
-- **问题反馈**: [GitHub Issues](https://github.com/your-username/xlcig-web/issues)
+- **在线演示**: https://xlcig.cn
 - **讨论区**: [GitHub Discussions](https://github.com/your-username/xlcig-web/discussions)
 
 ## 🌟 支持项目
