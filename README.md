@@ -51,7 +51,7 @@
 
 
 <div align="center">
-<img src="assets/ExampleDiagram/5.png" alt="" width="400"/>
+<img src="assets/ExampleDiagram/5.png" alt="" width="800"/>
 </div>
 
 
