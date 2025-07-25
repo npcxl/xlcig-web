@@ -30,6 +30,53 @@
 - 🛡️ **类型安全** - 全栈 TypeScript，减少运行时错误
 - 🔧 **专业化** - 针对PC硬件领域的专业功能设计
 
+## 📸 项目展示
+
+<div align="center">
+<img src="assets/ExampleDiagram/1.png" alt="" width="800"/>
+</div>
+
+
+<div align="center">
+<img src="assets/ExampleDiagram/2.png" alt="" width="800"/>
+</div>
+
+<div align="center">
+<img src="assets/ExampleDiagram/3.png" alt="" width="800"/>
+</div>
+
+<div align="center">
+<img src="assets/ExampleDiagram/4.png" alt="" width="800"/>
+</div>
+
+
+<div align="center">
+<img src="assets/ExampleDiagram/5.png" alt="" width="400"/>
+</div>
+
+
+<div align="center">
+<img src="assets/ExampleDiagram/6.png" alt="" width="800"/>
+</div>
+
+
+<div align="center">
+<img src="assets/ExampleDiagram/7.png" alt="" width="800"/>
+</div>
+
+
+<div align="center">
+<img src="assets/ExampleDiagram/8.png" alt="" width="800"/>
+</div>
+
+<div align="center">
+<img src="assets/ExampleDiagram/9.png" alt="" width="800"/>
+</div>
+
+<div align="center">
+<img src="assets/ExampleDiagram/10.png" alt="" width="800"/>
+</div>
+
 ## 必看
   在于 oxc-parser 这个包的 Windows 原生绑定文件缺失或损坏。这是一个常见的原生模块安装问题，特别是在 Windows 系统上。
   清除并重新安装依赖 运行命令 rm -rf node_modules package-lock.json 或手动删除掉这两个文件。
