@@ -32,6 +32,7 @@ export { useAppLoader } from '../composables/useAppLoader';
 export { useLocation } from '../composables/useLocation';
 export { useMessage } from '../composables/useMessage';
 export { usePageLoader, pageLoaderPresets } from '../composables/usePageLoader';
+export { useTheme } from '../composables/useTheme';
 export { default as apiClient } from '../utils/apiClient';
 export { getAuthToken, requestInterceptor, responseInterceptor, errorInterceptor, RequestInterceptorConfig } from '../utils/interceptors';
 export { getProvinces, getCitiesByProvinceName, getCitiesByProvinceCode, getAreasByCityName, getStreetsByAreaName, getRegionDetails, validateRegion, searchRegions, getFullAddress, getRegionTree, Province, City, Area, RegionItem } from '../utils/regions';

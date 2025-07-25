@@ -184,6 +184,7 @@ declare global {
   const useSlots: typeof import('../../node_modules/vue')['useSlots']
   const useState: typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']
   const useTemplateRef: typeof import('../../node_modules/vue')['useTemplateRef']
+  const useTheme: typeof import('../../composables/useTheme')['useTheme']
   const useTransitionState: typeof import('../../node_modules/vue')['useTransitionState']
   const useUserStore: typeof import('../../stores/user')['useUserStore']
   const validateRegion: typeof import('../../utils/regions')['validateRegion']
@@ -403,6 +404,7 @@ declare module 'vue' {
     readonly useSlots: UnwrapRef<typeof import('../../node_modules/vue')['useSlots']>
     readonly useState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']>
     readonly useTemplateRef: UnwrapRef<typeof import('../../node_modules/vue')['useTemplateRef']>
+    readonly useTheme: UnwrapRef<typeof import('../../composables/useTheme')['useTheme']>
     readonly useTransitionState: UnwrapRef<typeof import('../../node_modules/vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/user')['useUserStore']>
     readonly validateRegion: UnwrapRef<typeof import('../../utils/regions')['validateRegion']>
